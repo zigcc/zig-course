@@ -1,10 +1,12 @@
 {
   "scripts": {
-    "docs:dev": "vitepress dev learn",
-    "docs:build": "vitepress build learn",
-    "docs:preview": "vitepress preview learn"
+    "format": "prettier --write .",
+    "dev": "vitepress dev learn",
+    "build": "vitepress build learn",
+    "preview": "vitepress preview learn"
   },
   "devDependencies": {
+    "prettier": "^3.0.3",
     "vitepress": "^1.0.0-rc.11"
   }
 }
