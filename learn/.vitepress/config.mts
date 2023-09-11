@@ -3,7 +3,7 @@ import { defineConfig } from "vitepress";
 export default defineConfig({
   lang: "zh-CN",
   title: "Learn Zig",
-  description: "简单、快速地学习Zig",
+  description: "简单、快速地学习 Zig",
   themeConfig: {
     search: {
       provider: "local",
@@ -30,14 +30,18 @@ export default defineConfig({
     },
     nav: [
       { text: "主页", link: "/" },
-      { text: "Examples", link: "/markdown-examples" },
+      { text: "关于", link: "/about/" },
     ],
 
     sidebar: [
       {
-        text: "Examples",
+        text: "什么是 Zig ？",
+        link: "/what-is-zig",
+      },
+      {
+        text: "基础学习",
         items: [
-          { text: "Markdown Examples", link: "/markdown-examples" },
+          { text: "安装 Zig 环境", link: "/basic/install-environment" },
           { text: "Runtime API Examples", link: "/api-examples" },
         ],
       },
