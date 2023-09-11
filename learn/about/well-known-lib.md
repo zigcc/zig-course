@@ -20,3 +20,4 @@ outline: deep
 - **[LoLa](https://github.com/MasterQ32/LoLa)**: 适用于游戏的小型脚本语言
 - **[tigerbeetle](https://github.com/tigerbeetle/tigerbeetle)**: 专为关键任务安全性和性能而设计的分布式财务会计数据库
 - **[zig-sqlite](https://github.com/vrischmann/zig-sqlite)**: 对 sqlite 的 C API包装库
+- **[duckdb](https://github.com/beachglasslabs/duckdb.zig)**: 对 duckdb 的 API 包裹
