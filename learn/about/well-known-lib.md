@@ -4,7 +4,7 @@ outline: deep
 
 # 第三方库
 
-这里列出一些比较著名的 Zig 第三方库， 你可以进行参考和学习
+这里列出一些仍在积极维护的 Zig 第三方库，你可以进行参考和学习
 
 - **[zap](https://github.com/zigzap/zap)**： 速度极快的 zig 后端开发库
 - **[capy](https://github.com/capy-ui/capy)**： 依托于 GTK3 的强大的 GUI 库
