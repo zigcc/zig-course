@@ -8,6 +8,7 @@ export default defineConfig({
     search: {
       provider: "local",
       options: {
+        detailedView: true,
         locales: {
           zh: {
             translations: {
@@ -39,10 +40,22 @@ export default defineConfig({
         link: "/what-is-zig",
       },
       {
+        text: "环境配置",
+        items: [
+          {
+            text: "安装 Zig 环境",
+            link: "/basic/install-environment",
+          },
+          { text: "编辑器选择", link: "/basic/editor.md" },
+        ],
+      },
+      {
         text: "基础学习",
         items: [
-          { text: "安装 Zig 环境", link: "/basic/install-environment" },
-          { text: "Runtime API Examples", link: "/api-examples" },
+          {
+            text: "安装 Zig 环境",
+            link: "/basic/install-environment",
+          },
         ],
       },
     ],

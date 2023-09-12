@@ -8,7 +8,7 @@ hero:
   actions:
     - theme: brand
       text: 📖 开始阅读
-      link: /markdown-examples
+      link: /what-is-zig
     - theme: alt
       text: 🌐 Zig官网
       link: https://ziglang.org/
