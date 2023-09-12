@@ -36,7 +36,7 @@ Neovim：[https://github.com/neovim/neovim](https://github.com/neovim/neovim)
 
 ::: details
 
-推荐关闭 vim / neovim 的保存自动格式化功能（默认开始）：
+推荐关闭 vim / neovim 的保存自动格式化功能（默认开启）：
 
 ```sh
 # for vim
