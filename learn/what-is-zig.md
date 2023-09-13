@@ -43,7 +43,7 @@ _Zig 会要求你显示传递和管理你的内存，并且编译时就会跟踪
 
 ## 了解更多 ？
 
-查看[这里](about/well-known-lib.html)，列出了一些积极维护的 zig 库或者实现
+查看[这里](appendix/well-known-lib.html)，列出了一些积极维护的 zig 库或者实现
 
 以下列出了，可以在线执行 zig 的平台：
 
