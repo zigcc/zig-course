@@ -86,6 +86,12 @@ pub fn main() !void {
 
 此时我们就分别得到了使用缓冲区的 `stdout` 和 `stderr`， 性能更高了！
 
-## 再进一步？
+## 更进一步？
 
-TODO
+上面我们已经完成了带有缓冲区的“打印”，这很棒！
+
+但是，它还没有多线程支持，所以我们可能需要添加一个**锁**来保证打印函数的先后执行顺序，你可以使用 `std.Thread.Mutex`，它的文档在[这里](https://ziglang.org/documentation/master/std/#A;std:Thread.Mutex)，但我更推荐你结合标准库的源码来了解它。
+
+## 了解更多？
+
+如果你想了解更多内容，可以看一看这个视频 [Advanced Hello World in Zig - Loris Cro](https://youtu.be/iZFXAN8kpPo?si=WNpp3t42LPp1TkFI)
