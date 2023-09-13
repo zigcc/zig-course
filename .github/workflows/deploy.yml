@@ -47,4 +47,4 @@ jobs:
           external_repository: learnzig/learnzig.github.io
           publish_branch: main # default: gh-pages
           publish_dir: ./learn/.vitepress/dist
-          cname: blog.nvimer.org
+          cname: learnzig.nvimer.org
