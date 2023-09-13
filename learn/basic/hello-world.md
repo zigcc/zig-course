@@ -6,6 +6,8 @@ outline: deep
 
 我相信你一定是从 `Hello, World!` 开始学习其他语言的，在这里我们也不例外，我们来通过一个简单的程序，来向 zig 的世界打一声招呼！
 
+先使用 `zig init-exe` 命令初始化一个项目，再将以下内容覆写到 `src/main.zig` 中。
+
 ```zig
 const std = @import("std");
 

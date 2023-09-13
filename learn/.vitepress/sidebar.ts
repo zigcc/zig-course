@@ -21,6 +21,10 @@ export default [
         text: "编辑器选择",
         link: "/environment/editor.md",
       },
+      {
+        text: "zig 命令",
+        link: "/environment/zig-command",
+      },
     ],
   },
   {
