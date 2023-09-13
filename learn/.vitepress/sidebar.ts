@@ -39,10 +39,10 @@ export default [
   {
     text: "进阶学习",
     items: [
-      // {
-      // 	text: "安装 Zig 环境",
-      // 	link: "/basic/install-environment",
-      // },
+      {
+        text: "构建系统",
+        link: "/advanced/build-system",
+      },
     ],
   },
   {
