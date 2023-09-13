@@ -45,8 +45,12 @@ export default [
     text: "附录",
     items: [
       {
+        text: "社区",
+        link: "/appendix/community",
+      },
+      {
         text: "zig 第三方库",
-        link: "/about/well-known-lib",
+        link: "/appendix/well-known-lib",
       },
     ],
   },
