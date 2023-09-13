@@ -21,3 +21,10 @@ outline: deep
 - **[tigerbeetle](https://github.com/tigerbeetle/tigerbeetle)**: 专为关键任务安全性和性能而设计的分布式财务会计数据库
 - **[zig-sqlite](https://github.com/vrischmann/zig-sqlite)**: 对 sqlite 的 C API包装库
 - **[duckdb](https://github.com/beachglasslabs/duckdb.zig)**: 对 duckdb 的 API 包裹
+- **[legend-of-swarkland](https://github.com/thejoshwolfe/legend-of-swarkland)**: 游戏，斯沃克兰的传说
+- **[pacman](https://github.com/floooh/pacman.zig)**: 吃豆人游戏的 zig 版本
+- **[tetris](https://github.com/andrewrk/tetris)**: 使用 zig 编写的俄罗斯方块
+- **[bun](https://github.com/oven-sh/bun)**: 使用 zig 编写的 js 运行时，原生支持 ts 和包管理
+- **[river](https://github.com/riverwm/river)**: 使用 zig 编写的窗口管理器
+- **[minisign](https://github.com/jedisct1/zig-minisign)**: zig 实现的 minisign
+- **[zig-gamedev](https://github.com/michal-z/zig-gamedev)**: zig 的游戏生态库
