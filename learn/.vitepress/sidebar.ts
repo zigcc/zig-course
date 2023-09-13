@@ -53,7 +53,7 @@ export default [
         link: "/appendix/community",
       },
       {
-        text: "zig 第三方库",
+        text: "第三方库",
         link: "/appendix/well-known-lib",
       },
     ],
