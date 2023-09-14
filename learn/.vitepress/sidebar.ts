@@ -3,7 +3,7 @@ import { DefaultTheme } from "vitepress";
 export default [
   {
     text: "前言",
-    link: "/preface",
+    link: "/prologue",
   },
   {
     text: "什么是 Zig ？",
@@ -19,7 +19,7 @@ export default [
       },
       {
         text: "编辑器选择",
-        link: "/environment/editor.md",
+        link: "/environment/editor",
       },
       {
         text: "zig 命令",
@@ -34,11 +34,19 @@ export default [
         text: "Hello World",
         link: "/basic/hello-world",
       },
+      {
+        text: "变量声明",
+        link: "/basic/define-variable",
+      },
     ],
   },
   {
     text: "进阶学习",
     items: [
+      {
+        text: "容器",
+        link: "/advanced/container",
+      },
       {
         text: "构建系统",
         link: "/advanced/build-system",
@@ -48,6 +56,10 @@ export default [
   {
     text: "附录",
     items: [
+      // {
+      //   text: "后记",
+      //   link: "/epilogue",
+      // },
       {
         text: "社区",
         link: "/appendix/community",
