@@ -38,6 +38,10 @@ export default [
         text: "变量声明",
         link: "/basic/define-variable",
       },
+      {
+        text: "数值类型",
+        link: "/basic/number",
+      },
     ],
   },
   {
