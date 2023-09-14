@@ -54,7 +54,7 @@ export default [
     items: [
       {
         text: "构建系统",
-        link: "/advanced/build-system",
+        link: "/engineering/build-system",
       },
     ],
   },
