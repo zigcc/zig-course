@@ -47,6 +47,11 @@ export default [
         text: "容器",
         link: "/advanced/container",
       },
+    ],
+  },
+  {
+    text: "工程化",
+    items: [
       {
         text: "构建系统",
         link: "/advanced/build-system",
