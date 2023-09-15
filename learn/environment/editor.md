@@ -36,7 +36,7 @@ Neovim：[https://github.com/neovim/neovim](https://github.com/neovim/neovim)
 
 推荐安装插件 [zig.vim](https://github.com/ziglang/zig.vim)，由官方维护。
 
-::: details
+::: details 小细节
 
 推荐关闭 vim / neovim 的保存自动格式化功能（默认开启）：
 
@@ -52,7 +52,7 @@ vim.g.zig_fmt_autosave = false
 
 如果使用`coc.nvim`作为 _language server_，则推荐使用 [**coc-zls**](https://github.com/xiyaowong/coc-zls)，会自动下载最新的zls并配置好，如果使用 **neovim** 的内置 LSP 功能，则推荐使用 [**mason.nvim**](https://github.com/williamboman/mason.nvim) 和 [**mason-lspconfig.nvim**](https://github.com/williamboman/mason-lspconfig.nvim)。
 
-::: tip
+::: tip 🅿️ 提示
 mason 所安装的 zls 为稳定版本，如果需要 `nightly` 版本，则需要克隆最新版的源码进行编译，具体可以参照如下：
 
 ```sh
@@ -82,6 +82,6 @@ Emacs 也可以使用 [lsp-mode](https://github.com/emacs-lsp/lsp-mode) 来使�
 
 经典的编辑器，插件也是由 zig 官方维护：[sublime-zig-language](https://github.com/ziglang/sublime-zig-language)，安装即可。
 
-::: danger
+::: danger ⛔ 危险
 值得注意的是，该插件已经有两年无人维护！
 :::
