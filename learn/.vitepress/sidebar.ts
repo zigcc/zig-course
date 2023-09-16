@@ -42,6 +42,10 @@ export default [
         text: "数值类型",
         link: "/basic/number",
       },
+      {
+        text: "字符与布尔值",
+        link: "/basic/char-and-boolean",
+      },
     ],
   },
   {
