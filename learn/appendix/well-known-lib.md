@@ -7,6 +7,8 @@ outline: deep
 这里列出一些仍在积极维护的 Zig 第三方库，你可以进行参考和学习
 
 - **[zap](https://github.com/zigzap/zap)**： 速度极快的 zig 后端开发库
+- **[bun](https://github.com/oven-sh/bun)**: 使用 zig 编写的 js 运行时，原生支持 ts 和包管理
+- **[mach](https://machengine.org/)**：zig 的游戏引擎和图形套件
 - **[capy](https://github.com/capy-ui/capy)**： 依托于 GTK3 的强大的 GUI 库
 - **[zld](https://github.com/kubkon/zld)**: zig 实现的 LD 的替代品
 - **[zls](https://github.com/zigtools/zls)**: zig的 language server 实现
@@ -24,7 +26,6 @@ outline: deep
 - **[legend-of-swarkland](https://github.com/thejoshwolfe/legend-of-swarkland)**: 游戏，斯沃克兰的传说
 - **[pacman](https://github.com/floooh/pacman.zig)**: 吃豆人游戏的 zig 版本
 - **[tetris](https://github.com/andrewrk/tetris)**: 使用 zig 编写的俄罗斯方块
-- **[bun](https://github.com/oven-sh/bun)**: 使用 zig 编写的 js 运行时，原生支持 ts 和包管理
 - **[river](https://github.com/riverwm/river)**: 使用 zig 编写的窗口管理器
 - **[minisign](https://github.com/jedisct1/zig-minisign)**: zig 实现的 minisign
 - **[zig-gamedev](https://github.com/michal-z/zig-gamedev)**: zig 的游戏生态库
