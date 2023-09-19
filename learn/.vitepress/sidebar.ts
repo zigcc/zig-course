@@ -86,7 +86,16 @@ export default [
       {
         text: "流程控制",
         collapsed: true,
-        items: [],
+        items: [
+          {
+            text: "条件",
+            link: "/basic/process_control/decision",
+          },
+          {
+            text: "循环",
+            link: "/basic/process_control/loop",
+          },
+        ],
       },
       {
         text: "可选类型",
