@@ -4,4 +4,261 @@ outline: deep
 
 # 指针
 
-TODO
+> zig 作为一门 low level 语言，那肯定要有指针的。
+
+指针是指向一块内存区域地址的变量，它存储了一个地址，我们可以通过指针来操作其指向内存区域。
+
+**取地址**：通过 `&` 符号来获取某个变量所对应的内存地址，如 `&integer` 就是获取变量 `integer` 的内存地址。
+
+zig 的指针和 C 的指针略有不同，包含两种指针，一种单项（single-item）指针，一种是多项（many-item）指针，它们的解引用的方式也略有不同。
+
+:::warning 关于指针运算
+
+zig 本身支持指针运算，但有一点需要注意：最好将指针分配给 `[*]T` 类型后再进行计算。
+
+尤其是在切片中，不可直接对其指针进行更改，这会破坏切片的内部结构！
+
+:::
+
+## 单项指针
+
+单项指针指向单个元素。
+
+单项指针的类型为：`*T`，`T`是所指向内存区域的类型，解引用方法是 `ptr.*`。
+
+:::details 示例
+
+```zig
+const print = @import("std").debug.print;
+
+pub fn main() !void {
+    var integer: i16 = 666;
+    const ptr = &integer;
+    ptr.* = ptr.* + 1;
+
+    print("{}\n", .{integer});
+}
+```
+
+:::
+
+## 多项指针
+
+多项指针指向位置数量的多个元素。
+
+多项指针的类型为：`[*]T`，`T`是所指向内存区域的类型，且该类型必须具有明确的大小（这意味着它不能是 [`anyopaque`](https://ziglang.org/documentation/0.11.0/#toc-C-Type-Primitives) 和其他任意[不透明类型](https://ziglang.org/documentation/0.11.0/#opaque)）。
+
+解引用方法支持以下几种：
+
+- 索引语法 `ptr[i]`
+- 切片语法 `ptr[start..end]`
+- 指针运算 `ptr + x`，`ptr - x`
+
+:::details 示例
+
+```zig
+const print = @import("std").debug.print;
+
+pub fn main() !void {
+    const array = [_]i32{ 1, 2, 3, 4 };
+    var ptr: [*]const i32 = &array;
+
+    print("第一个元素：{}\n", .{ptr[0]});
+}
+```
+
+:::
+
+:::info 🅿️ 提示
+
+对于数组和切片，它们也有对应的指针类型。
+
+数组：`*[N]T`，N是数组的长度，它相当于一个指向数组的单项指针。
+
+切片：`[]T`，它相当于一个胖指针，包含了一个 指针类型 `[*]T` 和 长度。
+
+数组和切片的指针都存储了长度，因此它们除了指针默认的语法外，还有一个额外的语法 `ptr.len`，用来获取它们的长度。
+
+:::details 示例
+
+```zig
+const print = @import("std").debug.print;
+
+pub fn main() !void {
+    var array = [_]i32{ 1, 2, 3, 4 };
+    var arr_ptr: *const [4]i32 = &array;
+
+    print("数组第一个元素为：{}\n", .{arr_ptr[0]});
+    print("数组长度为：{}\n", .{arr_ptr.len});
+
+    var slice = array[1 .. array.len - 1];
+    var slice_ptr: []i32 = slice;
+
+    print("切片第一个元素为：{}\n", .{slice_ptr[0]});
+    print("切片长度为：{}\n", .{slice_ptr.len});
+}
+```
+
+:::
+
+### 哨兵指针
+
+哨兵指针就和哨兵数组类似，我们使用语法 `[*:x]T`，这个指针标记了边界的值，故称为“哨兵”。
+
+它的长度有标记值 `x` 来确定，这样做的好处就是提供了针对缓冲区溢出和过度读取的保护。
+
+:::details 示例
+
+我们接下来演示一个示例，该示例中使用了 zig 可以无缝与 C 交互的特性，故你可以暂时略过这里！
+
+```zig
+const std = @import("std");
+
+// 我们也可以用 std.c.printf 代替
+pub extern "c" fn printf(format: [*:0]const u8, ...) c_int;
+
+pub fn main() anyerror!void {
+    _ = printf("Hello, world!\n"); // OK
+}
+```
+
+以上代码编译需要额外连接 libc ，你只需要在你的 `build.zig` 中添加 `exe.linkLibC();` 即可。
+
+:::
+
+## 额外特性
+
+以下的是指针的额外特性，初学者可以直接略过以下部分，等到你需要时再来学习即可！
+
+### `volatile`
+
+> 如果不知道什么是指针操作的“ _副作用_ ”，那么这里你可以略过，等你需要时再来查看！
+
+对指针的操作应假定为没有副作用。如果存在副作用，例如使用内存映射输入输出（Memory Mapped Input/Output），则需要使用 `volatile` 关键字来修饰。
+
+在以下代码中，保证使用 `mmio_ptr` 的值进行操作（这里你看起来可能会感到迷惑，在编译代码时，可以能会对值进行缓存，这里保证每次都使用 `mmio_ptr` 的值，以避免没有触发 “副作用”），并保证了代码执行的顺序。
+
+```zig
+// 在这里我们使用了单元测试功能
+const expect = @import("std").testing.expect;
+
+test "volatile" {
+    const mmio_ptr: *volatile u8 = @ptrFromInt(0x12345678);
+    try expect(@TypeOf(mmio_ptr) == *volatile u8);
+}
+```
+
+该节内容，仅仅讲述的少量内容，如果要了解更多，你可能需要查看[官方文档](https://ziglang.org/documentation/0.11.0/#toc-volatile)！
+
+### 对齐
+
+> 如果你不知道内存对齐的含义是什么，那么本节内容你可以跳过了，等到你需要时再来查看！
+
+每种类型都有一个对齐方式——数个字节，这样，当从内存加载或存储该类型的值时，内存地址必须能被该数字整除。我们可以使用 `@alignOf` 找出任何类型的内存对齐大小。
+
+内存对齐大小取决于 CPU 架构，但始终是 2 的幂，并且小于 1 << 29。
+
+在 Zig 中，指针类型具有对齐值。如果该值等于基础类型的对齐方式，则可以从类型中省略它：
+
+```zig
+const std = @import("std");
+const builtin = @import("builtin");
+const expect = std.testing.expect;
+
+test "variable alignment" {
+    var x: i32 = 1234;
+    // 获取内存对齐信息
+    const align_of_i32 = @alignOf(@TypeOf(x));
+    // 尝试比较类型
+    try expect(@TypeOf(&x) == *i32);
+    // 尝试在设置内存对齐后再进行类型比较
+    try expect(*i32 == *align(align_of_i32) i32);
+
+    if (builtin.target.cpu.arch == .x86_64) {
+        // 获取了 x86_64 架构的指针对齐大小
+        try expect(@typeInfo(*i32).Pointer.alignment == 4);
+    }
+}
+```
+
+:::info 🅿️ 提示
+
+和 `*i32` 类型可以强制转换为 `*const i32` 类型类似，具有较大对齐大小的指针可以隐式转换为具有较小对齐大小的指针，但反之则不然。
+
+如果有一个指针或切片的对齐方式较小，但知道它实际上具有较大的对齐方式，请使用 `@alignCast` 将指针更改为更对齐的指针，例如：`@as([]align(4) u8, @alignCast(slice4))`，这在运行时无操作，但插入了安全检查。
+
+:::details 示例
+
+```zig
+const expect = @import("std").testing.expect;
+
+var foo: u8 align(4) = 100;
+
+test "global variable alignment" {
+    try expect(@typeInfo(@TypeOf(&foo)).Pointer.alignment == 4);
+    try expect(@TypeOf(&foo) == *align(4) u8);
+    const as_pointer_to_array: *align(4) [1]u8 = &foo;
+    const as_slice: []align(4) u8 = as_pointer_to_array;
+    const as_unaligned_slice: []u8 = as_slice;
+    try expect(as_unaligned_slice[0] == 100);
+}
+
+fn derp() align(@sizeOf(usize) * 2) i32 {
+    return 1234;
+}
+fn noop1() align(1) void {}
+fn noop4() align(4) void {}
+
+test "function alignment" {
+    try expect(derp() == 1234);
+    try expect(@TypeOf(noop1) == fn () align(1) void);
+    try expect(@TypeOf(noop4) == fn () align(4) void);
+    noop1();
+    noop4();
+}
+```
+
+:::
+
+### 零指针
+
+零指针实际上是一个未定义的错误行为（[Pointer Cast Invalid Null](https://ziglang.org/documentation/0.11.0/#Pointer-Cast-Invalid-Null)），但是当我们给指针增加上 `allowzero` 修饰符后，它就变成合法的行为了！
+
+:::warning 关于零指针的使用
+
+请只在目标 OS 为 `freestanding` 时使用零指针，如果想表示 `null` 指针，请使用[可选类型](/basic/optional_type)！
+
+:::
+
+:::details 示例
+
+```zig
+const std = @import("std");
+const expect = std.testing.expect;
+
+test "allowzero" {
+    var zero: usize = 0;
+    var ptr: *allowzero i32 = @ptrFromInt(zero);
+    try expect(@intFromPtr(ptr) == 0);
+}
+```
+
+:::
+
+### 编译期
+
+只要代码不依赖于未定义的内存布局，那么指针也可以在编译期发挥作用！
+
+```zig
+const expect = @import("std").testing.expect;
+
+test "comptime pointers" {
+    comptime {
+        var x: i32 = 1;
+        const ptr = &x;
+        ptr.* += 1;
+        x += 1;
+        try expect(ptr.* == 3);
+    }
+}
+```
