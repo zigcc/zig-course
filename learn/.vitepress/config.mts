@@ -7,7 +7,14 @@ export default defineConfig({
   lang: "zh-CN",
   title: "Learn Zig",
   description: "简单、快速地学习 Zig",
+  sitemap: {
+    hostname: "https://learnzig.nvimer.org/",
+  },
+  lastUpdated: true,
   themeConfig: {
+    editLink: {
+      pattern: "https://github.com/learnzig/learnzig/tree/main/learn/:path",
+    },
     search: {
       provider: "local",
       // options: {
