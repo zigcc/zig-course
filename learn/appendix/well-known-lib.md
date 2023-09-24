@@ -9,7 +9,7 @@ outline: deep
 - **[zap](https://github.com/zigzap/zap)**： 速度极快的 zig 后端开发库
 - **[bun](https://github.com/oven-sh/bun)**: 使用 zig 编写的 js 运行时，原生支持 ts 和包管理
 - **[mach](https://machengine.org/)**：zig 的游戏引擎和图形套件
-- **[capy](https://github.com/capy-ui/capy)**： 依托于 GTK3 的强大的 GUI 库
+- **[capy](https://github.com/capy-ui/capy)**： 依托于 GTK4 的强大的 GUI 库
 - **[zld](https://github.com/kubkon/zld)**: zig 实现的 LD 的替代品
 - **[zls](https://github.com/zigtools/zls)**: zig的 language server 实现
 - **[dt](https://github.com/so-dang-cool/dt)**: 用于 unix 的 pipe
