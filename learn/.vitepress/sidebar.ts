@@ -102,12 +102,12 @@ export default [
         ],
       },
       {
-        text: "可选类型",
-        link: "/basic/optional_type",
-      },
-      {
         text: "联合类型",
         link: "/basic/union",
+      },
+      {
+        text: "可选类型",
+        link: "/basic/optional_type",
       },
       {
         text: "错误处理",
