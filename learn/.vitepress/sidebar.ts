@@ -95,11 +95,19 @@ export default [
             text: "循环",
             link: "/basic/process_control/loop",
           },
+          {
+            text: "switch匹配",
+            link: "/basic/process_control/switch",
+          },
         ],
       },
       {
         text: "可选类型",
         link: "/basic/optional_type",
+      },
+      {
+        text: "联合类型",
+        link: "/basic/union",
       },
       {
         text: "错误处理",
