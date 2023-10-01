@@ -22,7 +22,7 @@ outline: deep
 
 ::: code-group
 
-```zig [结构体]
+```zig [default]
 const Circle = struct {
     radius: u8,
 
@@ -38,7 +38,7 @@ const Circle = struct {
 };
 ```
 
-```zig [完整示例]
+```zig [more]
 const std = @import("std");
 
 const Circle = struct {
@@ -77,7 +77,7 @@ pub fn main() void {
 
 ::: code-group
 
-```zig [结构体]
+```zig [default]
 const User = struct {
     userName: []u8,
     password: []u8,
@@ -112,7 +112,7 @@ const User = struct {
 };
 ```
 
-```zig [完整示例]
+```zig [more]
 const std = @import("std");
 
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -260,13 +260,13 @@ const x = Foo{
 
 ::: code-group
 
-```zig [结构体]
+```zig [default]
 const Empty = struct {
     // const PI = 3.14;
 };
 ```
 
-```zig [完整示例]
+```zig [more]
 const std = @import("std");
 
 const Empty = struct {
@@ -468,7 +468,7 @@ test "overaligned pointer to packed struct" {
 
 ::: code-group
 
-```zig [源代码]
+```zig [default]
 const std = @import("std");
 
 pub fn main() void {
@@ -485,7 +485,7 @@ fn List(comptime T: type) type {
 }
 ```
 
-```sh [输出]
+```sh [output]
 variable: struct_name.main.Foo
 anonymous: struct_name.main__struct_3509
 function: struct_name.List(i32)

@@ -29,13 +29,13 @@ zig 中的三元表达式是通过 `if else` 来实现的：
 
 ::: code-group
 
-```zig [简略]
+```zig [default]
 const a: u32 = 5;
 const b: u32 = 4;
 const result = if (a != b) 47 else 3089;
 ```
 
-```zig [完整]
+```zig [more]
 const print = @import("std").debug.print;
 
 pub fn main() !void {
