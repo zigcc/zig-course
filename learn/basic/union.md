@@ -25,7 +25,6 @@ var payload_1: Payload = .{ .int = 1234 };
 print("{}\n",.{payload.int});
 ```
 
-
 ```zig [more]
 const print = @import("std").debug.print;
 
@@ -38,14 +37,14 @@ const Payload = union {
 pub fn main() !void {
     var payload = Payload{ .int = 1234 };
     var payload_1: Payload = .{ .int = 1234 };
-    
+
     print("{}\n", .{payload.int});
 }
 ```
 
 :::
 
-:::info
+:::info 🅿️ 提示
 
 需要注意的是，zig 不保证普通联合类型在内存中的表现形式！如果有需要，可以使用 `extern union` 或者 `packed union` 来保证它遵守 c 的规则。
 
