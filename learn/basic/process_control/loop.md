@@ -329,11 +329,13 @@ fn typeNameLength(comptime T: type) usize {
 :::
 
 :::info 🅿️ 提示
+
 建议以下情况使用内联 while：
 
 - 需要在编译期执行循环
 - 你确定展开后会代码效率会更高
-  :::
+
+:::
 
 ### 解构可选类型
 
