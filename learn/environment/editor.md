@@ -53,7 +53,11 @@ vim.g.zig_fmt_autosave = false
 如果使用`coc.nvim`作为 _language server_，则推荐使用 [**coc-zls**](https://github.com/xiyaowong/coc-zls)，会自动下载最新的zls并配置好，如果使用 **neovim** 的内置 LSP 功能，则推荐使用 [**mason.nvim**](https://github.com/williamboman/mason.nvim) 和 [**mason-lspconfig.nvim**](https://github.com/williamboman/mason-lspconfig.nvim)。
 
 ::: tip 🅿️ 提示
-mason 所安装的 zls 为稳定版本，如果需要 `nightly` 版本，则需要克隆最新版的源码进行编译，具体可以参照如下：
+mason 所安装的 zls 为稳定版本，如果需要 `nightly` 版本，有两种方案可以选择，一是安装zig.nvim插件，或者手动编译。
+
+- Zig.nvim插件的仓库地址为：[jinzhongjia/Zig.nvim](https://github.com/jinzhongjia/Zig.nvim)
+
+- 手动编译安装的方法如下：
 
 ```sh
 # 单独创建一个source目录
