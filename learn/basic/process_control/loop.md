@@ -339,4 +339,82 @@ fn typeNameLength(comptime T: type) usize {
 
 ### 解构可选类型
 
-### 结构错误联合类型
+像 `if` 一样，`while` 也会尝试解构可选类型，并在遇到 `null` 时终止循环。
+
+::: code-group
+
+```zig [default]
+while (eventuallyNullSequence()) |value| {
+    sum2 += value;
+} else {
+    std.debug.print("meet a null\n", .{});
+}
+// 还可以使用else分支，碰到第一个 null 时触发并退出循环
+```
+
+```zig [more]
+const std = @import("std");
+
+var numbers_left: u32 = undefined;
+fn eventuallyNullSequence() ?u32 {
+    return if (numbers_left == 0) null else blk: {
+        numbers_left -= 1;
+        break :blk numbers_left;
+    };
+}
+
+pub fn main() !void {
+    var sum2: u32 = 0;
+    numbers_left = 3;
+    while (eventuallyNullSequence()) |value| {
+        sum2 += value;
+    } else {
+        std.debug.print("meet a null\n", .{});
+    }
+    // 还可以使用else分支，碰到第一个 null 时触发并退出循环
+}
+```
+
+:::
+
+当 `|x|` 语法出现在 `while` 表达式上，`while` 条件必须是可选类型。
+
+### 解构错误联合类型
+
+和上面类似，同样可以解构错误联合类型，`while` 分别会捕获错误和有效负载，当错误发生时，转到 `else` 分支执行，并退出：
+
+::: code-group
+
+```zig [default]
+while (eventuallyErrorSequence()) |value| {
+    sum1 += value;
+} else |err| {
+    std.debug.print("meet a err: {}\n", .{err});
+}
+```
+
+```zig [more]
+const std = @import("std");
+var numbers_left: u32 = undefined;
+
+fn eventuallyErrorSequence() anyerror!u32 {
+    return if (numbers_left == 0) error.ReachedZero else blk: {
+        numbers_left -= 1;
+        break :blk numbers_left;
+    };
+}
+
+pub fn main() !void {
+    var sum1: u32 = 0;
+    numbers_left = 3;
+    while (eventuallyErrorSequence()) |value| {
+        sum1 += value;
+    } else |err| {
+        std.debug.print("meet a err: {}\n", .{err});
+    }
+}
+```
+
+当 `else |x|` 时语法出现在 `while` 表达式上，`while` 条件必须是错误联合类型。
+
+:::
