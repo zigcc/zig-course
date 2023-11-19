@@ -29,7 +29,7 @@ export default [
   },
   {
     text: "Hello World",
-    link: "/basic/hello-world",
+    link: "/hello-world",
   },
   {
     text: "基础学习",
