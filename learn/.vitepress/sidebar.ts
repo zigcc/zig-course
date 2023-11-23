@@ -66,6 +66,10 @@ export default [
             link: "/basic/advanced_type/array",
           },
           {
+            text: "向量",
+            link: "/basic/advanced_type/vector",
+          },
+          {
             text: "指针",
             link: "/basic/advanced_type/pointer",
           },

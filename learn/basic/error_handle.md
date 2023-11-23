@@ -12,6 +12,8 @@ outline: deep
 
 :::
 
+## 基本使用
+
 以下展示了 error 的基本定义和使用：
 
 ```zig

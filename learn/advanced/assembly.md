@@ -122,8 +122,8 @@ asm volatile ("assembly code"
 
 ```asm
 # 别忘记三个冒号，即便对应的部分不存在也需要有冒号
-AssemblerTemplate 
-: OutputOperands 
+AssemblerTemplate
+: OutputOperands
 [ : InputOperands
 [ : Clobbers ] ]
 ```
