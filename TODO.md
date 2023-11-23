@@ -1,2 +1,4 @@
-- 关于容器的说明
 - 浮点的optimized说明，和关于向量浮点reduce的情况
+- 关于块的定义
+- unreachable
+- noreturn

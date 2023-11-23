@@ -85,6 +85,10 @@ export default [
             text: "枚举",
             link: "/basic/advanced_type/enum",
           },
+          {
+            text: "opaque",
+            link: "/basic/advanced_type/opaque",
+          },
         ],
       },
       {
@@ -106,6 +110,14 @@ export default [
           {
             text: "switch匹配",
             link: "/basic/process_control/switch",
+          },
+          {
+            text: "defer",
+            link: "/basic/process_control/defer",
+          },
+          {
+            text: "unreachable",
+            link: "/basic/process_control/unreachable",
           },
         ],
       },
@@ -171,6 +183,9 @@ export default [
     items: [
       {
         text: "什么是“命名空间”",
+      },
+      {
+        text: "函数反射",
       },
       {
         text: "零位类型",

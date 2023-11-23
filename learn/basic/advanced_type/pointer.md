@@ -42,6 +42,12 @@ pub fn main() !void {
 
 :::
 
+:::info 🅿️ 提示
+
+函数指针略有特殊：`const Call2Op = *const fn (a: i8, b: i8) i8;`
+
+:::
+
 ## 多项指针
 
 多项指针指向位置数量的多个元素。

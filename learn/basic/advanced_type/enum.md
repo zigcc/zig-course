@@ -134,7 +134,9 @@ const Number = enum(u8) {
 
 ## extern
 
-注意哈，我们不在这里使用 `extern` 关键字，默认情况下，zig 不保证枚举和 C ABI 兼容，但是我们可以通过指定序列类型来达到这一效果：
+注意，我们不在这里使用 `extern` 关键字。
+
+默认情况下，zig 不保证枚举和 C ABI 兼容，但是我们可以通过指定序列类型来达到这一效果：
 
 ```zig
 const Foo = enum(c_int) { a, b, c };
