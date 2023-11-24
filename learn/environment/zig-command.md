@@ -27,6 +27,12 @@ outline: deep
     └── main.zig
 ```
 
+::: warning
+
+当前 `nightly` 版本的 zig 已经将 `zig init-exe` 和 `zig init-lib` 合并为一个命令 `zig init`。
+
+:::
+
 ## `zig init-lib`
 
 如果你想写一个 zig 的库，那么可以使用该命令，在当前路径下创建 `src/main.zig` 和 `build.zig` 两个文件。
@@ -42,6 +48,12 @@ outline: deep
     └── main.zig
 ```
 
+::: warning
+
+当前 `nightly` 版本的 zig 已经将 `zig init-exe` 和 `zig init-lib` 合并为一个命令 `zig init`。
+
+:::
+
 ## `zig ast-check`
 
 对指定文件进行AST语法检查，支持指定文件和标准输入。
@@ -53,3 +65,16 @@ outline: deep
 ## `zig test`
 
 对指定的源文件运行test,适用于单元测试。
+
+## `zig fetch`
+
+::: warning
+
+该命令为 `nightly` 版本加入，用于将包添加到全局缓存并打印包的hash。
+
+:::
+
+```sh
+$ zig fetch https://github.com/limine-bootloader/limine-zig/archive/trunk.tar.gz
+12202809180bab2c7ae3382781b2fc65395e74b49d99ff2595f3fea9f7cf66cfa963
+```
