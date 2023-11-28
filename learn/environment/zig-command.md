@@ -78,3 +78,11 @@ outline: deep
 $ zig fetch https://github.com/limine-bootloader/limine-zig/archive/trunk.tar.gz
 12202809180bab2c7ae3382781b2fc65395e74b49d99ff2595f3fea9f7cf66cfa963
 ```
+
+当然如果你想将包直接添加到 `zon` 中，你可以附加 `--save` 参数来实现效果：
+
+```zig
+zig fetch --save https://github.com/limine-bootloader/limine-zig/archive/trunk.tar.gz
+// 当包提供 name 时，会自动使用包的 name
+// 当然，你也可以指定包的 name，使用 --save=limine
+```
