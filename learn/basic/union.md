@@ -52,25 +52,29 @@ pub fn main() !void {
 
 :::
 
-## 枚举标记
+如果要初始化一个在编译期已知的字段名的联合类型，可以使用 [`@unionInit`](https://ziglang.org/documentation/master/#unionInit)：
 
-联合类型可以在定义时使用枚举进行标记，类似[标记枚举](advanced_type/enum#标记类型)。你可以通过 `@as` 函数将联合类型作为声明的枚举来使用。
+```zig
+@unionInit(comptime Union: type, comptime active_field_name: []const u8, init_expr) Union
+```
+
+```zig
+const Payload = union {
+    int: i64,
+    float: f64,
+    boolean: bool,
+};
+// 通过 @unionInit 初始化一个联合类型
+const payload = @unionInit(Payload, "int", 666);
+```
+
+## 标记联合
+
+联合类型可以在定义时使用枚举进行标记，通过 `@as` 函数将联合类型作为声明的枚举来使用。
 
 示例
 
-:::code-group
 
-```zig [default]
-const ComplexTypeTag = enum {
-    ok,
-    not_ok,
-};
-
-const ComplexType = union(ComplexTypeTag) {
-    ok: u8,
-    not_ok: void,
-};
-```
 
 ```zig [more]
 const std = @import("std");
@@ -88,11 +92,71 @@ const ComplexType = union(ComplexTypeTag) {
 pub fn main() !void {
     const c = ComplexType{ .ok = 42 };
     try expect(@as(ComplexTypeTag, c) == ComplexTypeTag.ok);
+
+    switch (c) {
+        ComplexTypeTag.ok => |value| try expect(value == 42),
+        ComplexTypeTag.not_ok => unreachable,
+    }
+
+    // 使用 zig 的 meta 库获取对应的 tag
+    try expect(std.meta.Tag(ComplexType) == ComplexTypeTag);
 }
 ```
 
-:::
+如果要修改实际的载荷，你可以使用 `*` 语法捕获指针类型：
 
+```zig
+const std = @import("std");
+const expect = std.testing.expect;
+
+const ComplexTypeTag = enum {
+    ok,
+    not_ok,
+};
+const ComplexType = union(ComplexTypeTag) {
+    ok: u8,
+    not_ok: void,
+};
+
+pub fn main() !void {
+    var c = ComplexType{ .ok = 42 };
+
+    switch (c) {
+        ComplexTypeTag.ok => |*value| value.* += 1,
+        ComplexTypeTag.not_ok => unreachable,
+    }
+
+    try expect(c.ok == 43);
+}
+```
+
+还支持使用 [`@tagName`]() 来获取到对应的 name（返回的是一个 comptime 的 `[:0]const u8`，也就是字符串）：
+
+```zig
+const Small2 = union(enum) {
+    a: i32,
+    b: bool,
+    c: u8,
+};
+
+@tagName(Small2.a);
+// 这个返回值将会是 a
+```
+
+
+## 自动推断
+
+zig 也支持自动推断联合类型：
+
+```zig
+const Number = union {
+    int: i32,
+    float: f64,
+};
+
+// 自动推断
+const i: Number = .{ .int = 42 };
+```
 ## `extern union`
 
 `extern union` 保证内存布局与目标 C ABI 兼容。
