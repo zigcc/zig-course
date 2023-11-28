@@ -134,4 +134,97 @@ const z: [*]i32 = y;
 
 ## 可选类型
 
-TODO
+可选类型的载荷（**payload**），包括 `null`，允许自动转换为可选类型。
+
+```zig
+const y: ?i32 = null;
+const y1: anyerror!?i32 = null;
+// 错误联合可选类型也可以
+```
+
+## 错误联合类型
+
+错误联合类型的载荷（**payload**），包括错误集，允许自动转换为错误联合类型。
+
+```zig
+const y: anyerror!i32 = error.Failure;
+```
+
+## 编译期数字
+
+编译期已知的数字，如果另外一个类型可以表示它，那么会自动进行转换。
+
+```zig
+const x: u64 = 255;
+const y: u8 = x;
+// 自动转换到 u8
+```
+
+## 联合类型和枚举
+
+标记联合类型可以自动转换为对应的枚举，并且在编译期可以确定联合类型的某一个字段仅有一个可能值（该值为枚举的一个值）时，对应的枚举值可以直接自动转换为标记联合类型（这里包括 void 类型，因为它也是唯一值）：
+
+```zig
+const std = @import("std");
+const expect = std.testing.expect;
+
+const E = enum {
+    one,
+    two,
+    three,
+};
+
+const U = union(E) {
+    one: i32,
+    two: f32,
+    three,
+};
+
+const U2 = union(enum) {
+    a: void,
+    b: f32,
+
+    fn tag(self: U2) usize {
+        switch (self) {
+            .a => return 1,
+            .b => return 2,
+        }
+    }
+};
+
+pub fn main() !void {
+    const u = U{ .two = 12.34 };
+    const e: E = u; // 将联合类型转换为枚举
+    try expect(e == E.two);
+
+    const three = E.three;
+    const u_2: U = three; // 将枚举转换为联合类型，注意这里 three 并没有对应的类型，故可以直接转换
+    try expect(u_2 == E.three);
+
+    const u_3: U = .three; // 字面量供 zig 编译器来自动推导
+    try expect(u_3 == E.three);
+
+    const u_4: U2 = .a; // 字面量供 zig 编译器来推导，a 也是没有对应的类型（void）
+    try expect(u_4.tag() == 1);
+
+    // 下面的 b 字面量推导是错误的，因为它有对应的类型 f32
+    //var u_5: U2 = .b;
+    //try expect(u_5.tag() == 2);
+}
+```
+
+## undefined
+
+undefined 是一个神奇的值，它可以赋值给所有类型，代表这个值尚未初始化。
+
+## 元组和数组
+
+当元组中的所有值均为同一个类型时，我们可以直接将它转化为数组（自动转换）：
+
+```zig
+const Tuple = struct{ u8, u8 };
+
+const tuple: Tuple = .{5, 6};
+// 一切都是自动完成的
+const array: [2]u8 = tuple;
+```
