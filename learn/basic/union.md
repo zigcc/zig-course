@@ -74,8 +74,6 @@ const payload = @unionInit(Payload, "int", 666);
 
 示例
 
-
-
 ```zig [more]
 const std = @import("std");
 const expect = std.testing.expect;
@@ -130,7 +128,7 @@ pub fn main() !void {
 }
 ```
 
-还支持使用 [`@tagName`]() 来获取到对应的 name（返回的是一个 comptime 的 `[:0]const u8`，也就是字符串）：
+还支持使用 [`@tagName`](https://ziglang.org/documentation/master/#tagName) 来获取到对应的 name（返回的是一个 comptime 的 `[:0]const u8`，也就是字符串）：
 
 ```zig
 const Small2 = union(enum) {
@@ -142,7 +140,6 @@ const Small2 = union(enum) {
 @tagName(Small2.a);
 // 这个返回值将会是 a
 ```
-
 
 ## 自动推断
 
@@ -157,6 +154,7 @@ const Number = union {
 // 自动推断
 const i: Number = .{ .int = 42 };
 ```
+
 ## `extern union`
 
 `extern union` 保证内存布局与目标 C ABI 兼容。
