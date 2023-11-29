@@ -251,4 +251,111 @@ const array: [2]u8 = tuple;
 
 ## 对等类型转换
 
-TODO
+对等类型转换（**Peer Type Resolution**），这个词汇仅仅在 zig 的文档中出现过，它看起来与前面提到的普通类型解析很像，根据 zig 的[开发手册](https://ziglang.org/documentation/master/)所述，它发生在以下情况：
+
+- `switch` 的表达式
+- `if` 的表达式
+- `while` 的表达式
+- `for` 的表达式
+- 块中的多个 `break` 语句
+- 一些二元操作符
+
+对等类型转换发生时，会尽量转换为所有对等类型可以转换成的类型，以下是一些示例：
+
+对等类型转换处理整数转换：
+
+```zig
+const a: i8 = 12;
+const b: i16 = 34;
+const c = a + b;
+// c 的类型是 u16
+```
+
+对等类型转换处理不同大小的数组到切片：
+
+```zig
+const std = @import("std");
+const expect = std.testing.expect;
+const mem = std.mem;
+
+pub fn main() !void {
+    // mem.eql 执行检查内存是否相等
+    try expect(mem.eql(u8, boolToStr(true), "true"));
+    try expect(mem.eql(u8, boolToStr(false), "false"));
+    try comptime expect(mem.eql(u8, boolToStr(true), "true"));
+    try comptime expect(mem.eql(u8, boolToStr(false), "false"));
+}
+
+fn boolToStr(b: bool) []const u8 {
+    return if (b) "true" else "false";
+}
+```
+
+
+对等类型转换处理数组到常量切片：
+
+```zig
+fn testPeerResolveArrayConstSlice(b: bool) !void {
+    const value1 = if (b) "aoeu" else @as([]const u8, "zz");
+    const value2 = if (b) @as([]const u8, "zz") else "aoeu";
+    try expect(mem.eql(u8, value1, "aoeu"));
+    try expect(mem.eql(u8, value2, "zz"));
+}
+
+testPeerResolveArrayConstSlice(true);
+// 上面这个语句执行会成功
+```
+
+对等类型转换处理 `?T` 到 `T`：
+
+```zig
+fn peerTypeTAndOptionalT(c: bool, b: bool) ?usize {
+    if (c) {
+        return if (b) null else @as(usize, 0);
+    }
+
+    return @as(usize, 3);
+}
+
+// 下面语句执行为 true
+peerTypeTAndOptionalT(true, false).? == 0
+```
+
+对等类型转换处理 `*[0]u8` 到 `[]const u8`：
+
+> `*[0]u8` 是长度为 0 的数组的指针
+
+```zig
+fn peerTypeEmptyArrayAndSlice(a: bool, slice: []const u8) []const u8 {
+    if (a) {
+        return &[_]u8{};
+    }
+
+    return slice[0..1];
+}
+
+// 以下两句均为true
+peerTypeEmptyArrayAndSlice(true, "hi").len == 0
+peerTypeEmptyArrayAndSlice(false, "hi").len == 1
+```
+
+对等类型转换处理 `*[0]u8` 和 `[]const u8` 到 `anyerror![]u8`：
+
+```zig
+fn peerTypeEmptyArrayAndSliceAndError(a: bool, slice: []u8) anyerror![]u8 {
+    if (a) {
+        return &[_]u8{};
+    }
+
+    return slice[0..1];
+}
+```
+
+对等类型转换处理 `*const T` 到 `?*T`：
+
+```zig
+const a: *const usize = @ptrFromInt(0x123456780);
+const b: ?*usize = @ptrFromInt(0x123456780);
+
+a == b 这个表达式的值为 true
+```
