@@ -238,3 +238,17 @@ const array: [2]u8 = tuple;
 - [`@enumFromInt`](https://ziglang.org/documentation/0.11.0/#enumFromInt) 根据整数值获取对应的枚举值
 - [`@errSetCast`](https://ziglang.org/documentation/0.11.0/#errSetCast) 显式强制转换为错误的子集
 - [`@floatCast`](https://ziglang.org/documentation/0.11.0/#floatCast) 将大浮点数转为小浮点数
+- [`@floatFromInt`](https://ziglang.org/documentation/0.11.0/#floatFromInt) 将整数显式强制转换为浮点数
+- [`@intCast`](https://ziglang.org/documentation/0.11.0/#intCast) 在不同的整数类型中显式强制转换
+- [`@intFromBool`](https://ziglang.org/documentation/0.11.0/#intFromBool) 将 `true` 转换为 `1`，`false` 转换为 `0`
+- [`@intFromEnum`](https://ziglang.org/documentation/0.11.0/#intFromEnum) 根据整数值获取对应的联合标记或者枚举值
+- [`@intFromError`](https://ziglang.org/documentation/master/#intFromError) 获取对应错误的整数值
+- [`@intFromFloat`](https://ziglang.org/documentation/master/#intFromFloat) 获取浮点数的整数部分
+- [`@intFromPtr`](https://ziglang.org/documentation/master/#intFromPtr) 获取指针指向的地址（整数 `usize`），这在嵌入式开发和内核开发时很常用
+- [`@ptrFromInt`](https://ziglang.org/documentation/master/#ptrFromInt) 根据整数 `usize` 来获取对应的指针，这在嵌入式开发和内核开发时很常用
+- [`@ptrCast`](https://ziglang.org/documentation/master/#ptrCast) 不同的指针类型之间进行显式强制转换
+- [`@truncate`](https://ziglang.org/documentation/master/#truncate) 不同类型的整数间，截断位
+
+## 对等类型转换
+
+TODO
