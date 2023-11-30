@@ -148,12 +148,12 @@ export default [
         link: "/advanced/async",
       },
       {
-        text: "模块系统",
-        link: "/advanced/module-system",
-      },
-      {
         text: "编译期",
         link: "/advanced/comptime",
+      },
+      {
+        text: "模块系统",
+        link: "/advanced/module-system",
       },
       {
         text: "汇编",

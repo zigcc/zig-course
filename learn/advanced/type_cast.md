@@ -291,7 +291,6 @@ fn boolToStr(b: bool) []const u8 {
 }
 ```
 
-
 对等类型转换处理数组到常量切片：
 
 ```zig
