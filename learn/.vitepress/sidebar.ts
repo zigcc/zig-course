@@ -152,8 +152,8 @@ export default [
         link: "/advanced/comptime",
       },
       {
-        text: "模块系统",
-        link: "/advanced/module-system",
+        text: "包管理",
+        link: "/advanced/package_management",
       },
       {
         text: "汇编",
