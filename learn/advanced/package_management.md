@@ -33,7 +33,7 @@ zig 当前并没有一个中心化存储库，包可以来自任何来源，无�
 以上字段含义为：
 
 - `name`：当前你所开发的包的名字
-- `version`：包的版本，使用[Semantic Version](https://semver.org/)。
+- `version`：包的版本，使用 [Semantic Version](https://semver.org/)。
 - `dependencies`：依赖项，内部是一连串的匿名结构体，字段 `dep_name` 是依赖包的名字，`url` 是源代码地址，`hash` 是对应的hash（源文件内容的hash）
 - `paths`：显式声明包含的源文件，包含所有则指定为空，当前仅 `nightly` 可用。
 
@@ -78,13 +78,13 @@ pub fn build(b: *std.Build) void {
 
 ## 引入依赖项
 
-可以使用 `build` 函数传入的参数 `b: *std.Build`，它包含一个方法 `dependency`， 它的原型如下：
+可以使用 `build` 函数传入的参数 `b: *std.Build`，它包含一个方法 [`dependency`](https://ziglang.org/documentation/master/std/#A;std:Build.dependency)， 它的原型如下：
 
 ```zig
 fn dependency(b: *Build, name: []const u8, args: anytype) *Dependency
 ```
 
-其中 `name` 是在在 `.zon` 中的依赖项名字，它返回一个 `*std.Build.Dependency`，可以使用 `artifact` 和 `module` 方法来访问依赖的链接库和暴露的 `module`。
+其中 `name` 是在在 `.zon` 中的依赖项名字，它返回一个 [`*std.Build.Dependency`](https://ziglang.org/documentation/master/std/#A;std:Build.Dependency)，可以使用 `artifact` 和 `module` 方法来访问依赖的链接库和暴露的 `module`。
 
 ```zig
 const std = @import("std");
@@ -123,7 +123,7 @@ pub fn build(b: *std.Build) void {
 
 ```
 
-如果需要引入一个本地依赖项（且该依赖项自己有 `build.zig`），那么可以使用 `std.Build.anonymousDependency`， 它的原型为：
+如果需要引入一个本地依赖项（且该依赖项自己有 `build.zig`），那么可以使用 [`std.Build.anonymousDependency`](https://ziglang.org/documentation/master/std/#A;std:Build.anonymousDependency)， 它的原型为：
 
 ```zig
 fn anonymousDependency(b: *Build, relative_build_root: []const u8, comptime build_zig: type, args: anytype) *Dependency
@@ -133,6 +133,6 @@ fn anonymousDependency(b: *Build, relative_build_root: []const u8, comptime buil
 
 ::: info 🅿️ 提示
 
-`dependency` 和 `anonymousDependency` 都包含一个额外的参数 `args`，这是传给对应的依赖项构建的参数（类似在命令行构建时使用的 `-D` 参数，通过 `std.Build.option` 实现），当前包的参数并不会向依赖项传递，需要手动显式指定转发。
+`dependency` 和 `anonymousDependency` 都包含一个额外的参数 `args`，这是传给对应的依赖项构建的参数（类似在命令行构建时使用的 `-D` 参数，通过 [`std.Build.option`](https://ziglang.org/documentation/master/std/#A;std:Build.option) 实现），当前包的参数并不会向依赖项传递，需要手动显式指定转发。
 
 :::
