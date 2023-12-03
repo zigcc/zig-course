@@ -39,16 +39,100 @@ zig 当前并没有一个中心化存储库，包可以来自任何来源，无�
 
 目前为止，`0.11` 版本支持两种打包格式的源文件：`tar.gz` 和 `tar.xz`。
 
-## 包对外暴露模块
+## 编写包
 
-每个作为依赖的包都可以对外暴露模块，使用 `std.Build.addModule` 实现，通过该函数暴露的模块是完全公开的，如果需要使用私有的模块，请使用 `std.Build.createModule`。关于二进制构建结果（例如动态链接库），任何会被执行 `install` 的构建均会被暴露出去。
+::: info 🅿️ 提示
+
+zig 支持在一个 `build.zig` 中对外暴露出多个模块，也就是说一个包本身可以包含多个模块，并且 `lib` 和 `executable` 两种是完全可以共存的！
+
+:::
+
+如何将模块对外暴露呢？
+
+可以使用 `build` 函数传入的参数 `b: *std.Build`，它包含一个方法 [`addModule`](https://ziglang.org/documentation/master/std/#A;std:Build.addModule)， 它的原型如下：
+
+```zig
+fn addModule(b: *Build, name: []const u8, options: CreateModuleOptions) *Module
+```
+
+使用起来也很简单，例如：
+
+```zig
+const std = @import("std");
+
+pub fn build(b: *std.Build) void {
+    const lib_module = b.addModule("package", .{ .source_file = .{ .path = "lib.zig" } });
+    _ = lib_module;
+}
+```
+
+这就是一个最基本的包暴露实现，通过 `addModule` 函数暴露的模块是完全公开的。
+
+::: info 🅿️ 提示
+
+如果需要使用私有的模块，请使用 [`std.Build.createModule`](https://ziglang.org/documentation/master/std/#A;std:Build.createModule)，使用方式和 `addModule` 同理。
+
+关于二进制构建结果（例如动态链接库和静态链接库），任何被执行 `install` 操作的构建结果均会被暴露出去（即引入该包的项目均可看到该包的构建结果，但需要手动 link ）。
+
+:::
 
 ## 引入依赖项
 
-在 `build.zig` 中，可以使用 `std.Build.dependency` 函数引入依赖项，它使用在 `.zon` 中的依赖项名字并返回一个 `*std.Build.Dependency`，返回的结果可以使用 `artifact` 和 `module` 方法来访问依赖项的构建结果和暴漏的模块。
+可以使用 `build` 函数传入的参数 `b: *std.Build`，它包含一个方法 `dependency`， 它的原型如下：
 
-如果需要引入本地具有 `build.zig` 的依赖项，可以使用 `std.Build.anonymousDependency`， 它会将依赖项的包构建根目录和通过 `@import` 导入的依赖项的 `build.zig` 作为参数。
+```zig
+fn dependency(b: *Build, name: []const u8, args: anytype) *Dependency
+```
+
+其中 `name` 是在在 `.zon` 中的依赖项名字，它返回一个 `*std.Build.Dependency`，可以使用 `artifact` 和 `module` 方法来访问依赖的链接库和暴露的 `module`。
+
+```zig
+const std = @import("std");
+
+pub fn build(b: *std.Build) void {
+
+    // 默认构建目标
+    const target = b.standardTargetOptions(.{});
+    // 默认优化模式
+    const optimize = b.standardOptimizeOption(.{});
+
+    // ...
+
+    // 获取依赖项
+    const package = b.dependency("package_name", .{});
+
+    // 获取依赖项构建的library，例如链接库
+    const library_name = package.artifact("library_name");
+
+
+    // 获取依赖项提供的模块
+    const module_name = package.module("module_name");
+
+    // ...
+
+    const exe = try b.addExecutable(.{
+        .name = "my_binary",
+        .root_source_file = .{ .path = "src/main.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+
+    // 链接依赖提供的库
+    exe.linkLibrary(library_name);
+}
+
+```
+
+如果需要引入一个本地依赖项（且该依赖项自己有 `build.zig`），那么可以使用 `std.Build.anonymousDependency`， 它的原型为：
+
+```zig
+fn anonymousDependency(b: *Build, relative_build_root: []const u8, comptime build_zig: type, args: anytype) *Dependency
+```
+
+参数为依赖项的包构建根目录和通过 `@import` 导入的依赖项的 `build.zig` 。
+
+::: info 🅿️ 提示
 
 `dependency` 和 `anonymousDependency` 都包含一个额外的参数 `args`，这是传给对应的依赖项构建的参数（类似在命令行构建时使用的 `-D` 参数，通过 `std.Build.option` 实现），当前包的参数并不会向依赖项传递，需要手动显式指定转发。
 
-TODO：更多的示例说明，当前的包管理讲解并不清楚！
+:::
