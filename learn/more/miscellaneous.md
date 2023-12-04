@@ -6,7 +6,7 @@ outline: deep
 
 本部分是关于 zig 一些额外知识的补充，暂时还没有决定好分类到何处！
 
-## 为什么 zig 可以做到比 c 更好的链接
+## 为什么 zig 可以做到比 c 更好的编译
 
 实际上，zig 本身实现了一个 C 的编译器，当然不仅仅如此，zig 还提供了一个比较 **_magic_** 的东西—— [`glibc-abi-tool`](https://github.com/ziglang/glibc-abi-tool)，这是一个收集每个版本的 glibc 的 `.abilist` 文件的存储库，还包含一个将它们组合成一个数据集的工具。
 
