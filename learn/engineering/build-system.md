@@ -4,6 +4,8 @@ outline: deep
 
 # 构建系统
 
+TODO
+
 ## 构建静态链接库
 
 通常我们定义一个 `lib` 的方式如下：
@@ -60,3 +62,5 @@ pub fn build(b: *std.Build) void {
 ```
 
 :::
+
+TODO

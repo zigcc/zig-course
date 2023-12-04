@@ -199,6 +199,10 @@ export default [
       {
         text: "风格指南",
       },
+      {
+        text: "杂项",
+        link: "/more/miscellaneous",
+      },
     ],
   },
   {

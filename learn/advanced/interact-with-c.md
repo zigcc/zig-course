@@ -68,4 +68,3 @@ pub fn main() void {
 ## `C Translation CLI`
 
 TODO
-
