@@ -144,3 +144,5 @@ AssemblerTemplate
 内联汇编特性在未来可能会发生更改以支持新的特性（如多个返回值），具体见此 [issue](https://github.com/ziglang/zig/issues/215)。
 
 :::
+
+了解更多？可以查看我的这篇文章 [Handle Interrupt on x86-64 kernel with zig](https://blog.nvimer.org/2023/11/12/handle-interrupt-on-x86-64-kernel-with-zig/)，这是一篇关于如何在 x86-64 内核上利用 zig 的特性实现中断处理的文章，在这其中我用了内联汇编，算是一个比较巧妙的例子。
