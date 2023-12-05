@@ -63,4 +63,23 @@ pub fn build(b: *std.Build) void {
 
 :::
 
+## 构建 api 文档
+
+zig 本身提供了一个实验性的文档生成器，它支持搜索查询，操作如下：
+
+```zig
+    // 添加 step
+    const docs_step = b.step("docs", "Emit docs");
+
+    const docs_install = b.addInstallDirectory(.{
+        // lib 库
+        .source_dir = lib.getEmittedDocs(),
+        .install_dir = .prefix,
+        // 文档子文件夹
+        .install_subdir = "docs",
+    });
+    // 依赖step
+    docs_step.dependOn(&docs_install.step);
+```
+
 TODO
