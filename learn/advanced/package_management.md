@@ -137,6 +137,9 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    // 引入模块
+    exe.addModule("module_name", module_name);
+
     // 链接依赖提供的库
     exe.linkLibrary(library_name);
 }
