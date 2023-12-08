@@ -8,6 +8,8 @@ outline: deep
 
 zig 当前并没有一个中心化存储库，包可以来自任何来源，无论是本地还是网络上。
 
+当前的包管理模式为，先在 `build.zig.zon` 添加包的元信息，然后在 `build.zig` 中引入包。
+
 ## 新的文件结构
 
 `build.zig.zon` 这个文件存储了包的信息，它是 zig 新引入的一种简单数据交换格式，使用了 zig 的匿名结构和数组初始化语法。
@@ -55,7 +57,7 @@ zig 当前并没有一个中心化存储库，包可以来自任何来源，无�
 
 ::: info 🅿️ 提示
 
-当前 `nightly` 的 zig 支持了通过 [`zig fetch`](../environment/zig-command#zig-fetch) 来获取 hash 并写入到 `.zon` 中！
+当前 `nightly` 的 zig 支持通过 [`zig fetch`](../environment/zig-command#zig-fetch) 来获取 hash 并写入到 `.zon` 中！
 
 :::
 
