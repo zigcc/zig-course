@@ -380,7 +380,7 @@ pub fn build(b: *std.Build) void {
 
 每个文件可以使用 `zig test` 命令来执行测试，但实际开发中这样很不方便，zig 的构建系统提供了另外一种方式来处理当项目变得复杂时的测试。
 
-使用构建系统执行单元测试时，构建器和测试器会通过 stdin 和 stdout 进行通信，以便同时运行多个测试，并且可以有效地报告错误（不会将错误混到一起），但这导致了无法[在单元测试中写入 stdin](https://github.com/ziglang/zig/issues/15091)，这会扰乱测试器的正常工作。另外， zig 将引入一个额外的机制，允许预测 [`panic`](https://github.com/ziglang/zig/issues/1356)。
+使用构建系统执行单元测试时，构建器和测试器会通过 stdin 和 stdout 进行通信，以便同时运行多个测试，并且可以有效地报告错误（不会将错误混到一起），但这导致了无法[在单元测试中写入 stdin](https://github.com/ziglang/zig/issues/15091)，这会扰乱测试器的正常工作。另外， zig 将引入一个额外的机制，允许[预测 `panic`](https://github.com/ziglang/zig/issues/1356)。
 
 ```zig
 const std = @import("std");
