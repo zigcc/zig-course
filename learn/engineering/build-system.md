@@ -456,7 +456,71 @@ const exe = b.addExecutable(.{
 
 ## `embedFile`
 
-TODO
+[`@embedFile`](https://ziglang.org/documentation/master/#embedFile) 是由 zig 提供的一个内嵌文件的方式，它的引入规则与 `@import` 相同。
+
+在 `build.zig` 直接使用 [`b.anonymousDependency`](https://ziglang.org/documentation/master/std/#A;std:Build.anonymousDependency) 添加一个匿名模块即可，如：
+
+::: code-group
+
+```zig [main.zig]
+const std = @import("std");
+const kkk = @embedFile("kkk");
+// const kkk = @embedFile("kkk.txt"); 均可以
+
+pub fn main() !void {
+    std.debug.print("{s}", .{kkk});
+}
+```
+
+```txt [kkk.txt]
+ddd
+```
+
+```zig [build.zig]
+const std = @import("std");
+
+pub fn build(b: *std.Build) void {
+    // 标准构建目标
+    const target = b.standardTargetOptions(.{});
+
+    // 标准构建模式
+    const optimize = b.standardOptimizeOption(.{});
+
+    // 添加一个二进制可执行程序构建
+    const exe = b.addExecutable(.{
+        .name = "zig",
+        .root_source_file = .{ .path = "src/main.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+
+    // 添加一个匿名的依赖
+    exe.addAnonymousModule("kkk", .{ .source_file = .{ .path = "src/kkk.txt" } });
+
+    // 添加到顶级 install step 中作为依赖
+    b.installArtifact(exe);
+
+    // zig 提供了一个方便的函数允许我们直接运行构建结果
+    const run_cmd = b.addRunArtifact(exe);
+
+    run_cmd.step.dependOn(b.getInstallStep());
+
+    // 传递参数
+    if (b.args) |args| {
+        run_cmd.addArgs(args);
+    }
+
+    // 指定一个 step 为 run
+    const run_step = b.step("run", "Run the app");
+
+    // 指定该 step 依赖于 run_exe，即实际的运行
+    run_step.dependOn(&run_cmd.step);
+}
+```
+
+:::
+
+不仅仅是以上两种方式，匿名模块还支持直接使用其他程序输出！
 
 ## 执行其他命令
 
