@@ -8,6 +8,12 @@ outline: deep
 
 先使用 `zig init-exe` 命令初始化一个项目，再将以下内容覆写到 `src/main.zig` 中。
 
+::: warning
+
+当前 `nightly` 版本的 zig 已经将 `zig init-exe` 和 `zig init-lib` 合并为一个命令 `zig init`。
+
+:::
+
 ```zig
 const std = @import("std");
 
