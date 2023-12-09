@@ -431,7 +431,28 @@ pub fn build(b: *std.Build) void {
 
 ## 交叉编译
 
-TODO
+得益于 LLVM 的存在，zig 支持交叉编译到任何 LLVM 的目标代码，zig 可以很方便的处理交叉编译，只需要指定好恰当的 target 即可。
+
+关于所有的 target，可以在此处 [查看](https://ziglang.org/documentation/master/#Targets)。
+
+最常用的一个 target 设置可能是 `b.standardTargetOptions`，它会允许读取命令行输入来决定构建目标 target，它返回一个 [`CrossTarget`](https://ziglang.org/documentation/master/std/#A;std:zig.CrossTarget)。
+
+如果需要手动指定一个 target，可以手动构建一个 `CrossTarget` 传递给构建（`addExecutable` 和 `addStaticLibrary`），如:
+
+```zig
+var target: std.zig.CrossTarget = .{
+    .cpu_arch = .x86_64,
+    .os_tag = .freestanding,
+    .abi = .none,
+};
+
+const exe = b.addExecutable(.{
+    .name = "zig",
+    .root_source_file = .{ .path = "src/main.zig" },
+    .target = target,
+    .optimize = optimize,
+});
+```
 
 ## `embedFile`
 
