@@ -10,3 +10,4 @@ outline: deep
 - [Ziggit](https://ziggit.dev/)
 - [lemm](https://lemm.ee/c/zig)
 - [Zig SHOW](https://zig.show/)
+- [Zig 中文语言社区](https://github.com/zigcc)
