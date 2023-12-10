@@ -6,7 +6,7 @@ import socialLinks from "./socialLinks";
 export default defineConfig({
   lang: "zh-CN",
   title: "Learn Zig",
-  description: "简单、快速地学习 Zig",
+  description: "zig中文教程，简单、快速地学习 Zig",
   sitemap: {
     hostname: "https://learnzig.nvimer.org/",
   },
