@@ -6,12 +6,6 @@ outline: deep
 
 zig 本身就是一套完整的工具链，它可以用于任何语言的构建，不仅仅是 zig、C、CPP。
 
-:::danger
-
-注意：本章的构建系统内容是根据 `nightly` 版本制作，后续会更新 `release` 部分。
-
-:::
-
 ::: info 🅿️ 提示
 
 当前 zig 的标准构建器位置：[Github](https://github.com/ziglang/zig/blob/master/lib/build_runner.zig)
@@ -257,9 +251,7 @@ pub fn build(b: *std.Build) void {
 
 通常我们定义一个 `lib` 的方式如下：
 
-:::code-group
-
-```zig [nightly]
+```zig
 const std = @import("std");
 
 pub fn build(b: *std.Build) void {
@@ -300,33 +292,6 @@ pub fn build(b: *std.Build) void {
     b.installArtifact(exe);
 }
 ```
-
-```zig [0.11]
-const std = @import("std");
-
-pub fn build(b: *std.Build) void {
-    // 使用默认提供的优化方案，支持我们从命令行构建时指定构建模式
-    const optimize = b.standardOptimizeOption(.{});
-
-    // 尝试添加一个静态库
-    // 动态链接库则是 addSharedLibrary
-    const lib = b.addStaticLibrary(.{
-        // 库的名字
-        .name = "example",
-        // 源文件地址
-        .root_source_file = .{ .path = "src/main.zig" },
-        // 优化模式
-        .optimize = optimize,
-    });
-
-    // 在构建时自动构建 lib
-    lib.install();
-
-    // TODO
-}
-```
-
-:::
 
 通常，二进制可执行程序的构建结果会输出在 `zig-out/bin` 下，而链接库的构建结果会输出在 `zig-out/lib` 下。
 
