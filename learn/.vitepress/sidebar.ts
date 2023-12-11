@@ -182,7 +182,8 @@ export default [
     text: "更多",
     items: [
       {
-        text: "函数反射",
+        text: "反射",
+        link:"/more/reflection"
       },
       {
         text: "零位类型",
