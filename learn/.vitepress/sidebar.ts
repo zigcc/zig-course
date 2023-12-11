@@ -189,6 +189,7 @@ export default [
       },
       {
         text: "零位类型",
+        link: "/more/zero-type",
       },
       {
         text: "原子操作",
