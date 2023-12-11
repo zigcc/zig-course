@@ -88,7 +88,7 @@ fn addFortyTwo(x: anytype) @TypeOf(x) {
 
 ### `noreturn`
 
-`noteturn` 是一个特殊的类型，它代表以下内容：
+`noreturn` 是一个特殊的类型，它代表以下内容：
 
 - `break`
 - `continue`
@@ -122,7 +122,7 @@ extern "c" fn atan2(a: f64, b: f64) f64;
 
 :::
 
-### `@setCode`
+### `@setCold`
 
 `@setCold(comptime is_cold: bool) void`
 

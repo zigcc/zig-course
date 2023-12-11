@@ -18,11 +18,11 @@ outline: deep
 
 ![vscode-zig](/picture/basic/vscode-zig.png){data-zoomable}
 
-## Cloin
+## CLion
 
-> Clion 是一款专为开发 C 及 C++ 所设计的跨平台 IDE。它是以 IntelliJ 为基础设计的，包含了许多智能功能来提高开发人员的生产力。CLion 帮助开发人员使用智能编辑器来提高代码质量、自动代码重构并且深度整合 CMake 编译系统，从而提高开发人员的工作效率。
+> CLion 是一款专为开发 C 及 C++ 所设计的跨平台 IDE。它是以 IntelliJ 为基础设计的，包含了许多智能功能来提高开发人员的生产力。CLion 帮助开发人员使用智能编辑器来提高代码质量、自动代码重构并且深度整合 CMake 编译系统，从而提高开发人员的工作效率。
 
-原本 Clion 仅仅是 C/C++ 的开发IDE，但在安装插件后可以作为 zig 的 IDE 使用。
+原本 CLion 仅仅是 C/C++ 的开发IDE，但在安装插件后可以作为 zig 的 IDE 使用。
 
 目前插件市场活跃的两个 zig 插件（均为第三方作者维护）分别是 [ZigBrains](https://plugins.jetbrains.com/plugin/22456-zigbrains) 和 [Zig Support](https://plugins.jetbrains.com/plugin/18062-zig-support)，均支持 zig 的 `0.11.0` 版本。
 

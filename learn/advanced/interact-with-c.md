@@ -205,7 +205,7 @@ const std = @import("std");
 fn add(count: c_int, ...) callconv(.C) c_int {
     // 对应 C 的宏 va_start
     var ap = @cVaStart();
-    // 对应 C 的宏 va_start
+    // 对应 C 的宏 va_end
     defer @cVaEnd(&ap);
     var i: usize = 0;
     var sum: c_int = 0;
