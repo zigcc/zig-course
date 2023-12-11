@@ -192,6 +192,9 @@ export default [
         text: "原子操作",
       },
       {
+        text: "WASI",
+      },
+      {
         text: "未定义行为",
       },
       {
