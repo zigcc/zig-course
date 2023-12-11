@@ -182,9 +182,6 @@ export default [
     text: "更多",
     items: [
       {
-        text: "什么是“命名空间”",
-      },
-      {
         text: "函数反射",
       },
       {
