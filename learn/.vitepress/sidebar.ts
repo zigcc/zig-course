@@ -191,15 +191,19 @@ export default [
       },
       {
         text: "原子操作",
+        link: "/more/atomic",
       },
       {
-        text: "WASI",
+        text: "WASM",
+        link: "/more/wasm",
       },
       {
         text: "未定义行为",
+        link: "/more/undefined_behavior",
       },
       {
         text: "风格指南",
+        link: "/more/style_guide",
       },
       {
         text: "杂项",
