@@ -11,6 +11,19 @@ outline: deep
 
 ## Windows
 
+::: details windows 输出中文乱码问题
+
+如果你是中文简体用户，那么建议将 windows 的编码修改为UTF-8编码，由于 zig 的源代码编码格式是 UTF-8，导致在windows下向控制台打印输出中文会发生乱码的现象。
+
+修改方法为：
+
+1. 打开 widnows 设置中的 **时间和语言**，进入 **语言和区域**。
+2. 点击下方的管理语言设置，在新打开的窗口中点击 **管理**。
+3. 点击下方的 **更改系统区域设置**，勾选下方的 “使用 unicode UTF-8 提供全球语言支持”
+4. 重启计算机。
+
+:::
+
 ### Scoop
 
 推荐使用 [Scoop](https://scoop.sh/#/) 工具进行安装，Scoop 的 **main** 仓库和 **version** 仓库分别有着最新的 `release` 和 `nightly` 版本。
