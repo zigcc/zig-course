@@ -182,6 +182,10 @@ export default [
     text: "更多",
     items: [
       {
+        text: "内建函数",
+        link: "/more/builtin_func",
+      },
+      {
         text: "反射",
         link: "/more/reflection",
       },

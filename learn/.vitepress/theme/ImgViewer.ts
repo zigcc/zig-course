@@ -1,37 +1,37 @@
-import Viewer from 'viewerjs';
-import { nextTick, onMounted, watch } from 'vue';
-import { Route } from 'vitepress';
+import Viewer from "viewerjs";
+import { nextTick, onMounted, watch } from "vue";
+import { Route } from "vitepress";
 
 /**
  * 给图片添加预览功能
  */
-const setViewer = (el: string = '.vp-doc img', option?: Viewer.Options) => {
-    // 默认配置
-    const defaultBaseOption: Viewer.Options = {
-        navbar: false,
-        title: false,
-        toolbar: {
-            zoomIn: 4,
-            zoomOut: 4,
-            prev: 4,
-            next: 4,
-            reset: 4,
-            oneToOne: 4
-        }
-    }
-    document.querySelectorAll(el).forEach((item: Element) => {
-        (item as HTMLElement).onclick = () => {
-            const viewer = new Viewer(<HTMLElement>item, {
-                ...defaultBaseOption,
-                ...option,
-                hide(e) {
-                    viewer.destroy();
-                }
-            });
-            viewer.show()
-        }
-        (item as HTMLElement).style.cursor = "zoom-in";
-    });
+const setViewer = (el: string = ".vp-doc img", option?: Viewer.Options) => {
+  // 默认配置
+  const defaultBaseOption: Viewer.Options = {
+    navbar: false,
+    title: false,
+    toolbar: {
+      zoomIn: 4,
+      zoomOut: 4,
+      prev: 4,
+      next: 4,
+      reset: 4,
+      oneToOne: 4,
+    },
+  };
+  document.querySelectorAll(el).forEach((item: Element) => {
+    (item as HTMLElement).onclick = () => {
+      const viewer = new Viewer(<HTMLElement>item, {
+        ...defaultBaseOption,
+        ...option,
+        hide(e) {
+          viewer.destroy();
+        },
+      });
+      viewer.show();
+    };
+    (item as HTMLElement).style.cursor = "zoom-in";
+  });
 };
 
 /**
@@ -44,12 +44,16 @@ const setViewer = (el: string = '.vp-doc img', option?: Viewer.Options) => {
  * <br/>viewerjs 设置选项
  */
 const imageViewer = (route: Route, el?: string, option?: Viewer.Options) => {
-    onMounted(() => {
+  onMounted(() => {
+    setViewer(el, option);
+  });
+  watch(
+    () => route.path,
+    () =>
+      nextTick(() => {
         setViewer(el, option);
-    })
-    watch(() => route.path, () => nextTick(() => {
-        setViewer(el, option);
-    }));
-}
+      }),
+  );
+};
 
 export default imageViewer;
