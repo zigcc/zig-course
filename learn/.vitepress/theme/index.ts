@@ -38,7 +38,9 @@ export default {
             lang: 'zh-CN', // default: `zh-CN`
             strict: "1",
             reactionsEnabled: "1",
-            theme: "preferred_color_scheme",
+            // theme:"dark",
+            lightTheme: "light",
+            darkTheme:"dark"
         }, {
             frontmatter, route
         },
