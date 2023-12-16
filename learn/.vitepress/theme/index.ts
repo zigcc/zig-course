@@ -1,6 +1,8 @@
 // .vitepress/theme/index.js
 import DefaultTheme from 'vitepress/theme';
 import giscusTalk from 'vitepress-plugin-comment-with-giscus';
+import codeblocksFold from 'vitepress-plugin-codeblocks-fold';
+import 'vitepress-plugin-codeblocks-fold/style/index.scss';
 import { useData, useRoute } from 'vitepress';
 
 export default {
@@ -13,6 +15,9 @@ export default {
         const { frontmatter } = useData();
         const route = useRoute();
         
+        // code fold support
+        codeblocksFold({ route, frontmatter }, true, 400);
+
         // Obtain configuration from: https://giscus.app/
         giscusTalk({
             repo: 'learnzig/learnzig',
