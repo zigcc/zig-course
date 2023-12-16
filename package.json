@@ -9,5 +9,8 @@
     "medium-zoom": "^1.0.8",
     "prettier": "^3.0.3",
     "vitepress": "^1.0.0-rc.11"
+  },
+  "dependencies": {
+    "vitepress-plugin-comment-with-giscus": "^1.1.11"
   }
 }
