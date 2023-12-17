@@ -21,7 +21,7 @@ export default defineComponent({
           repoId: "R_kgDOKRsb5Q",
           category: "Comments",
           categoryId: "DIC_kwDOKRsb5c4Cbx2i",
-          mapping: "url",
+          mapping: "pathname",
           strict: "1",
           reactionsEnabled: "1",
           emitMetadata: "0",
