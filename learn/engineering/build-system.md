@@ -572,14 +572,121 @@ pub fn build(b: *std.Build) !void {
 
 :::
 
-### 文件生成
-
-TODO
-
 ### 构建纯 C 项目
 
-TODO
+在这里我们使用 [GTK4](https://www.gtk.org/) 的官方示例 [Hello-World](https://www.gtk.org/docs/getting-started/hello-world/) 来作为演示：
+
+:::code-group
+
+```zig [build.zig]
+const std = @import("std");
+
+pub fn build(b: *std.Build) void {
+    // 构建目标
+    const target = b.standardTargetOptions(.{});
+
+    // 构建优化模式
+    const optimize = b.standardOptimizeOption(.{});
+
+    // 添加一个二进制可执行程序构建
+    // 注意：我们在这里并没有使用 root_source_file 字段
+    // 该字段是为 zig 源文件准备的
+    const exe = b.addExecutable(.{
+        .name = "zig",
+        .target = target,
+        .optimize = optimize,
+    });
+
+    // 添加 C 源代码文件，两个参数：
+    // 源代码路径（相对于build.zig）
+    // 传递的 flags
+    exe.addCSourceFile(.{
+        .file = .{
+            .path = "src/main.c",
+        },
+        .flags = &[_][]const u8{},
+    });
+
+    // 链接标准 C 库
+    exe.linkLibC();
+
+    // 链接系统的GTK4库
+    exe.linkSystemLibrary("gtk4");
+
+    // 添加到顶级 install step 中作为依赖
+    b.installArtifact(exe);
+
+    // 创建一个运行
+    const run_cmd = b.addRunArtifact(exe);
+
+    // 依赖于构建
+    run_cmd.step.dependOn(b.getInstallStep());
+
+    // 运行时参数传递
+    if (b.args) |args| {
+        run_cmd.addArgs(args);
+    }
+
+    // 运行的 step
+    const run_step = b.step("run", "Run the app");
+    // 依赖于前面的运行
+    run_step.dependOn(&run_cmd.step);
+}
+```
+
+```c [src/main.c]
+// 待添加详细注释
+#include <gtk/gtk.h>
+
+static void
+print_hello (GtkWidget *widget,
+             gpointer   data)
+{
+  g_print ("Hello World\n");
+}
+
+static void
+activate (GtkApplication *app,
+          gpointer        user_data)
+{
+  GtkWidget *window;
+  GtkWidget *button;
+
+  window = gtk_application_window_new (app);
+  gtk_window_set_title (GTK_WINDOW (window), "Hello");
+  gtk_window_set_default_size (GTK_WINDOW (window), 200, 200);
+
+  button = gtk_button_new_with_label ("Hello World");
+  g_signal_connect (button, "clicked", G_CALLBACK (print_hello), NULL);
+  gtk_window_set_child (GTK_WINDOW (window), button);
+
+  gtk_window_present (GTK_WINDOW (window));
+}
+
+int
+main (int    argc,
+      char **argv)
+{
+  GtkApplication *app;
+  int status;
+
+  app = gtk_application_new ("org.gtk.example", G_APPLICATION_DEFAULT_FLAGS);
+  g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
+  status = g_application_run (G_APPLICATION (app), argc, argv);
+  g_object_unref (app);
+
+  return status;
+}
+```
+
+:::
+
+以上构建中我们先使用了 `addCSourceFile` 来添加 C 源代码，再使用 `linkLibC` 和 `linkSystemLibrary` 来链接 C 标准库和 GTK 库。
 
 ### 构建纯 C++ 项目
+
+TODO
+
+### 文件生成
 
 TODO
