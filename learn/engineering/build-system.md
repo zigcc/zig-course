@@ -683,6 +683,12 @@ main (int    argc,
 
 以上构建中我们先使用了 `addCSourceFile` 来添加 C 源代码，再使用 `linkLibC` 和 `linkSystemLibrary` 来链接 C 标准库和 GTK 库。
 
+::: info 🅿️ 提示
+
+关于头文件的引入，可以使用 `exe.addIncludePath(.{ .path = "path" });`
+
+:::
+
 ### 构建纯 C++ 项目
 
 TODO
