@@ -470,7 +470,7 @@ pub fn build(b: *std.Build) void {
     // 添加一个匿名的依赖 // [!code focus]
     exe.addAnonymousModule("hello", .{ .source_file = .{ .path = "src/hello.txt" } }); // [!code focus]
 
-    // 添加到顶级 install step 中作为依赖 
+    // 添加到顶级 install step 中作为依赖
     b.installArtifact(exe);
 
     // zig 提供了一个方便的函数允许我们直接运行构建结果
