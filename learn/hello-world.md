@@ -84,28 +84,28 @@ pub fn main() !void {
 
 它们都是依靠系统调用来实现输出效果，但是这就面临着性能问题，我们知道系统调用会造成内核上下文切换的开销（系统调用的流程：执行系统调用，此时控制权会切换回内核，由内核执行完成进程需要的系统调用函数后再将控制权返回给进程），所以我们如何解决这个问题呢？可以增加一个缓冲区，等到要打印的内容都到一定程度后再一次性全部 `print`，那么此时的解决方式就如下：
 
-```zig
+```zig 
 const std = @import("std");
 
 pub fn main() !void {
-    var out = std.io.getStdOut().writer();
-    var err = std.io.getStdErr().writer();
+    var out = std.io.getStdOut().writer();// [!code focus]
+    var err = std.io.getStdErr().writer();// [!code focus]
 
-    // 获取buffer
-    var out_buffer = std.io.bufferedWriter(out);
-    var err_buffer = std.io.bufferedWriter(err);
+    // 获取buffer// [!code focus]
+    var out_buffer = std.io.bufferedWriter(out);// [!code focus]
+    var err_buffer = std.io.bufferedWriter(err);// [!code focus]
 
-    // 获取writer句柄
-    var out_writer = out_buffer.writer();
-    var err_writer = err_buffer.writer();
+    // 获取writer句柄// [!code focus]
+    var out_writer = out_buffer.writer();// [!code focus]
+    var err_writer = err_buffer.writer();// [!code focus]
 
-    // 通过句柄写入buffer
-    try out_writer.print("Hello {s}!\n", .{"out"});
-    try err_writer.print("Hello {s}!\n", .{"err"});
+    // 通过句柄写入buffer// [!code focus]
+    try out_writer.print("Hello {s}!\n", .{"out"});// [!code focus]
+    try err_writer.print("Hello {s}!\n", .{"err"});// [!code focus]
 
-    // 尝试刷新buffer
-    try out_buffer.flush();
-    try err_buffer.flush();
+    // 尝试刷新buffer// [!code focus]
+    try out_buffer.flush();// [!code focus]
+    try err_buffer.flush();// [!code focus]
 }
 ```
 
