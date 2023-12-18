@@ -121,16 +121,17 @@ pub fn build(b: *std.Build) void {
         .root_source_file = .{ .path = "hello.zig" },
     });
 
-    // 构建并 install
+    // 添加到顶级 install step 中作为依赖
     b.installArtifact(exe);
 
-    // zig 提供了一个方便的函数允许我们直接运行构建结果
-    const run_exe = b.addRunArtifact(exe);
+    // zig 提供了一个方便的函数允许我们直接运行构建结果 // [!code focus]
+    const run_exe = b.addRunArtifact(exe); // [!code focus]
 
-    // 注意：这个步骤不是必要的，显示声明运行依赖于构建
-    // 这会使运行是从构建输出目录（默认为 zig-out/bin ）运行而不是构建缓存中运行
-    // 不过，如果应用程序运行依赖于其他已存在的文件（例如某些 ini 配置文件），这可以确保它们正确的运行
-    run_exe.step.dependOn(b.getInstallStep());
+    // 注意：这个步骤不是必要的，显示声明运行依赖于构建 // [!code focus]
+    // 这会使运行是从构建输出目录（默认为 zig-out/bin ）运行而不是构建缓存中运行 // [!code focus]
+    // 不过，如果应用程序运行依赖于其他已存在的文件（例如某些 ini 配置文件）// [!code focus]
+    // 这可以确保它们正确的运行 // [!code focus]
+    run_exe.step.dependOn(b.getInstallStep()); // [!code focus]
 
     // 注意：此步骤不是必要的
     // 此操作允许用户通过构建系统的命令传递参数，例如 zig build  -- arg1 arg2
@@ -139,11 +140,11 @@ pub fn build(b: *std.Build) void {
         run_cmd.addArgs(args);
     }
 
-    // 指定一个 step 为 run
-    const run_step = b.step("run", "Run the application");
+    // 指定一个 step 为 run // [!code focus]
+    const run_step = b.step("run", "Run the application"); // [!code focus]
 
-    // 指定该 step 依赖于 run_exe，即实际的运行
-    run_step.dependOn(&run_exe.step);
+    // 指定该 step 依赖于 run_exe，即实际的运行 // [!code focus]
+    run_step.dependOn(&run_exe.step); // [!code focus]
 }
 ```
 
@@ -169,11 +170,11 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    // 使用 option 来获取命令参数决定是否剥离调试信息
-    const is_strip = b.option(bool, "is_strip", "whether strip executable") orelse false;
+    // 使用 option 来获取命令参数决定是否剥离调试信息 // [!code focus]
+    const is_strip = b.option(bool, "is_strip", "whether strip executable") orelse false; // [!code focus]
 
-    // 设置 exe 的 strip
-    exe.strip = is_strip;
+    // 设置 exe 的 strip // [!code focus]
+    exe.strip = is_strip; // [!code focus]
 
     // 添加到顶级 install step 中作为依赖
     b.installArtifact(exe);
@@ -220,17 +221,17 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    // 通过标准库获取时间戳
-    const timestamp = std.time.timestamp();
+    // 通过标准库获取时间戳 // [!code focus]
+    const timestamp = std.time.timestamp(); // [!code focus]
 
-    // 创建一个 options
-    const options = b.addOptions();
+    // 创建一个 options // [!code focus]
+    const options = b.addOptions(); // [!code focus]
 
-    // 向 options 添加 option, 变量名是time_stamp,
-    options.addOption(i64, "time_stamp", timestamp);
+    // 向 options 添加 option, 变量名是time_stamp // [!code focus]
+    options.addOption(i64, "time_stamp", timestamp); // [!code focus]
 
-    // 向 exe 中添加 options
-    exe.addOptions("timestamp", options);
+    // 向 exe 中添加 options // [!code focus]
+    exe.addOptions("timestamp", options); // [!code focus]
 
     // 添加到顶级 install step 中作为依赖
     b.installArtifact(exe);
@@ -261,21 +262,21 @@ pub fn build(b: *std.Build) void {
     // 使用默认提供的优化方案，支持我们从命令行构建时指定构建模式
     const optimize = b.standardOptimizeOption(.{});
 
-    // 尝试添加一个静态库
-    const lib = b.addStaticLibrary(.{
-        // 库的名字
-        .name = "example",
-        // 源文件地址
-        .root_source_file = .{ .path = "src/main.zig" },
-        // 构建目标
-        .target = target,
-        // 构建模式
-        .optimize = optimize,
-    });
+    // 尝试添加一个静态库 // [!code focus]
+    const lib = b.addStaticLibrary(.{ // [!code focus]
+        // 库的名字 // [!code focus]
+        .name = "example", // [!code focus]
+        // 源文件地址 // [!code focus]
+        .root_source_file = .{ .path = "src/main.zig" }, // [!code focus]
+        // 构建目标 // [!code focus]
+        .target = target, // [!code focus]
+        // 构建模式 // [!code focus]
+        .optimize = optimize, // [!code focus]
+    }); // [!code focus]
 
-    // 这代替原本的 lib.install，在构建时自动构建 lib
-    // 但其实这是不必要的，因为如果有可执行二进制程序构建使用了 lib，那么它会自动被构建
-    b.installArtifact(lib);
+    // 这代替原本的 lib.install，在构建时自动构建 lib // [!code focus]
+    // 但其实这是不必要的，因为如果有可执行二进制程序构建使用了 lib，那么它会自动被构建 // [!code focus]
+    b.installArtifact(lib); // [!code focus]
 
     // 添加一个二进制可执行程序构建
     const exe = b.addExecutable(.{
@@ -285,8 +286,8 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    // 链接 lib
-    exe.linkLibrary(lib);
+    // 链接 lib // [!code focus]
+    exe.linkLibrary(lib); // [!code focus]
 
     // 添加到顶级 install step 中作为依赖，构建 exe
     b.installArtifact(exe);
@@ -306,10 +307,11 @@ pub fn build(b: *std.Build) void {
         .root_source_file = .{ .path = "zip.zig" },
     });
 
-    // 链接到系统的 libz
-    exe.linkSystemLibrary("z");
-    // 链接到 libc
-    exe.linkLibC();
+    // 链接到系统的 libz // [!code focus]
+    exe.linkSystemLibrary("z"); // [!code focus]
+
+    // 链接到 libc // [!code focus]
+    exe.linkLibC(); // [!code focus]
 
     b.installArtifact(exe);
 }
@@ -327,17 +329,17 @@ const std = @import("std");
 pub fn build(b: *std.Build) void {
     // ...
 
-    // 添加 step
-    const docs_step = b.step("docs", "Emit docs");
+    // 添加 step // [!code focus]
+    const docs_step = b.step("docs", "Emit docs"); // [!code focus]
 
-    // 构建文档
-    const docs_install = b.addInstallDirectory(.{
-        // lib 库
-        .source_dir = lib.getEmittedDocs(),
-        .install_dir = .prefix,
-        // 文档子文件夹
-        .install_subdir = "docs",
-    });
+    // 构建文档 // [!code focus]
+    const docs_install = b.addInstallDirectory(.{ // [!code focus]
+        // lib 库 // [!code focus]
+        .source_dir = lib.getEmittedDocs(), // [!code focus]
+        .install_dir = .prefix, // [!code focus]
+        // 文档子文件夹 // [!code focus]
+        .install_subdir = "docs", // [!code focus]
+    }); // [!code focus]
 
     // 依赖step
     docs_step.dependOn(&docs_install.step);
@@ -374,26 +376,26 @@ pub fn build(b: *std.Build) void {
     // 添加到顶级 install step 中作为依赖
     b.installArtifact(exe);
 
-    // 此处开始构建单元测试
+    // 此处开始构建单元测试 // [!code focus]
 
-    // 构建一个单元测试的 Compile
-    const exe_unit_tests = b.addTest(.{
-        .root_source_file = .{ .path = "src/main.zig" },
-        .target = target,
-        .optimize = optimize,
-    });
+    // 构建一个单元测试的 Compile // [!code focus]
+    const exe_unit_tests = b.addTest(.{ // [!code focus]
+        .root_source_file = .{ .path = "src/main.zig" }, // [!code focus]
+        .target = target, // [!code focus]
+        .optimize = optimize, // [!code focus]
+    }); // [!code focus]
 
-    // 执行单元测试
-    const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests);
+    // 执行单元测试 // [!code focus]
+    const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests); // [!code focus]
 
-    // 如果想要跳过外部来自于其他包的单元测试（例如依赖中的包），可以使用 skip_foreign_checks
-    run_unit_tests.skip_foreign_checks = true;
+    // 如果想要跳过外部来自于其他包的单元测试（例如依赖中的包），可以使用 skip_foreign_checks // [!code focus]
+    run_unit_tests.skip_foreign_checks = true; // [!code focus]
 
-    // 构建一个 step，用于执行测试
-    const test_step = b.step("test", "Run unit tests");
+    // 构建一个 step，用于执行测试 // [!code focus]
+    const test_step = b.step("test", "Run unit tests"); // [!code focus]
 
-    // 测试 step 依赖上方构建的 run_exe_unit_tests
-    test_step.dependOn(&run_exe_unit_tests.step);
+    // 测试 step 依赖上方构建的 run_exe_unit_tests // [!code focus]
+    test_step.dependOn(&run_exe_unit_tests.step); // [!code focus]
 }
 
 ```
@@ -435,11 +437,11 @@ const exe = b.addExecutable(.{
 
 ```zig [main.zig]
 const std = @import("std");
-const hello = @embedFile("hello");
-// const hello = @embedFile("hello.txt"); 均可以
+const hello = @embedFile("hello"); // [!code focus]
+// const hello = @embedFile("hello.txt"); 均可以 // [!code focus]
 
 pub fn main() !void {
-    std.debug.print("{s}", .{hello});
+    std.debug.print("{s}", .{hello}); // [!code focus]
 }
 ```
 
@@ -465,10 +467,10 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    // 添加一个匿名的依赖
-    exe.addAnonymousModule("hello", .{ .source_file = .{ .path = "src/hello.txt" } });
+    // 添加一个匿名的依赖 // [!code focus]
+    exe.addAnonymousModule("hello", .{ .source_file = .{ .path = "src/hello.txt" } }); // [!code focus]
 
-    // 添加到顶级 install step 中作为依赖
+    // 添加到顶级 install step 中作为依赖 
     b.installArtifact(exe);
 
     // zig 提供了一个方便的函数允许我们直接运行构建结果
@@ -504,10 +506,10 @@ zig 的构建系统还允许我们执行一些额外的命令，录入根据 jso
 
 ```zig [main.zig]
 const std = @import("std");
-const hello = @embedFile("hello");
+const hello = @embedFile("hello"); // [!code focus]
 
 pub fn main() !void {
-    std.debug.print("{s}", .{hello});
+    std.debug.print("{s}", .{hello}); // [!code focus]
 }
 ```
 
@@ -529,24 +531,24 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
 
-    // 构建一个运行命令
-    const run_sys_cmd = b.addSystemCommand(&.{
-        "/bin/sh",
-        "-c",
-    });
+    // 构建一个运行命令 // [!code focus]
+    const run_sys_cmd = b.addSystemCommand(&.{ // [!code focus]
+        "/bin/sh", // [!code focus]
+        "-c", // [!code focus]
+    }); // [!code focus]
 
-    // 添加参数，此方法允许添加多个参数
-    // 也可以使用 addArg 来添加单个参数
-    run_sys_cmd.addArgs(&.{
-        "echo hello",
-    });
+    // 添加参数，此方法允许添加多个参数 // [!code focus]
+    // 也可以使用 addArg 来添加单个参数 // [!code focus]
+    run_sys_cmd.addArgs(&.{ // [!code focus]
+        "echo hello", // [!code focus]
+    }); // [!code focus]
 
-    // 尝试运行命令并捕获标准输出
-    // 也可以使用 captureStdErr 来捕获标准错误输出
-    const output = run_sys_cmd.captureStdOut();
+    // 尝试运行命令并捕获标准输出 // [!code focus]
+    // 也可以使用 captureStdErr 来捕获标准错误输出 // [!code focus]
+    const output = run_sys_cmd.captureStdOut(); // [!code focus]
 
-    // 添加一个匿名的依赖
-    exe.addAnonymousModule("hello", .{ .source_file = output });
+    // 添加一个匿名的依赖 // [!code focus]
+    exe.addAnonymousModule("hello", .{ .source_file = output }); // [!code focus]
 
     // 添加到顶级 install step 中作为依赖
     b.installArtifact(exe);
@@ -588,30 +590,30 @@ pub fn build(b: *std.Build) void {
     // 构建优化模式
     const optimize = b.standardOptimizeOption(.{});
 
-    // 添加一个二进制可执行程序构建
-    // 注意：我们在这里并没有使用 root_source_file 字段
-    // 该字段是为 zig 源文件准备的
-    const exe = b.addExecutable(.{
-        .name = "zig",
-        .target = target,
-        .optimize = optimize,
-    });
+    // 添加一个二进制可执行程序构建 // [!code focus]
+    // 注意：我们在这里并没有使用 root_source_file 字段 // [!code focus]
+    // 该字段是为 zig 源文件准备的 // [!code focus]
+    const exe = b.addExecutable(.{ // [!code focus]
+        .name = "zig", // [!code focus]
+        .target = target, // [!code focus]
+        .optimize = optimize, // [!code focus]
+    }); // [!code focus]
 
-    // 添加 C 源代码文件，两个参数：
-    // 源代码路径（相对于build.zig）
-    // 传递的 flags
-    exe.addCSourceFile(.{
-        .file = .{
-            .path = "src/main.c",
-        },
-        .flags = &[_][]const u8{},
-    });
+    // 添加 C 源代码文件，两个参数： // [!code focus]
+    // 源代码路径（相对于build.zig） // [!code focus]
+    // 传递的 flags // [!code focus]
+    exe.addCSourceFile(.{ // [!code focus]
+        .file = .{ // [!code focus]
+            .path = "src/main.c", // [!code focus]
+        }, // [!code focus]
+        .flags = &[_][]const u8{}, // [!code focus]
+    }); // [!code focus]
 
-    // 链接标准 C 库
-    exe.linkLibC();
+    // 链接标准 C 库 // [!code focus]
+    exe.linkLibC(); // [!code focus]
 
-    // 链接系统的GTK4库
-    exe.linkSystemLibrary("gtk4");
+    // 链接系统的GTK4库 // [!code focus]
+    exe.linkSystemLibrary("gtk4"); // [!code focus]
 
     // 添加到顶级 install step 中作为依赖
     b.installArtifact(exe);
