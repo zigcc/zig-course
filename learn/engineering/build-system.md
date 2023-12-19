@@ -576,7 +576,14 @@ pub fn build(b: *std.Build) !void {
 
 ### 构建纯 C 项目
 
-在这里我们使用 [GTK4](https://www.gtk.org/) 的官方示例 [Hello-World](https://www.gtk.org/docs/getting-started/hello-world/) 来作为演示：
+在这里我们使用 [GTK4](https://www.gtk.org/) 的官方示例 [Hello-World](https://www.gtk.org/docs/getting-started/hello-world/) 来作为演
+示：
+
+::: warning
+
+在进行本部分教程前请先安装好 GTK4 的依赖，具体安装方法见 GTK 的指南。
+
+:::
 
 :::code-group
 
@@ -696,6 +703,12 @@ main (int    argc,
 ### 构建纯 C++ 项目
 
 由于 GTK 的 C++ 构建过于复杂（需要手动编译gtkmm），故我们这里选择构建一个 [tinytetris](https://github.com/taylorconor/tinytetris):
+
+::: warning
+
+注意：由于依赖了 curses 库，故只能在 linux 进行编译！
+
+:::
 
 ::: code-group
 
