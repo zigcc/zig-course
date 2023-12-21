@@ -93,7 +93,7 @@ const is_all_true = @reduce(.And, result);
 2. `.And`, `.Or`, `.Xor` 还可用于布尔。
 3. `.Min`, `.Max`, `.Add`, `.Mul` 还可以用于浮点型。
 
-注意：`.Add` 和 `.Mul` 在整形上的操作是 **wrapping**。
+注意：`.Add` 和 `.Mul` 在整型上的操作是 **wrapping**。
 
 <!-- 增加说明关于浮点的optimized说明 -->
 
