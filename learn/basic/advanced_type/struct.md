@@ -71,6 +71,69 @@ pub fn main() void {
 - 一个声明 `PI`
 - 包含两个方法 `init` 和 `area`
 
+:::info 🅿️ 提示
+
+值得注意的是，结构体的方法除了使用 `.` 语法来使用外，和其他的函数没有任何区别！这意味着你可以在任何你用普通函数的地方使用结构体的方法。
+
+:::
+
+## 自引用
+
+通常自引用方式为函数参数第一个为结构体指针类型，例如：
+
+```zig
+const std = @import("std");
+
+const TT = struct { // [!code focus]
+    pub fn print(self: *TT) void { // [!code focus]
+        _ = self; // [!code focus]
+        std.debug.print("Hello, world!\n", .{}); // [!code focus]
+    } // [!code focus]
+}; // [!code focus]
+
+pub fn main() !void {
+    var tmp: TT = .{};
+    tmp.print();
+}
+```
+
+平常使用过程中会面临另外的一个情况，就是匿名结构体要如何实现自引用呢？
+
+答案是使用 [`@This`](https://ziglang.org/documentation/master/#This)，这是 zig 专门为匿名结构体和文件类的类型声明（此处可以看 [命名空间](../../more/miscellaneous.md#容器)）提供的处理方案。
+
+此函数会返回一个当前包裹它的容器的类型！
+
+例如：
+
+```zig
+const std = @import("std");
+
+fn List(comptime T: type) type { // [!code focus]
+    return struct { // [!code focus]
+        const Self = @This(); // [!code focus]
+
+        items: []T, // [!code focus]
+
+        fn length(self: Self) usize { // [!code focus]
+            return self.items.len; // [!code focus]
+        } // [!code focus]
+    }; // [!code focus]
+} // [!code focus]
+
+pub fn main() !void {
+    const int_list = List(u8);
+    var arr: [5]u8 = .{
+        1, 2, 3, 4, 5,
+    };
+
+    var list: int_list = .{
+        .items = &arr,
+    };
+
+    std.debug.print("list len is {}\n", .{list.length()});
+}
+```
+
 :::details 更复杂的例子
 
 下面是一个日常会用到的一个结构体例子，系统账号管理的使用：
@@ -190,11 +253,7 @@ pub fn main() !void {
 
 :::
 
-:::info 🅿️ 提示
 
-值得注意的是，结构体的方法除了使用 `.` 语法来使用外，和其他的函数没有任何区别！这意味着你可以在任何你用普通函数的地方使用结构体的方法。
-
-:::
 
 ## 自动推断
 
