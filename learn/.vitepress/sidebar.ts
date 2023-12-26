@@ -182,10 +182,6 @@ export default [
     text: "更多",
     items: [
       {
-        text: "内建函数",
-        link: "/more/builtin_func",
-      },
-      {
         text: "反射",
         link: "/more/reflection",
       },
@@ -204,6 +200,10 @@ export default [
       {
         text: "未定义行为",
         link: "/more/undefined_behavior",
+      },
+      {
+        text: "内建函数",
+        link: "/more/builtin_func",
       },
       {
         text: "风格指南",
