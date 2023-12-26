@@ -120,24 +120,86 @@ pub fn main() void {
 
 ## 移位溢出
 
+进行左移操作时，可能导致结果溢出，此时程序或者编译器会停止并发出警告！
+
 ## 除零操作
 
-## 精确触发溢出
+很显然，除零是非法操作，故会引起程序或者编译器报错！
 
-## 尝试解开 Null
+当然，还包括求余运算，除数为零是也是非法的！
 
-## 尝试解开 Error
+## 精确除法溢出
+
+精确除法使用的是 [`@divExact`](https://ziglang.org/documentation/master/#divExact)，它需要保证被除数可以整除除数，否则会触发编译器错误！
+
+## 尝试解开可选类型 Null
+
+可选类型值是 `null` 时，如果直接使用 `variable.?` 语法来解开可选，那么会导致出现错误！
+
+正确的处理方案是使用 [`if` 语法](../basic/process_control/decision.md#解构可选类型)来解开可选类型。
+
+## 尝试解开错误联合类型 Error
+
+错误联合类型如果是 `error` 时，直接使用它会导致程序或者编译器停止运行！
+
+正确的处理方案是使用 [`if` 语法](../basic/process_control/decision.md#解构错误联合类型)来解开可选类型。
 
 ## 无效错误码
 
+使用 [`@errorFromInt`](https://ziglang.org/documentation/master/#errorFromInt) 获取错误时，如果没有对应整数的错误，那么会导致程序或编译器报错！
+
 ## 无效枚举转换
+
+当使用 [`@enumFromInt`](https://ziglang.org/documentation/master/#enumFromInt) 来获取枚举时，如果没有对应整数的枚举，那么会导致程序或者编译器报告错误！
 
 ## 无效错误集合转换
 
+两个不相关的错误集不可以相互转换，如果强制使用 [`@errorCast`](https://ziglang.org/documentation/master/#errorCast)转换两个不相关的错误集，那么会导致程序或者编译器报告错误！
+
 ## 指针对齐错误
+
+指针对齐转换可能发生错误，如：
+
+```zig
+const ptr: *align(1) i32 = @ptrFromInt(0x1);
+const aligned: *align(4) i32 = @alignCast(ptr);
+```
+
+`0x1` 地址很明显是不符合 4 字节对齐，会导致编译器错误。
 
 ## 联合类型字段访问错误
 
+如果访问的联合类型字段并非是它当前的有效字段，那么会触发非法行为！
+
+可以通过重新分配来更改联合类型的有效字段：
+
+```zig
+const Foo = union {
+    float: f32,
+    int: u32,
+};
+
+var f = Foo{ .int = 42 };
+f = Foo{ .float = 12.34 };
+```
+
+::: info 🅿️ 提示
+
+注意：packed 和 extern 标记的联合类型并没有这种安全监测！
+
+:::
+
 ## 浮点转换整数发生越界
 
+当将浮点数转换为整数时，如果浮点数的值超出了整数类型的范围，就会发生非法越界，例如：
+
+```zig
+const float: f32 = 4294967296;
+const int: i32 = @intFromFloat(float);
+```
+
 ## 指针强制转换为 Null
+
+将允许地址为 0 的指针转换为地址不可能为 0 的指针，这会触发非法行为。
+
+C 指针、可选指针、`allowzero` 标记的指针，这些都是允许地址为 0，但普通指针是不允许的。
