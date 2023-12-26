@@ -72,8 +72,51 @@ const byte: u8 = @intCast(spartan_count);
 
 ## 整数溢出
 
-常规的运算可能导致溢出，如加 `+` 减 `-` 乘 `*` 除 `/` 取反 `-`
+常规的运算可能导致溢出，如加 `+` 减 `-` 乘 `*` 除 `/` 取反 `-` 运算可能出现溢出。
 
+还有 [`@divTrunc`](https://ziglang.org/documentation/master/#divTrunc)、[`@divFloor`](https://ziglang.org/documentation/master/#divFloor)、[`@divExact`](https://ziglang.org/documentation/master/#divExact)，可能造成溢出。
+
+标准库提供的函数可能存在溢出：
+
+- `@import("std").math.add`
+- `@import("std").math.sub`
+- `@import("std").math.mul`
+- `@import("std").math.divTrunc`
+- `@import("std").math.divFloor`
+- `@import("std").math.divExact`
+- `@import("std").math.shl`
+
+为了处理这些情况，zig 提供了几个溢出检测函数来处理溢出问题：
+
+- [`@addWithOverflow`](https://ziglang.org/documentation/master/#addWithOverflow)
+- [`@subWithOverflow`](https://ziglang.org/documentation/master/#subWithOverflow)
+- [`@mulWithOverflow`](https://ziglang.org/documentation/master/#mulWithOverflow)
+- [`@shlWithOverflow`](https://ziglang.org/documentation/master/#shlWithOverflow)
+
+以上这些内置函数会返回一个元组，包含计算的结果和是否发生溢出的判断位。
+
+```zig
+const print = @import("std").debug.print;
+pub fn main() void {
+    const byte: u8 = 255;
+
+    const ov = @addWithOverflow(byte, 10);
+    if (ov[1] != 0) {
+        print("overflowed result: {}\n", .{ov[0]});
+    } else {
+        print("result: {}\n", .{ov[0]});
+    }
+}
+```
+
+除此以外，我们还可以使用环绕（**Wrapping**）操作来处理计算：
+
+- `+%` 加法环绕
+- `-%` 减法环绕
+- `-%` 取否环绕
+- `*%` 乘法环绕
+
+它们会取计算后溢出的值！
 
 ## 移位溢出
 
