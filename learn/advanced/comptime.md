@@ -102,18 +102,18 @@ fn one(value: i32) i32 { return value + 1; }
 fn two(value: i32) i32 { return value + 2; }
 fn three(value: i32) i32 { return value + 3; }
 
-fn performFn(comptime prefix_char: u8, start_value: i32) i32 {
-    var result: i32 = start_value;
-    // 以下的变量 i 被标记为编译期已知的
-    comptime var i = 0;
-    // 下面的 while 循环将会被自动内联
-    inline while (i < cmd_fns.len) : (i += 1) {
-        if (cmd_fns[i].name[0] == prefix_char) {
-            result = cmd_fns[i].func(result);
-        }
-    }
-    return result;
-}
+fn performFn(comptime prefix_char: u8, start_value: i32) i32 { // [!code focus]
+    var result: i32 = start_value; // [!code focus]
+    // 以下的变量 i 被标记为编译期已知的 // [!code focus]
+    comptime var i = 0; // [!code focus]
+    // 下面的 while 循环将会被自动内联 // [!code focus]
+    inline while (i < cmd_fns.len) : (i += 1) { // [!code focus]
+        if (cmd_fns[i].name[0] == prefix_char) { // [!code focus]
+            result = cmd_fns[i].func(result); // [!code focus]
+        } // [!code focus]
+    } // [!code focus]
+    return result; // [!code focus]
+} // [!code focus]
 
 test "perform fn" {
     try expect(performFn('t', 1) == 6);
@@ -197,7 +197,7 @@ test "fibonacci" {
 
 :::info 🅿️ 提示
 
-注意：当前的自托管编译期设计存在某些缺陷（使用自己的堆栈进行comptime函数调用），当宿主机器并没有提供足够大的堆栈时，将导致堆栈溢出，具体问题可以见这个[issue](https://github.com/ziglang/zig/issues/13724)。
+注意：当前的自托管编译期设计存在某些缺陷（使用自己的堆栈进行comptime函数调用），当宿主机器并没有提供足够大的堆栈时，将导致堆栈溢出，具体问题可以见这个 [issue](https://github.com/ziglang/zig/issues/13724)。
 
 :::
 
