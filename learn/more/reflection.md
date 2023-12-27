@@ -80,4 +80,44 @@ main.T.Y
 
 提供类型反射的具体功能，结构体、联合类型、枚举和错误集的类型信息具有保证与源文件中出现的顺序相同的字段，结构、联合、枚举和不透明的类型信息都有声明，也保证与源文件中出现的顺序相同。
 
+实际上，该函数的效果是返回一个 [`std.builtin.Type`](https://ziglang.org/documentation/master/std/#A;std:builtin.Type)，该类型包含了所有 zig 当前可用的类型信息，并允许我们通过该类型观察并获取指定类型的具体信息。
+
+以下是一个简单的示例：
+
+```zig
+const std = @import("std");
+
+const T = struct {
+    a: u8,
+    b: u8,
+};
+
+pub fn main() !void {
+    // 通过 @typeInfo 获取类型信息
+    const type_info = @typeInfo(T);
+    // 断言它为 struct
+    const struct_info = type_info.Struct;
+
+    // inline for 打印该结构体内部字段的信息
+    inline for (struct_info.fields) |field| {
+        std.debug.print("field name is {s}, field type is {}\n", .{
+            field.name,
+            field.type,
+        });
+    }
+}
+```
+
+以上的示例中，我们使用了`@typeInfo` 来获取类型 `T` 的信息，随后将其断言为一个 `Struct` 类型，然后再通过 `inline for` 打印输出其字段值。
+
+需要注意的是，我们在此处打印必须要要使用 `inline for`，否则将会编译无法通过，这是因为 结构体的 **“字段类型”** [`std.builtin.Type.StructField`](https://ziglang.org/documentation/master/std/#A;std:builtin.Type.StructField)，其中有一个字段是 `comptime_int`，使得无法在运行时计算索引来便利，只能通过 `inline for` 将其转换为编译期计算。
+
+::: warning
+
+值得注意的是，我们观察并获得的类型信息是 **只读的**，无法以此来修改已有类型，这是由于 zig 是一门静态语言并不具有过多的运行时功能！
+
+但我们可以以此为基础在编译期构建新的类型！
+
+:::
+
 TODO
