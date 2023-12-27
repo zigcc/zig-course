@@ -10,7 +10,7 @@ outline: deep
 
 ## 观察已有类型
 
-zig 提供了不少函数来获取已有类型的信息,如：`@TypeOf`、`@typeName`、`@typeInfo`、`@hasDecl`、`@hasField`。
+zig 提供了不少函数来获取已有类型的信息,如：`@TypeOf`、`@typeName`、`@typeInfo`、`@hasDecl`、`@hasField`、`@field`、`@fieldParentPtr`、`@call`。
 
 ### `@TypeOf`
 
@@ -119,5 +119,27 @@ pub fn main() !void {
 但我们可以以此为基础在编译期构建新的类型！
 
 :::
+
+TODO：增加新的示例，仅仅一个示例不足以说明 `@typeInfo` 的使用！
+
+### `@hasDecl`
+
+### `@hasField`
+
+### `@field`
+
+### `@fieldParentPtr`
+
+### `@call`
+
+## 构建新的类型
+
+zig 除了获取类型信息外，还提供了在编译期构建全新类型的能力，允许我们通过非常规的方式来声明一个类型。
+
+构建新类型的能力主要依赖于 `@Type`。
+
+### `@Type`
+
+该函数实际上就是 `@typeInfo` 的反函数，它将类型信息具体化为一个类型。
 
 TODO
