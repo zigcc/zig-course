@@ -148,6 +148,20 @@ pub fn build(b: *std.Build) void {
 }
 ```
 
+::: info 🅿️ 提示
+
+值得注意的是，`b.installArtifact` 是将构建放入 `install` 这一 step 中，即默认的 step。
+
+如果我们想要重新创建一个全新的 install，可以使用 [`b.addInstallArtifact`](https://ziglang.org/documentation/master/std/#A;std:Build.addInstallArtifact)，它的原型为：
+
+```zig
+fn addInstallArtifact(self: *Build, artifact: *Step.Compile, options: Step.InstallArtifact.Options) *Step.InstallArtifact
+```
+
+它会返回一个新的 [`InstallArtifact`](https://ziglang.org/documentation/master/std/#A;std:Build.Step.InstallArtifact)，让对应的 step 依赖它即可！
+
+:::
+
 ## CLI 参数
 
 通过 `b.option` 使构建脚本部分配置由用户决定（通过命令行参数传递），这也可用于依赖于当前包的其他包。
