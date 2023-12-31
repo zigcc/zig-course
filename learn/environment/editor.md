@@ -18,6 +18,14 @@ outline: deep
 
 ![vscode-zig](/picture/basic/vscode-zig.png){data-zoomable}
 
+## VS
+
+官网地址：[https://visualstudio.microsoft.com/](https://visualstudio.microsoft.com/)
+
+> Microsoft Visual Studio是微软公司的开发工具包系列产品。VS是一个基本完整的开发工具集，它包括了整个软件生命周期中所需要的大部分工具，如UML工具、代码管控工具、集成开发环境等等。
+
+windows 上最棒的开发 IDE，存在第三方插件：[ZigVS](https://marketplace.visualstudio.com/items?itemName=LuckystarStudio.ZigVS)。
+
 ## CLion
 
 > CLion 是一款专为开发 C 及 C++ 所设计的跨平台 IDE。它是以 IntelliJ 为基础设计的，包含了许多智能功能来提高开发人员的生产力。CLion 帮助开发人员使用智能编辑器来提高代码质量、自动代码重构并且深度整合 CMake 编译系统，从而提高开发人员的工作效率。
