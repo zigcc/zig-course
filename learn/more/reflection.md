@@ -124,13 +124,137 @@ TODO：增加新的示例，仅仅一个示例不足以说明 `@typeInfo` 的使
 
 ### `@hasDecl`
 
+[`@hasDecl`](https://ziglang.org/documentation/master/#hasDecl) 用于返回一个容器中是否包含指定名字的声明。
+
+完全是编译期计算的，故值也是编译期已知的。
+
+```zig
+const std = @import("std");
+
+const Foo = struct {
+    nope: i32,
+
+    pub var blah = "xxx";
+    const hi = 1;
+};
+
+
+pub fn main() !void {
+    // true
+    std.debug.print("blah:{}\n", .{@hasDecl(Foo, "blah")});
+    // true 
+    // hi 此声明可以被检测到是因为类型和代码处于同一个文件中，这导致他们之间可以互相访问
+    // 换另一个文件就不行了
+    std.debug.print("hi:{}\n", .{@hasDecl(Foo, "hi")});
+    // false 不检查字段
+    std.debug.print("nope:{}\n", .{@hasDecl(Foo, "nope")});
+    // false 没有对应的声明
+    std.debug.print("nope1234:{}\n", .{@hasDecl(Foo, "nope1234")});
+}
+```
+
 ### `@hasField`
+
+[`@hasField`](https://ziglang.org/documentation/master/#hasField) 和 [`@hasDecl`](https://ziglang.org/documentation/master/#hasDecl) 类似，但作用于字段，它会返回一个结构体类型（联合类型、枚举类型）是否包含指定名字的字段。
+
+完全是编译期计算的，故值也是编译期已知的。
+
+```zig
+const std = @import("std");
+
+const Foo = struct {
+    nope: i32,
+
+    pub var blah = "xxx";
+    const hi = 1;
+};
+
+pub fn main() !void {
+    // false
+    std.debug.print("blah:{}\n", .{@hasField(Foo, "blah")});
+    // false
+    std.debug.print("hi:{}\n", .{@hasField(Foo, "hi")});
+    // true
+    std.debug.print("nope:{}\n", .{@hasField(Foo, "nope")});
+    // false
+    std.debug.print("nope1234:{}\n", .{@hasField(Foo, "nope1234")});
+}
+```
 
 ### `@field`
 
+[`@field`](https://ziglang.org/documentation/master/#field) 用于获取变量（容器类型）的字段或者容器类型的声明。
+
+```zig
+const std = @import("std");
+
+const Point = struct {
+    x: u32,
+    y: u32,
+
+    pub var z: u32 = 1;
+};
+
+pub fn main() !void {
+    var p = Point{ .x = 0, .y = 0 };
+
+    @field(p, "x") = 4;
+    @field(p, "y") = @field(p, "x") + 1;
+    // x is 4, y is 5
+    std.debug.print("x is {}, y is {}\n", .{ p.x, p.y });
+
+    // Point's z is 1
+    std.debug.print("Point's z is {}\n", .{@field(Point, "z")});
+}
+```
+
+::: info 🅿️ 提示
+
+注意：`@field` 作用于变量时只能访问字段，而作用于类型时只能访问声明。
+
+:::
+
+
 ### `@fieldParentPtr`
 
+[`@fieldParentPtr`](https://ziglang.org/documentation/master/#fieldParentPtr) 根据给定的指向结构体字段的指针和名字，可以获取结构体的基指针。
+
+```zig
+const std = @import("std");
+
+const Point = struct {
+    x: u32,
+};
+
+pub fn main() !void {
+    var p = Point{ .x = 0, .y = 0 };
+
+    const res = &p == @fieldParentPtr(Point, "x", &p.x);
+
+    // test is true
+    std.debug.print("test is {}\n", .{res});
+}
+```
+
+
+
 ### `@call`
+
+[`@call`](https://ziglang.org/documentation/master/#call) 调用一个函数，和普通的函数调用方式相同。
+
+它接收一个调用修饰符、一个函数、一个元组作为参数。
+
+```zig
+const std = @import("std");
+
+fn add(a: i32, b: i32) i32 {
+    return a + b;
+}
+
+pub fn main() !void {
+    std.debug.print("call function add, the result is {}\n", .{@call(.auto, add, .{ 1, 2 })});
+}
+```
 
 ## 构建新的类型
 
