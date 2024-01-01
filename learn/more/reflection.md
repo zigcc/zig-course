@@ -142,7 +142,7 @@ const Foo = struct {
 pub fn main() !void {
     // true
     std.debug.print("blah:{}\n", .{@hasDecl(Foo, "blah")});
-    // true 
+    // true
     // hi 此声明可以被检测到是因为类型和代码处于同一个文件中，这导致他们之间可以互相访问
     // 换另一个文件就不行了
     std.debug.print("hi:{}\n", .{@hasDecl(Foo, "hi")});
@@ -214,7 +214,6 @@ pub fn main() !void {
 
 :::
 
-
 ### `@fieldParentPtr`
 
 [`@fieldParentPtr`](https://ziglang.org/documentation/master/#fieldParentPtr) 根据给定的指向结构体字段的指针和名字，可以获取结构体的基指针。
@@ -235,8 +234,6 @@ pub fn main() !void {
     std.debug.print("test is {}\n", .{res});
 }
 ```
-
-
 
 ### `@call`
 
