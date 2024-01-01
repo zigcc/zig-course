@@ -201,10 +201,10 @@ export default [
         text: "未定义行为",
         link: "/more/undefined_behavior",
       },
-      {
-        text: "内建函数",
-        link: "/more/builtin_func",
-      },
+      // {
+      //   text: "内建函数",
+      //   link: "/more/builtin_func",
+      // },
       {
         text: "风格指南",
         link: "/more/style_guide",
