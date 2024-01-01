@@ -263,4 +263,47 @@ zig 除了获取类型信息外，还提供了在编译期构建全新类型的�
 
 该函数实际上就是 `@typeInfo` 的反函数，它将类型信息具体化为一个类型。
 
-TODO
+函数的原型为：
+
+`@Type(comptime info: std.builtin.Type) type`
+
+参数的具体类型可以参考 [此处](https://ziglang.org/documentation/master/std/#A;std:builtin.Type)。
+
+以下示例为我们构建一个新的结构体：
+
+```zig
+const std = @import("std");
+
+const T = @Type(.{
+    .Struct = .{
+        .layout = .Auto,
+        .fields = &.{
+            .{
+                .alignment = 8,
+                .name = "b",
+                .type = u32,
+                .is_comptime = false,
+                .default_value = null,
+            },
+        },
+        .decls = &.{},
+        .is_tuple = false,
+    },
+});
+
+pub fn main() !void {
+    const D = T{
+        .b = 666,
+    };
+
+    std.debug.print("{}\n", .{D.b});
+}
+```
+
+::: warning
+
+需要注意的是，当前 zig 并不支持构建的类型包含声明（declaration），即定义的变量（常量）或方法，具体原因见此 [issue](https://github.com/ziglang/zig/issues/6709)！
+
+不得不说，不支持声明极大地降低了 zig 编译期的特性。
+
+:::
