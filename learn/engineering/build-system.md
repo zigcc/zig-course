@@ -137,7 +137,7 @@ pub fn build(b: *std.Build) void {
     // 此操作允许用户通过构建系统的命令传递参数，例如 zig build  -- arg1 arg2
     // 当前是将参数传递给运行构建结果
     if (b.args) |args| {
-        run_cmd.addArgs(args);
+        run_exe.addArgs(args);
     }
 
     // 指定一个 step 为 run // [!code focus]
