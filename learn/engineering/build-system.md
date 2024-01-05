@@ -483,6 +483,7 @@ pub fn build(b: *std.Build) void {
 
     // 添加一个匿名的依赖 // [!code focus]
     exe.addAnonymousModule("hello", .{ .source_file = .{ .path = "src/hello.txt" } }); // [!code focus]
+    // 注意：zig `nightly` 已经将上行代码中的 `source_file` 字段更换为 `root_source_file` ！ // [!code focus]
 
     // 添加到顶级 install step 中作为依赖
     b.installArtifact(exe);
@@ -563,6 +564,8 @@ pub fn build(b: *std.Build) !void {
 
     // 添加一个匿名的依赖 // [!code focus]
     exe.addAnonymousModule("hello", .{ .source_file = output }); // [!code focus]
+    // 注意：zig `nightly` 已经将上行代码中的 `source_file` 字段更换为 `root_source_file` ！ // [!code focus]
+
 
     // 添加到顶级 install step 中作为依赖
     b.installArtifact(exe);
