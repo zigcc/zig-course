@@ -3,12 +3,14 @@ import { defineComponent, h } from "vue";
 import { useData, useRoute } from "vitepress";
 import Giscus from "@giscus/vue";
 
+const is_dev = process.env.NODE_ENV === "development";
+
 export default defineComponent({
   setup() {
     const route = useRoute();
     const { isDark } = useData();
 
-    return () =>
+    return () =>is_dev? h("div"):
       h(
         "div",
         {
@@ -30,6 +32,7 @@ export default defineComponent({
           lang: "zh-CN",
           term: route.path,
         }),
-      );
+      ) 
+       ;
   },
 });
