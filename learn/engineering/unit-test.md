@@ -100,9 +100,26 @@ const U = union { // U 被顶层测试块引用了
 };
 ```
 
-值得注意的是，嵌套引用测试在全局测试块中引用另一个容器后，并不会递归，也就是说它仅仅会执行容器的顶层测试块和它引用的容器的顶层测试块。
+注意，嵌套引用测试在全局测试块中引用另一个容器后，并不会递归，也就是说它仅仅会执行容器的顶层测试块和它引用的容器的顶层测试块。
+
+::: info 🅿️ 提示
 
 zig 的标准库还为我们提供了一个函数 `std.testing.refAllDecls`，专门处理上面这种语法（ `_=...` 这种语法看起来并不好看）。
+
+但需要注意的是，`std.testing.refAllDecls` 的实现如下：
+
+```zig
+pub fn refAllDecls(comptime T: type) void {
+    if (!builtin.is_test) return;
+    inline for (comptime std.meta.declarations(T)) |decl| {
+        _ = &@field(T, decl.name);
+    }
+}
+```
+
+它所使用的 `std.meta.declarations` 只能获取到公共成员（即被 `pub` 修饰的），非公共成员需要我们手动以 `_ = ..` 形式引入测试。
+
+:::
 
 ## 跳过测试
 

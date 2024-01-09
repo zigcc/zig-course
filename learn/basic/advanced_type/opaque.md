@@ -22,5 +22,4 @@ fn foo(w: *Wat) callconv(.C) void {
 
 `anyopaque` 是一个比较特殊的类型，代表可以接受任何类型的 `opaque`（由于 `opaque` 拥有不同的变量/常量声明和方法的定义，故是不同的类型），常用于与 C 交互的函数中，相当于是 C 的 `void` 类型！
 
-
 TODO: 添加更多关于该类型使用的示例和说明！
