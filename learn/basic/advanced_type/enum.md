@@ -73,7 +73,7 @@ const Suit = enum {
 
 要注意的是，枚举的大小是会经过 zig 编译器进行严格的计算，如以上的枚举类型 `Type` ，它大小等效于 `u1`。
 
-以下示例中，我们使用了内置函数 `@typeInfo` 和 `@tagName` 来获取枚举的大小和对应的 tag name：
+以下示例中，我们使用了内建函数 `@typeInfo` 和 `@tagName` 来获取枚举的大小和对应的 tag name：
 
 ```zig
 const std = @import("std");

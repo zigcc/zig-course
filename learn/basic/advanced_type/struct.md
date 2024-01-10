@@ -359,7 +359,7 @@ fn setYBasedOnX(x: *f32, y: f32) void {
 }
 ```
 
-这里使用了内置函数 [`@fieldParentPtr`](https://ziglang.org/documentation/0.11.0/#toc-fieldParentPtr) ，它会根据给定字段指针，返回对应的结构体基指针。
+这里使用了内建函数 [`@fieldParentPtr`](https://ziglang.org/documentation/0.11.0/#toc-fieldParentPtr) ，它会根据给定字段指针，返回对应的结构体基指针。
 
 ## 元组
 

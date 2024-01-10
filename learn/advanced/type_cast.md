@@ -231,7 +231,7 @@ const array: [2]u8 = tuple;
 
 ## 显式强制转换
 
-显式强制转换是通过内置函数完成的，有些转换是安全的，有些是执行语言级断言，有些转换在运行时无操作。
+显式强制转换是通过内建函数完成的，有些转换是安全的，有些是执行语言级断言，有些转换在运行时无操作。
 
 - [`@bitCast`](https://ziglang.org/documentation/0.11.0/#bitCast) 更改类型但保持位不变
 - [`@alignCast`](https://ziglang.org/documentation/0.11.0/#alignCast) 显式强制转换对齐

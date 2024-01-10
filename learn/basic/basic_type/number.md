@@ -135,7 +135,7 @@ zig 中，有以下默认操作可以导致溢出：
 - [`@mulWithOverflow`](https://ziglang.org/documentation/0.11.0/#mulWithOverflow)
 - [`@shlWithOverflow`](https://ziglang.org/documentation/0.11.0/#shlWithOverflow)
 
-这些内置函数返回一个元组，其中包含是否存在溢出（作为 `u1`）以及操作中可能溢出的位.
+这些内建函数返回一个元组，其中包含是否存在溢出（作为 `u1`）以及操作中可能溢出的位.
 
 环绕操作符：
 

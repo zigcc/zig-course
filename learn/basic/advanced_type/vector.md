@@ -14,7 +14,7 @@ outline: deep
 - 位操作符 (`>>`, `<<`, `&`, `|`,`~`, ... )
 - 比较远算符 (`<`, `>`, `==`, ...)
 
-禁止对标量（单个数字）和向量的混合使用数学运算符，Zig 提供了 [`@splat`](https://ziglang.org/documentation/0.11.0/#splat) 内置函数来轻松从标量转换为向量，并且它支持 [`@reduce`](https://ziglang.org/documentation/0.11.0/#reduce) 和数组索引语法以从向量转换为标量，向量还支持对具有已知长度的固定长度数组进行赋值，如果需要重新排列元素，可以使用 [`@shuffle`](https://ziglang.org/documentation/0.11.0/#shuffle) 和 [`@select`](https://ziglang.org/documentation/0.11.0/#select) 函数。
+禁止对标量（单个数字）和向量的混合使用数学运算符，Zig 提供了 [`@splat`](https://ziglang.org/documentation/0.11.0/#splat) 内建函数来轻松从标量转换为向量，并且它支持 [`@reduce`](https://ziglang.org/documentation/0.11.0/#reduce) 和数组索引语法以从向量转换为标量，向量还支持对具有已知长度的固定长度数组进行赋值，如果需要重新排列元素，可以使用 [`@shuffle`](https://ziglang.org/documentation/0.11.0/#shuffle) 和 [`@select`](https://ziglang.org/documentation/0.11.0/#select) 函数。
 
 ```zig
 const std = @import("std");

@@ -93,7 +93,7 @@ const byte: u8 = @intCast(spartan_count);
 - [`@mulWithOverflow`](https://ziglang.org/documentation/master/#mulWithOverflow)
 - [`@shlWithOverflow`](https://ziglang.org/documentation/master/#shlWithOverflow)
 
-以上这些内置函数会返回一个元组，包含计算的结果和是否发生溢出的判断位。
+以上这些内建函数会返回一个元组，包含计算的结果和是否发生溢出的判断位。
 
 ```zig
 const print = @import("std").debug.print;
