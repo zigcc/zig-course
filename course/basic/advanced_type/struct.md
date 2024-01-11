@@ -147,7 +147,7 @@ const User = struct {
     email: []u8,
     active: bool,
 
-    pub const writer = "learnzig";
+    pub const writer = "zig-course";
 
     pub fn init(userName: []u8, password: []u8, email: []u8, active: bool) User {
         return User{
@@ -186,7 +186,7 @@ const User = struct {
     email: []u8,
     active: bool,
 
-    pub const writer = "learnzig";
+    pub const writer = "zig-course";
 
     pub fn init(userName: []u8, password: []u8, email: []u8, active: bool) User {
         return User{
