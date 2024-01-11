@@ -1,4 +1,3 @@
 node_modules
-learn/.vitepress/cache
-learn/.vitepress/dist
 .vscode
+course/.vitepress/cache/deps

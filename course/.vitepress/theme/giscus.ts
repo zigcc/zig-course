@@ -21,7 +21,7 @@ export default defineComponent({
               },
             },
             h(Giscus, {
-              repo: "learnzig/learnzig",
+              repo: "zigcc/zig-course",
               repoId: "R_kgDOKRsb5Q",
               category: "Comments",
               categoryId: "DIC_kwDOKRsb5c4Cbx2i",
