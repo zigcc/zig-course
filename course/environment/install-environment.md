@@ -132,39 +132,40 @@ Linux安装的话， 由于发行版的不同，安装的方式五花八门，�
 
 ### 手动安装
 
-通过官方的[发布页面](https://ziglang.org/zh/download/)下载对应的 Zig 版本，普通用户选择 `zig-linux-x86_64` 即可。
+通过官方的[发布页面](https://ziglang.org/zh/download/)下载对应的 Zig 版本，之后将包含 Zig 二进制的目录加入到 PATH 环境变量即可。
 
-以下讲述两种两种方法安装 zig ，一种是采取通用的linux安装方式，一种是在个人目录下安装，添加环境变量
+## 多版本管理
 
-#### 通用linux安装方式
+由于 Zig 还在快速开发迭代中，因此在使用社区已有类库时，有可能出现新版本 Zig 无法编译的情况，这时候一方面可以跟踪上游进展，看看是否有解决方案；另一个就是使用固定的版本来编译这个项目，显然这种方式更靠谱一些。
 
-创建目录 `/usr/lib/zig`，然后将所有文件内容移动到 `/usr/lib/zig` 目录下，最后将可执行文件 `zig` 通过软链接映射到 `/usr/bin/zig` ，具体命令操作如下：
+目前为止，Zig 的版本管理工具主要有如下几个：
 
-```sh
-tar -xpf archive.tar.xz
-cd zig-linux
-cp -r . /usr/lib/zig
-ln -s /usr/lib/zig/zig /usr/bin/zig
+- [marler8997/zigup](https://github.com/marler8997/zigup): Download and manage zig compilers
+- [tristanisham/zvm](https://github.com/tristanisham/zvm): Lets you easily install/upgrade between different versions of Zig
+- [hendriknielaender/zvm](https://github.com/hendriknielaender/zvm): Fast and
+
+读者可根据自身需求选择，这里介绍一个通用的版本管理工具：[asdf](https://asdf-vm.com/)。
+
+1. 参考 [Getting Started](https://asdf-vm.com/guide/getting-started.html) 下载 asdf，一般而言，常见的系统管理器，如 brew、apt 均可直接安装
+2. 安装 asdf [Zig 插件](https://github.com/asdf-community/asdf-zig)
+```bash
+asdf plugin-add zig https://github.com/asdf-community/asdf-zig.git
 ```
+3. 之后就可以用 asdf 管理 Zig 版本。这里列举一些 asdf 常用命令：
 
-#### 个人目录安装
+```bash
+# 列举所有可安装的版本
+asdf list-all zig
 
-这种方案是采取配置`PATH`来实现：
+# 安装指定版本的 Zig
+asdf install zig <version>
 
-```sh
-# 推荐将资源文件放置在 ~/.local/bin
-mkdir ~/.local/bin
-mkdir ~/.local/bin/zig
+# 卸载指定版本的 Zig
+asdf uninstall zig <version>
 
-tar -xpf archive.tar.xz
-cd zig-linux
-cp -r . ~/.local/bin/zig
+# 设置全局默认版本，会写到 $HOME/.tool-versions 文件
+asdf global zig <version>
+
+# 设置当前目录使用的版本，会写到 $(pwd)/.tool-versions 文件
+asdf local zig <version>
 ```
-
-然后像bash写入环境变量配置，如 `~/.bashrc` ：
-
-```sh
-export PATH="~/.local/bin/zig/:$PATH"
-```
-
-如果使用其他的shell,则需要用户自己参照所使用的shell的配置来设置PATH
