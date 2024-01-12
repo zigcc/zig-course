@@ -5,7 +5,7 @@ import socialLinks from "./socialLinks";
 
 export default defineConfig({
   lang: "zh-CN",
-  title: "Zig 圣经",
+  title: "Zig 语言圣经",
   description: "简单、快速地学习 Zig，ziglang中文教程，zig中文教程，",
   sitemap: {
     hostname: "https://zigcc.github.io/zig-course/",
