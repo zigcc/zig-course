@@ -12,14 +12,36 @@ outline: deep
 const print = @import("std").debug.print;
 
 pub fn main() !void {
-    var num: u8 = 1;
-    if (num == 1) {
-        print("num is 1\n", .{});
-    } else if (num == 2) {
-        print("num is 2\n", .{});
-    } else {
-        print("num is other\n", .{});
-    }
+    var num: u8 = 1; // [!code focus]
+    if (num == 1) { // [!code focus]
+        print("num is 1\n", .{}); // [!code focus]
+    } else if (num == 2) { // [!code focus]
+        print("num is 2\n", .{}); // [!code focus]
+    } else { // [!code focus]
+        print("num is other\n", .{}); // [!code focus]
+    } // [!code focus]
+}
+```
+
+## 匹配枚举类型
+
+`if` 可以用于枚举类型的匹配，判断是否相等：
+
+```zig
+const std = @import("std");
+
+const Small = enum { // [!code focus]
+    one, // [!code focus]
+    two, // [!code focus]
+    three, // [!code focus]
+    four, // [!code focus]
+}; // [!code focus]
+
+pub fn main() !void {
+    const demo = Small.one; // [!code focus]
+    if (demo == Small.one) { // [!code focus]
+        std.debug.print("{}\n", .{demo}); // [!code focus]
+    } // [!code focus]
 }
 ```
 
