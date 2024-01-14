@@ -6,8 +6,6 @@ outline: deep
 
 > **_工欲善其事，必先利其器！_**
 
-目前有以下几种编辑器推荐：
-
 ## VS Code
 
 官网地址：[https://code.visualstudio.com/](https://code.visualstudio.com/)
@@ -17,22 +15,6 @@ outline: deep
 目前最轻量且生态丰富的编辑器，微软出品，zig 官方为其开发了插件，仅需要安装 [`Zig Language`](https://marketplace.visualstudio.com/items?itemName=ziglang.vscode-zig)这个插件即可，在初次初始化时会推荐安装 _language server_， 确认即可！
 
 ![vscode-zig](/picture/basic/vscode-zig.png){data-zoomable}
-
-## VS
-
-官网地址：[https://visualstudio.microsoft.com/](https://visualstudio.microsoft.com/)
-
-> Microsoft Visual Studio是微软公司的开发工具包系列产品。VS是一个基本完整的开发工具集，它包括了整个软件生命周期中所需要的大部分工具，如UML工具、代码管控工具、集成开发环境等等。
-
-windows 上最棒的开发 IDE，存在第三方插件：[ZigVS](https://marketplace.visualstudio.com/items?itemName=LuckystarStudio.ZigVS)。
-
-## CLion
-
-> CLion 是一款专为开发 C 及 C++ 所设计的跨平台 IDE。它是以 IntelliJ 为基础设计的，包含了许多智能功能来提高开发人员的生产力。CLion 帮助开发人员使用智能编辑器来提高代码质量、自动代码重构并且深度整合 CMake 编译系统，从而提高开发人员的工作效率。
-
-原本 CLion 仅仅是 C/C++ 的开发IDE，但在安装插件后可以作为 zig 的 IDE 使用。
-
-目前插件市场活跃的两个 zig 插件（均为第三方作者维护）分别是 [ZigBrains](https://plugins.jetbrains.com/plugin/22456-zigbrains) 和 [Zig Support](https://plugins.jetbrains.com/plugin/18062-zig-support)，均支持 zig 的 `0.11.0` 版本。
 
 ## Vim / Neovim
 
@@ -88,7 +70,25 @@ cp zig-out/bin/zls  ~/.local/share/nvim/mason/packages/zls/bin/zls
 
 Zig 官方维护了 Emacs 的插件 [zig-mode](https://github.com/ziglang/zig-mode)，参照页面配置即可。
 
-Emacs 也可以使用 [lsp-mode](https://github.com/emacs-lsp/lsp-mode) 来使用 **zls** 。
+推荐使用 Emacs 28 版本新引入的 [eglot](https://www.gnu.org/software/emacs/manual/html_mono/eglot.html) 作为 LSP 客户端。
+
+![emacs-zig](/picture/basic/emacs-zig.png){data-zoomable}
+
+## VS
+
+官网地址：[https://visualstudio.microsoft.com/](https://visualstudio.microsoft.com/)
+
+> Microsoft Visual Studio是微软公司的开发工具包系列产品。VS是一个基本完整的开发工具集，它包括了整个软件生命周期中所需要的大部分工具，如UML工具、代码管控工具、集成开发环境等等。
+
+windows 上最棒的开发 IDE，存在第三方插件：[ZigVS](https://marketplace.visualstudio.com/items?itemName=LuckystarStudio.ZigVS)。
+
+## CLion
+
+> CLion 是一款专为开发 C 及 C++ 所设计的跨平台 IDE。它是以 IntelliJ 为基础设计的，包含了许多智能功能来提高开发人员的生产力。CLion 帮助开发人员使用智能编辑器来提高代码质量、自动代码重构并且深度整合 CMake 编译系统，从而提高开发人员的工作效率。
+
+原本 CLion 仅仅是 C/C++ 的开发IDE，但在安装插件后可以作为 zig 的 IDE 使用。
+
+目前插件市场活跃的两个 zig 插件（均为第三方作者维护）分别是 [ZigBrains](https://plugins.jetbrains.com/plugin/22456-zigbrains) 和 [Zig Support](https://plugins.jetbrains.com/plugin/18062-zig-support)，均支持 zig 的 `0.11.0` 版本。
 
 ## Sublime Text
 
