@@ -14,13 +14,9 @@ outline: deep
 
 :::
 
-```zig
-const std = @import("std");
-
-pub fn main() void {
-    std.debug.print("Hello, World!\n", .{});
-}
-```
+<!-- 引入代码片段 -->
+<!-- 具体说明见：https://vitepress.dev/zh/guide/markdown#import-code-snippets -->
+<<<@/examples/hello_world_1.zig
 
 _很简单，不是吗？_
 
@@ -58,17 +54,7 @@ zig 会自动为我们根据后面的参量表推导出对应的类型，当 zig
 
 首先，我要告诉你，zig 并没有一个内置的打印功能，包含“输出”功能的包只有 `log` 包和 `debug` 包，zig 并没有内置类似与 `@print()` 这种函数。再来一个简单的例子告诉你，如何打印东西（**_但是请记住，以下示例代码不应用于生产环境中_**）。
 
-```zig
-const std = @import("std");
-
-pub fn main() !void {
-    var out = std.io.getStdOut().writer();
-    var err = std.io.getStdErr().writer();
-
-    try out.print("Hello {s}!\n", .{"out"});
-    try err.print("Hello {s}!\n", .{"err"});
-}
-```
+<<<@/examples/hello_world_2.zig
 
 :::info 🅿️ 提示
 
@@ -84,30 +70,7 @@ pub fn main() !void {
 
 它们都是依靠系统调用来实现输出效果，但是这就面临着性能问题，我们知道系统调用会造成内核上下文切换的开销（系统调用的流程：执行系统调用，此时控制权会切换回内核，由内核执行完成进程需要的系统调用函数后再将控制权返回给进程），所以我们如何解决这个问题呢？可以增加一个缓冲区，等到要打印的内容都到一定程度后再一次性全部 `print`，那么此时的解决方式就如下：
 
-```zig
-const std = @import("std");
-
-pub fn main() !void {
-    var out = std.io.getStdOut().writer();// [!code focus]
-    var err = std.io.getStdErr().writer();// [!code focus]
-
-    // 获取buffer// [!code focus]
-    var out_buffer = std.io.bufferedWriter(out);// [!code focus]
-    var err_buffer = std.io.bufferedWriter(err);// [!code focus]
-
-    // 获取writer句柄// [!code focus]
-    var out_writer = out_buffer.writer();// [!code focus]
-    var err_writer = err_buffer.writer();// [!code focus]
-
-    // 通过句柄写入buffer// [!code focus]
-    try out_writer.print("Hello {s}!\n", .{"out"});// [!code focus]
-    try err_writer.print("Hello {s}!\n", .{"err"});// [!code focus]
-
-    // 尝试刷新buffer// [!code focus]
-    try out_buffer.flush();// [!code focus]
-    try err_buffer.flush();// [!code focus]
-}
-```
+<<<@/examples/hello_world_3.zig
 
 此时我们就分别得到了使用缓冲区的 `stdout` 和 `stderr`， 性能更高了！
 
