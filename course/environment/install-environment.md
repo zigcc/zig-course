@@ -148,9 +148,11 @@ Linux安装的话， 由于发行版的不同，安装的方式五花八门，�
 
 1. 参考 [Getting Started](https://asdf-vm.com/guide/getting-started.html) 下载 asdf，一般而言，常见的系统管理器，如 brew、apt 均可直接安装
 2. 安装 asdf [Zig 插件](https://github.com/asdf-community/asdf-zig)
+
 ```bash
 asdf plugin-add zig https://github.com/asdf-community/asdf-zig.git
 ```
+
 3. 之后就可以用 asdf 管理 Zig 版本。这里列举一些 asdf 常用命令：
 
 ```bash
