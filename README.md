@@ -16,4 +16,11 @@
 - 等待 review
 - 合并到上游仓库，并由 github action 自动构建
 
+```sh
+bun dev // 启动热更开发服务
+bun format // 运行 prettier 格式化程序
+bun run build // 构建产物
+bun run preview // 运行预览
+```
+
 注意：本文档所使用的构建工具为 [bunjs](https://bun.sh/)，在提交时请勿将其他nodejs的包管理工具的额外配置文件添加到仓库中。
