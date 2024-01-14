@@ -7,7 +7,7 @@ export default [
   },
   {
     text: "什么是 Zig ？",
-    link: "/what-is-zig",
+    link: "/",
   },
 
   {
