@@ -4,48 +4,16 @@ outline: deep
 
 # 构建系统
 
-zig 本身就是一套完整的工具链，它可以作为任何语言的构建系统（类似Makefile一样的存在，但更加的现代化），不仅仅是 zig、C、CPP。
+Zig 除了是一门编程语言外，本身还是一套完整的工具链，例如：
 
-::: info 🅿️ 提示
+- `zig cc`、`zig c++` C/C++ 编译器
+- `zig build` 适用于 Zig/C/C++ 的构建系统
 
-当前 zig 的标准构建器位置：[Github](https://github.com/ziglang/zig/blob/master/lib/build_runner.zig)
+本小节就来介绍 Zig 的构建系统。
 
-:::
+## 理念
 
-## 构建模式
-
-zig 提供了四种构建模式（**Build Mode**）：
-
-- _Debug_
-- _ReleaseFast_
-- _ReleaseSafe_
-- _ReleaseSmall_
-
-如果在 `build.zig` 中使用了 `standardOptimizeOption`，则构建系统会接收命令行的参数来决定实际构建模式（缺省时为 Debug），参数类型为 `-Doptimize`，例如 `zig build -Doptimize=Debug` 就是以 Debug 模式构建。
-
-以下讲述四种构建模式的区别：
-
-| Debug          | ReleaseFast    | ReleaseSafe    | ReleaseSmall   |
-| -------------- | -------------- | -------------- | -------------- |
-| 构建速度很快   | 构建速度慢     | 构建速度慢     | 构建速度慢     |
-| 启用安全检查   | 启用安全检查   | 启用安全检查   | 禁用安全检查   |
-| 较差的运行效率 | 很好的运行效率 | 中等的运行效率 | 中等的运行效率 |
-| 二进制体积大   | 二进制体积大   | 二进制体积大   | 二进制体积小   |
-| 无复现构建     | 可复现构建     | 可复现构建     | 可复现构建     |
-
-:::details 关于 Debug 不可复现的原因
-
-关于为什么 Debug 是不可复现的，ziglang 的文档并未给出具体说明：
-
-效果是在 Debug 构建模式下，编译器会添加一些随机因素进入到程序中（例如内存结构不同），所以任何没有明确说明内存布局的容器在 Debug 构建下可能会有所不同，这便于我们在 Debug 模式下快速暴露某些错误。有意思的是，这并不会影响程序正常运行，除非你的程序逻辑有问题。
-
-**_这是 zig 加强安全性的一种方式（尽可能提高安全性但又不至于造成类似 Rust 开发时过重的心智负担）。_**
-
-:::
-
-## 普通构建
-
-一个最简单的 `build.zig` 是这样的：
+Zig 使用 `build.zig` 文件来描述一个项目的构建步骤，如其名字所示，该文件本身就是一个 Zig 程序，而不是类似 `Cargo.toml` 或 `CMakeLists.txt` 这样的领域特定语言（DSL）。这样的好处也很明显，表达能力更强，开发者只需要使用同一门语言即可进行项目构建，减轻了用户心智。一个典型的构建文件如下：
 
 ```zig
 const std = @import("std");
@@ -70,23 +38,18 @@ pub fn build(b: *std.Build) void {
 }
 ```
 
-zig 会通过该文件对整个项目进行构建操作，包含一个对外暴露的 `build` 函数：
+`build` 是构建的入口函数，而不是常见的 `main`，真正的 `main` 函数定义在 [build_runner.zig](https://github.com/ziglang/zig/blob/0.11.0/lib/build_runner.zig#L15) 中，这是由于 Zig 的构建分为两个阶段：
 
-```zig
-pub fn build(b: *std.Build) void
-```
+1. 生成由 [`std.Build.Step`](https://ziglang.org/documentation/master/std/#A;std:Build.Step) 构成有向无环图（DAG）
+2. 真正执行构建逻辑
 
-zig 的标准构建器会以此为入口点，创建一个节点均为 [`std.Build.Step`](https://ziglang.org/documentation/master/std/#A;std:Build.Step) 的有向无环图，其中的每个节点（`Step`）均是我们构建的一部分。
+第一次接触 Zig 的构建流程，可能会觉得有些复杂，尤其是构建 Step 的依赖关系，但这是为了后续并发编译做基础，如果没有 `build_runner.zig` ，让开发者自己去处理并发编译，是件繁琐且容易出错的事情，
 
-例如以上示例中的 `installArtifact`，会给顶层的 **install step** 添加一个依赖项（构建 exe ），并且使用默认的 options。
-
-以上构建的其他说明：
+`Step` 会在下一小节中会重点讲述，这里介绍一下上面这个构建文件的其他部分：
 
 - `b.standardTargetOptions`: 允许构建器读取来自命令行参数的**构建目标三元组**。
 - `b.standardOptimizeOption`： 允许构建器读取来自命令行参数的**构建优化模式**。
 - `b.addExecutable`：创建一个 [`Build.Step.Compile`](https://ziglang.org/documentation/master/std/#A;std:Build.Step.Compile) 并返回对应的指针，其参数为 [`std.Build.ExecutableOptions`](https://ziglang.org/documentation/master/std/#A;std:Build.ExecutableOptions)。
-
-以上的 `addExecutable` 通常仅使用 `name`、`root_source_file`、`target`、`optimize` 这几个字段。
 
 ::: info 🅿️ 提示
 
@@ -94,7 +57,7 @@ zig 的标准构建器会以此为入口点，创建一个节点均为 [`std.Bui
 
 :::
 
-## Step
+### Step
 
 Step 可以称之为构建时的步骤，它们可以构成一个有向无环图，我们可以通过 Step 来指定构建过程之间的依赖管理，例如要构建的二进制程序 **A** 依赖一个库 **B**，那么我们可以在构建 **A** 前先构建出 **B**，而 **B** 的构建依赖于 另一个程序生成的数据 **C**，此时我们可以再指定构建库 **B** 前先构建出数据 **C**，大致的图如下：
 
@@ -150,7 +113,7 @@ pub fn build(b: *std.Build) void {
 
 ::: info 🅿️ 提示
 
-值得注意的是，`b.installArtifact` 是将构建放入 `install` 这一 step 中，即默认的 step。
+值得注意的是，`b.installArtifact` 是将构建放入 `install` 这一默认的 step 中。
 
 如果我们想要重新创建一个全新的 install，可以使用 [`b.addInstallArtifact`](https://ziglang.org/documentation/master/std/#A;std:Build.addInstallArtifact)，它的原型为：
 
@@ -162,7 +125,40 @@ fn addInstallArtifact(self: *Build, artifact: *Step.Compile, options: Step.Insta
 
 :::
 
-## CLI 参数
+## 基本使用
+
+### 构建模式
+
+zig 提供了四种构建模式（**Build Mode**）：
+
+- _Debug_
+- _ReleaseFast_
+- _ReleaseSafe_
+- _ReleaseSmall_
+
+如果在 `build.zig` 中使用了 `standardOptimizeOption`，则构建系统会接收命令行的参数来决定实际构建模式（缺省时为 Debug），参数类型为 `-Doptimize`，例如 `zig build -Doptimize=Debug` 就是以 Debug 模式构建。
+
+以下讲述四种构建模式的区别：
+
+| Debug          | ReleaseFast    | ReleaseSafe    | ReleaseSmall   |
+| -------------- | -------------- | -------------- | -------------- |
+| 构建速度很快   | 构建速度慢     | 构建速度慢     | 构建速度慢     |
+| 启用安全检查   | 启用安全检查   | 启用安全检查   | 禁用安全检查   |
+| 较差的运行效率 | 很好的运行效率 | 中等的运行效率 | 中等的运行效率 |
+| 二进制体积大   | 二进制体积大   | 二进制体积大   | 二进制体积小   |
+| 无复现构建     | 可复现构建     | 可复现构建     | 可复现构建     |
+
+:::details 关于 Debug 不可复现的原因
+
+关于为什么 Debug 是不可复现的，ziglang 的文档并未给出具体说明：
+
+效果是在 Debug 构建模式下，编译器会添加一些随机因素进入到程序中（例如内存结构不同），所以任何没有明确说明内存布局的容器在 Debug 构建下可能会有所不同，这便于我们在 Debug 模式下快速暴露某些错误。有意思的是，这并不会影响程序正常运行，除非你的程序逻辑有问题。
+
+**_这是 zig 加强安全性的一种方式（尽可能提高安全性但又不至于造成类似 Rust 开发时过重的心智负担）。_**
+
+:::
+
+### CLI 参数
 
 通过 `b.option` 使构建脚本部分配置由用户决定（通过命令行参数传递），这也可用于依赖于当前包的其他包。
 
@@ -202,7 +198,7 @@ Project-Specific Options:
   -Dis_strip=[bool]            whether strip executable
 ```
 
-## Options 编译期配置
+### Options 编译期配置
 
 **Options** 允许我们将一些信息传递到项目中，例如我们可以以此实现让程序打印构建时的时间戳：
 
@@ -262,7 +258,7 @@ pub fn build(b: *std.Build) void {
 
 :::
 
-## 构建静/动态链接库
+### 构建静/动态链接库
 
 通常我们定义一个 `lib` 的方式如下：
 
@@ -310,7 +306,7 @@ pub fn build(b: *std.Build) void {
 
 通常，二进制可执行程序的构建结果会输出在 `zig-out/bin` 下，而链接库的构建结果会输出在 `zig-out/lib` 下。
 
-如果要连接到系统的库，则使用 `exe.linkSystemLibrary`，例如：
+如果要连接到系统的库，则使用 `exe.linkSystemLibrary`，Zig 内部借助 pkg-config 实现该功能。示例：
 
 ```zig
 const std = @import("std");
@@ -333,7 +329,7 @@ pub fn build(b: *std.Build) void {
 
 这会链接一个名为 libz 的库，约定库的名字不包含 “lib”。
 
-## 构建 api 文档
+### 生成文档
 
 zig 本身提供了一个实验性的文档生成器，它支持搜索查询，操作如下：
 
@@ -363,7 +359,7 @@ pub fn build(b: *std.Build) void {
 
 以上代码定义了一个名为 `docs` 的 Step，并将 `addInstallDirectory` 操作作为依赖添加到 `docs` Step 上。
 
-## Test
+### 单元测试
 
 每个文件可以使用 `zig test` 命令来执行测试，但实际开发中这样很不方便，zig 的构建系统提供了另外一种方式来处理当项目变得复杂时的测试。
 
@@ -416,7 +412,9 @@ pub fn build(b: *std.Build) void {
 
 以上代码中，先通过 `b.addTest` 构建一个单元测试的 `Compile`，随后进行执行并将其绑定到 `test` Step 上。
 
-## 交叉编译
+## 高级功能
+
+### 交叉编译
 
 得益于 LLVM 的存在，zig 支持交叉编译到任何 LLVM 的目标代码，zig 可以很方便的处理交叉编译，只需要指定好恰当的 target 即可。
 
@@ -441,7 +439,7 @@ const exe = b.addExecutable(.{
 });
 ```
 
-## `embedFile`
+### `embedFile`
 
 [`@embedFile`](https://ziglang.org/documentation/master/#embedFile) 是由 zig 提供的一个内嵌文件的方式，它的引入规则与 `@import` 相同。
 
@@ -509,9 +507,9 @@ pub fn build(b: *std.Build) void {
 
 :::
 
-不仅仅是以上两种方式，匿名模块还支持直接使用其他程序输出,见下方执行其他命令部分！
+不仅仅是以上两种方式，匿名模块还支持直接使用其他程序输出，具体可参考下面一小节。
 
-## 执行其他命令
+### 执行外部命令
 
 zig 的构建系统还允许我们执行一些额外的命令，录入根据 json 生成某些特定的文件（例如 zig 源代码），构建其他的编程语言（不只是 C / C++），如Golang、Rust、前端项目构建等等！
 
@@ -968,6 +966,6 @@ zig 的工具链使用的是 `libc++`（LLVM ABI），而GNU的则是 `libstdc++
 
 :::
 
-### 文件生成
+# 更多参考
 
-TODO
+- [Zig Build System ⚡ Zig Programming Language](https://ziglang.org/learn/build-system/)
