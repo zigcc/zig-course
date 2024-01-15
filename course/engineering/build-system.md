@@ -1,15 +1,18 @@
 ---
 outline: deep
 ---
+
 # 构建系统
 
 Zig 除了是一门编程语言外，本身还是一套完整的工具链，例如：
+
 - `zig cc`、`zig c++` C/C++ 编译器
 - `zig build` 适用于 Zig/C/C++ 的构建系统
 
 本小节就来介绍 Zig 的构建系统。
 
 ## 理念
+
 Zig 使用 `build.zig` 文件来描述一个项目的构建步骤，如其名字所示，该文件本身就是一个 Zig 程序，而不是类似 `Cargo.toml` 或 `CMakeLists.txt` 这样的领域特定语言（DSL）。这样的好处也很明显，表达能力更强，开发者只需要使用同一门语言即可进行项目构建，减轻了用户心智。一个典型的构建文件如下：
 
 ```zig
@@ -36,12 +39,14 @@ pub fn build(b: *std.Build) void {
 ```
 
 `build` 是构建的入口函数，而不是常见的 `main`，真正的 `main` 函数定义在 [build_runner.zig](https://github.com/ziglang/zig/blob/0.11.0/lib/build_runner.zig#L15) 中，这是由于 Zig 的构建分为两个阶段：
+
 1. 生成由 [`std.Build.Step`](https://ziglang.org/documentation/master/std/#A;std:Build.Step) 构成有向无环图（DAG）
 2. 真正执行构建逻辑
 
 第一次接触 Zig 的构建流程，可能会觉得有些复杂，尤其是构建 Step 的依赖关系，但这是为了后续并发编译做基础，如果没有 `build_runner.zig` ，让开发者自己去处理并发编译，是件繁琐且容易出错的事情，
 
 `Step` 会在下一小节中会重点讲述，这里介绍一下上面这个构建文件的其他部分：
+
 - `b.standardTargetOptions`: 允许构建器读取来自命令行参数的**构建目标三元组**。
 - `b.standardOptimizeOption`： 允许构建器读取来自命令行参数的**构建优化模式**。
 - `b.addExecutable`：创建一个 [`Build.Step.Compile`](https://ziglang.org/documentation/master/std/#A;std:Build.Step.Compile) 并返回对应的指针，其参数为 [`std.Build.ExecutableOptions`](https://ziglang.org/documentation/master/std/#A;std:Build.ExecutableOptions)。
@@ -408,6 +413,7 @@ pub fn build(b: *std.Build) void {
 以上代码中，先通过 `b.addTest` 构建一个单元测试的 `Compile`，随后进行执行并将其绑定到 `test` Step 上。
 
 ## 高级功能
+
 ### 交叉编译
 
 得益于 LLVM 的存在，zig 支持交叉编译到任何 LLVM 的目标代码，zig 可以很方便的处理交叉编译，只需要指定好恰当的 target 即可。
@@ -504,6 +510,7 @@ pub fn build(b: *std.Build) void {
 不仅仅是以上两种方式，匿名模块还支持直接使用其他程序输出，具体可参考下面一小节。
 
 ### 执行外部命令
+
 zig 的构建系统还允许我们执行一些额外的命令，录入根据 json 生成某些特定的文件（例如 zig 源代码），构建其他的编程语言（不只是 C / C++），如Golang、Rust、前端项目构建等等！
 
 例如我们可以让 zig 在构建时调用系统的 sh 来输出 hello 并使用 `@embedFile` 传递给包：
@@ -960,4 +967,5 @@ zig 的工具链使用的是 `libc++`（LLVM ABI），而GNU的则是 `libstdc++
 :::
 
 # 更多参考
+
 - [Zig Build System ⚡ Zig Programming Language](https://ziglang.org/learn/build-system/)
