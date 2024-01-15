@@ -1,10 +1,15 @@
 ---
 outline: deep
 ---
+# 构建系统
 
-Zig 除了是一门编程语言外，本身还是一套完整的工具链，它可以作为任何语言的构建系统（类似Makefile一样的存在，但更加的现代化），不仅仅是 zig、C、CPP。
+Zig 除了是一门编程语言外，本身还是一套完整的工具链，例如：
+- `zig cc`、`zig c++` C/C++ 编译器
+- `zig build` 适用于 Zig/C/C++ 的构建系统
 
-# 理念
+本小节就来介绍 Zig 的构建系统。
+
+## 理念
 Zig 使用 `build.zig` 文件来描述一个项目的构建步骤，如其名字所示，该文件本身就是一个 Zig 程序，而不是类似 `Cargo.toml` 或 `CMakeLists.txt` 这样的领域特定语言（DSL）。这样的好处也很明显，表达能力更强，开发者只需要使用同一门语言即可进行项目构建，减轻了用户心智。一个典型的构建文件如下：
 
 ```zig
@@ -47,7 +52,7 @@ pub fn build(b: *std.Build) void {
 
 :::
 
-## Step
+### Step
 
 Step 可以称之为构建时的步骤，它们可以构成一个有向无环图，我们可以通过 Step 来指定构建过程之间的依赖管理，例如要构建的二进制程序 **A** 依赖一个库 **B**，那么我们可以在构建 **A** 前先构建出 **B**，而 **B** 的构建依赖于 另一个程序生成的数据 **C**，此时我们可以再指定构建库 **B** 前先构建出数据 **C**，大致的图如下：
 
@@ -103,7 +108,7 @@ pub fn build(b: *std.Build) void {
 
 ::: info 🅿️ 提示
 
-值得注意的是，`b.installArtifact` 是将构建放入 `install` 这一 step 中，即默认的 step。
+值得注意的是，`b.installArtifact` 是将构建放入 `install` 这一默认的 step 中。
 
 如果我们想要重新创建一个全新的 install，可以使用 [`b.addInstallArtifact`](https://ziglang.org/documentation/master/std/#A;std:Build.addInstallArtifact)，它的原型为：
 
@@ -115,9 +120,9 @@ fn addInstallArtifact(self: *Build, artifact: *Step.Compile, options: Step.Insta
 
 :::
 
-# 基本使用
+## 基本使用
 
-## 构建模式
+### 构建模式
 
 zig 提供了四种构建模式（**Build Mode**）：
 
@@ -148,7 +153,7 @@ zig 提供了四种构建模式（**Build Mode**）：
 
 :::
 
-## CLI 参数
+### CLI 参数
 
 通过 `b.option` 使构建脚本部分配置由用户决定（通过命令行参数传递），这也可用于依赖于当前包的其他包。
 
@@ -188,7 +193,7 @@ Project-Specific Options:
   -Dis_strip=[bool]            whether strip executable
 ```
 
-## Options 编译期配置
+### Options 编译期配置
 
 **Options** 允许我们将一些信息传递到项目中，例如我们可以以此实现让程序打印构建时的时间戳：
 
@@ -248,7 +253,7 @@ pub fn build(b: *std.Build) void {
 
 :::
 
-## 构建静/动态链接库
+### 构建静/动态链接库
 
 通常我们定义一个 `lib` 的方式如下：
 
@@ -296,7 +301,7 @@ pub fn build(b: *std.Build) void {
 
 通常，二进制可执行程序的构建结果会输出在 `zig-out/bin` 下，而链接库的构建结果会输出在 `zig-out/lib` 下。
 
-如果要连接到系统的库，则使用 `exe.linkSystemLibrary`，例如：
+如果要连接到系统的库，则使用 `exe.linkSystemLibrary`，Zig 内部借助 pkg-config 实现该功能。示例：
 
 ```zig
 const std = @import("std");
@@ -319,7 +324,7 @@ pub fn build(b: *std.Build) void {
 
 这会链接一个名为 libz 的库，约定库的名字不包含 “lib”。
 
-## 构建 api 文档
+### 生成文档
 
 zig 本身提供了一个实验性的文档生成器，它支持搜索查询，操作如下：
 
@@ -349,7 +354,7 @@ pub fn build(b: *std.Build) void {
 
 以上代码定义了一个名为 `docs` 的 Step，并将 `addInstallDirectory` 操作作为依赖添加到 `docs` Step 上。
 
-## Test
+### 单元测试
 
 每个文件可以使用 `zig test` 命令来执行测试，但实际开发中这样很不方便，zig 的构建系统提供了另外一种方式来处理当项目变得复杂时的测试。
 
@@ -402,7 +407,8 @@ pub fn build(b: *std.Build) void {
 
 以上代码中，先通过 `b.addTest` 构建一个单元测试的 `Compile`，随后进行执行并将其绑定到 `test` Step 上。
 
-## 交叉编译
+## 高级功能
+### 交叉编译
 
 得益于 LLVM 的存在，zig 支持交叉编译到任何 LLVM 的目标代码，zig 可以很方便的处理交叉编译，只需要指定好恰当的 target 即可。
 
@@ -427,7 +433,7 @@ const exe = b.addExecutable(.{
 });
 ```
 
-## `embedFile`
+### `embedFile`
 
 [`@embedFile`](https://ziglang.org/documentation/master/#embedFile) 是由 zig 提供的一个内嵌文件的方式，它的引入规则与 `@import` 相同。
 
@@ -495,10 +501,9 @@ pub fn build(b: *std.Build) void {
 
 :::
 
-不仅仅是以上两种方式，匿名模块还支持直接使用其他程序输出,见下方执行其他命令部分！
+不仅仅是以上两种方式，匿名模块还支持直接使用其他程序输出，具体可参考下面一小节。
 
-# 高级功能
-
+### 执行外部命令
 zig 的构建系统还允许我们执行一些额外的命令，录入根据 json 生成某些特定的文件（例如 zig 源代码），构建其他的编程语言（不只是 C / C++），如Golang、Rust、前端项目构建等等！
 
 例如我们可以让 zig 在构建时调用系统的 sh 来输出 hello 并使用 `@embedFile` 传递给包：
@@ -954,10 +959,5 @@ zig 的工具链使用的是 `libc++`（LLVM ABI），而GNU的则是 `libstdc++
 
 :::
 
-### 文件生成
-
-TODO
-
-
-# 参考
-- [[https://ziglang.org/learn/build-system/][Zig Build System ⚡ Zig Programming Language]]
+# 更多参考
+- [Zig Build System ⚡ Zig Programming Language](https://ziglang.org/learn/build-system/)
