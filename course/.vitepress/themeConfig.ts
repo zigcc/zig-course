@@ -5,7 +5,7 @@ import socialLinks from "./socialLinks";
 
 const config: DefaultTheme.Config = {
   editLink: {
-    pattern: "https://github.com/zigcc/zig-course/tree/main/learn/:path",
+    pattern: "https://github.com/zigcc/zig-course/tree/main/course/:path",
   },
   search: {
     provider: "local",
