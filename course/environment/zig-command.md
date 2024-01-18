@@ -20,7 +20,7 @@ outline: deep
 
 ## `zig build-test`
 
-编译并执行 Zig 项目中的所有测试用例。
+编译并执行 Zig 文件中的所有测试用例。
 
 ## `zig init-exe`
 
