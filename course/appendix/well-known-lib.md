@@ -30,3 +30,4 @@ outline: deep
 - **[minisign](https://github.com/jedisct1/zig-minisign)**: zig 实现的 minisign
 - **[zig-gamedev](https://github.com/michal-z/zig-gamedev)**: zig 的游戏生态库
 - **[zig-webui](https://github.com/webui-dev/zig-webui)**：webui 的包裹，允许 zig 将浏览器作为渲染前端
+- **[zigar](https://github.com/chung-leong/zigar)**: 在JavaScript项目中使用Zig代码
