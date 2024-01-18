@@ -14,6 +14,14 @@ outline: deep
 
 构建项目，会自动搜索当前目录及父目录的 `build.zig` 进行构建。
 
+## `zig build-obj`
+
+编译一个 Zig 源文件为一个对象文件（`.o` 文件）。
+
+## `zig build-test`
+
+编译并执行 Zig 项目中的所有测试用例。
+
 ## `zig init-exe`
 
 这个命令用于初始化项目（可执行二进制文件），在当前路径下创建 `src/main.zig` 和 `build.zig` 两个文件。
@@ -66,6 +74,34 @@ outline: deep
 
 对指定的源文件运行test,适用于单元测试。
 
+## `zig run`
+
+编译并立即运行一个 Zig 程序。这对于快速测试片段代码非常有用。
+
+## `zig cc`
+
+使用 Zig 的内置 C 编译器来编译 C 代码。
+
+## `zig c++`
+
+使用 Zig 的内置 C++ 编译器来编译 C++ 代码。
+
+## `zig translate-c`
+
+将 C 代码转换为 Zig 代码。这是 Zig 提供的一个强大功能，可以帮助你将现有的 C 代码库迁移到 Zig。
+
+## `zig targets`
+
+显示 Zig 编译器支持的所有目标架构、操作系统和 ABI。
+
+## `zig version`
+
+显示当前安装的 Zig 编译器版本。
+
+## `zig zen`
+
+输出 Zig 的设计哲学。
+
 ## `zig fetch`
 
 ::: warning
@@ -86,3 +122,7 @@ zig fetch --save https://github.com/limine-bootloader/limine-zig/archive/trunk.t
 // 当包提供 name 时，会自动使用包的 name
 // 当然，你也可以指定包的 name，使用 --save=limine
 ```
+
+除了上述命令之外，还有一些其他的命令和选项可以在 Zig 的官方文档中找到。随着 Zig 语言的不断发展，可能会有新的命令和功能加入，所以建议定期查看官方文档来获取最新信息。
+
+希望这些补充能够帮助完善你的文档。如果你需要更详细的信息，可以参考 Zig 的官方文档。
