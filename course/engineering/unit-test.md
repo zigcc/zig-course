@@ -65,7 +65,7 @@ const expect = std.testing.expect;
 test {
     std.testing.refAllDecls(S);
     _ = S;
-    - = U;
+    _ = U;
 }
 
 const S = struct {
