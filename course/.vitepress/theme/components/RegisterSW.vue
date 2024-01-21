@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { onBeforeMount, ref } from "vue";
+import { onBeforeMount, ref,watch } from "vue";
+import { useData } from "vitepress";
+
+const { isDark } = useData();
 
 const offlineReady = ref(false);
 function onOfflineReady() {
@@ -22,6 +25,21 @@ onBeforeMount(async () => {
     },
   });
 });
+
+watch(isDark, (new_value) => {
+  if (new_value) {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      meta.setAttribute('content', '#000000');
+    }
+  } else {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      meta.setAttribute('content', '#ffffff');
+    }
+  }
+})
+
 </script>
 
 <template>
@@ -45,7 +63,7 @@ onBeforeMount(async () => {
   z-index: 100;
   text-align: left;
   box-shadow: 3px 4px 5px 0 #8885;
-  background-color: white;
+  background-color: inherit;
 }
 .pwa-toast #pwa-message {
   margin-bottom: 8px;
