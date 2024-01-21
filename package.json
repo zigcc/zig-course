@@ -7,6 +7,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
+    "@vite-pwa/vitepress": "^0.3.1",
     "medium-zoom": "^1.0.8",
     "prettier": "^3.0.3",
     "vitepress": "^1.0.0-rc.11"
