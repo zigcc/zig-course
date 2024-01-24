@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeMount, ref,watch } from "vue";
+import { onBeforeMount, ref, watch } from "vue";
 import { useData } from "vitepress";
 
 const { isDark } = useData();
@@ -30,16 +30,15 @@ watch(isDark, (new_value) => {
   if (new_value) {
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
-      meta.setAttribute('content', '#000000');
+      meta.setAttribute("content", "#000000");
     }
   } else {
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
-      meta.setAttribute('content', '#ffffff');
+      meta.setAttribute("content", "#ffffff");
     }
   }
-})
-
+});
 </script>
 
 <template>
