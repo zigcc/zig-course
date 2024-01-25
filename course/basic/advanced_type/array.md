@@ -23,7 +23,7 @@ pub fn main() !void {
     const message = [5]u8{ 'h', 'e', 'l', 'l', 'o' };
     // const message = [_]u8{ 'h', 'e', 'l', 'l', 'o' };
     print("{s}\n", .{message}); // hello
-    print("{h}\n", .{message[0]}); // h
+    print("{c}\n", .{message[0]}); // h
 }
 ```
 
