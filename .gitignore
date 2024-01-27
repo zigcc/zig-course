@@ -1,7 +1,8 @@
 node_modules
 .vscode
-course/.vitepress/cache/deps
-course/.vitepress/course/.vitepress/dist
 course/.vitepress/cache/
 course/.vitepress/dist/
 package-lock.json
+zig-cache
+*/zig-cache
+course/code/zig-out/bin
