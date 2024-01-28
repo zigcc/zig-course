@@ -1,0 +1,6 @@
+fail_fast: false
+repos:
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.16.0
+    hooks:
+      - id: typos

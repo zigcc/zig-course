@@ -829,7 +829,7 @@ void frame() {
   refresh();
 }
 
-// set the value fo the board for a particular (x,y,r) piece
+// set the value of the board for a particular (x,y,r) piece
 void set_piece(int x, int y, int r, int v) {
   for (int i = 0; i < 8; i += 2) {
     board[NUM(r, i * 2) + y][NUM(r, (i * 2) + 2) + x] = v;
