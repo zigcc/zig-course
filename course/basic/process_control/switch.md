@@ -202,7 +202,7 @@ const result = switch (color) {
 switch 的分支可以标记为 `inline` 来要求编译器生成该分支对应的所有可能分支：
 
 ```zig
-// 这段函数用来判断一个结构体的字段是否是 optinal，同时它也是 comptime 的
+// 这段函数用来判断一个结构体的字段是否是 optional，同时它也是 comptime 的
 // 故我们可以在下面使用inline 来要求编译器帮我们展开这个switch
 fn isFieldOptional(comptime T: type, field_index: usize) !bool {
     const fields = @typeInfo(T).Struct.fields;
