@@ -1,0 +1,30 @@
+name: CI
+on:
+  push:
+    paths:
+      - "**.zig"
+
+  pull_request:
+    branches: [main]
+    paths:
+      - "**.zig"
+
+jobs:
+  check_11:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: goto-bus-stop/setup-zig@v2
+        with:
+          version: 0.11.0
+  check_12:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: goto-bus-stop/setup-zig@v2
