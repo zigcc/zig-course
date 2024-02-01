@@ -82,11 +82,8 @@ pub fn build_release(b: *Build) void {
                 // this api maybe changed in the future
                 child.cwd = cwd;
 
-                // spawn child process
-                child.spawn() catch unreachable;
-
-                // wait child process
-                _ = child.wait() catch unreachable;
+                // spawn and wait child process
+                _ = child.spawnAndWait() catch unreachable;
             }
         } else {
             break;

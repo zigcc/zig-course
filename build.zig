@@ -12,5 +12,8 @@ pub fn build(b: *Build) void {
         build_release(b);
     } else if (current_zig.minor == 12) {
         build_dev(b);
+    } else {
+        std.log.err("not support current zig version", .{});
+        std.os.exit(1);
     }
 }
