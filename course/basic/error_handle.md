@@ -8,7 +8,7 @@ outline: deep
 
 :::info 🅿️ 提示
 
-事实上，目前 zig 的错误处理方案笔者认为是比较简陋的，因为错误类型在 zig 中只是略微加工后的 `enum`，这导致错误类型无法携带有效的 `payload`，你只能通过 error 的 tagName 来获取有效的信息。
+事实上，目前 zig 的错误处理方案笔者认为是比较简陋的，在 zig 中错误类型很像 `enum`，这导致错误类型无法携带有效的 `payload`，你只能通过 error 的 tagName 来获取有效的信息。
 
 :::
 
