@@ -2,9 +2,9 @@
 outline: deep
 ---
 
-# Echo Tcp Server
+# Echo TCP Server
 
-我们来进行编写一个小小的示例———— Echo Tcp Server，帮助我们理解更多的内容。
+我们来进行编写一个小小的示例———— Echo TCP Server(TCP 回显 server)，帮助我们理解更多的内容。
 
 > 代码一共也就一百行左右，简洁但不简单！
 
@@ -26,90 +26,66 @@ Socket（套接字）是计算机网络中用于实现不同计算机或同一�
 
 I/O 多路复用的常见实现包括 select、poll 和 epoll 等系统调用。这些系统调用允许程序指定一个文件描述符列表，并等待其中任何一个文件描述符准备好进行 I/O 操作。当一个或多个文件描述符准备好时，系统调用返回，程序就可以进行相应的读或写操作。
 
+## 思路讲解
+
+目标：实现一个单线程基于 `poll` 的 **echo server**。
+
+常规的 socket 编程流程为：
+
+1. `socket( )`
+2. `bind( )`
+3. `listen( )`
+4. `accept( )`
+5. `read( )`
+6. `write( )`
+7. `close( )`
+
+![tcp](../picture/echo_tcp_server/tcp.drawio.png)
+
+以上是一个常规的 TCP server 的运作图，但是缺点也很明显，那就是这样运行的话 server 一次只能处理一个连接，无法实现并发连接。
+
+故我们引入 `poll`，它是 POSIX 标准之一，允许我们通知内核替我们监听多个描述符（此处指代 socket 描述符），以一种订阅的方案来监听一组描述符，直到描述符可读或写时通知进程就绪的描述符数量。
+
+::: info 🅿️ 提示
+
+严格来说，**poll** 已经算是一门“过时”的技术，在 linux 平台它被 **epoll** 取代，BSD 系统（包括 mac ）则使用 **kqueue**，而 windows 使用 **IOCP（I/O Completion Ports）** 和 **Overlapped I/O**。
+
+WSAPoll For Windows: [WSAPoll function](https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsapoll)
+
+Poll For Linux: [poll(2) — Linux manual page](https://man7.org/linux/man-pages/man2/poll.2.html)
+
+:::
+
+以下是使用 `poll` 后的运作图：
+
+![tcp](../picture/echo_tcp_server/tcp_poll.drawio.png)
+
 ## 实战
 
-本示例仅使用了 poll （POSIX标准之一）
+为了同时兼容 linux 和 windows，我们需要利用一下 zig 的 `builtin` 包来判断构建目标来决定使用的函数（poll 在 windows 上的实现不完全标准）。
 
-```zig
-const std = @import("std");
-const net = std.net;
-const windows = std.os.windows;
-const posix = std.posix;
+完整的代码在 [Github](https://github.com/zigcc/zig-course/tree/main/course/code/11/echo_tcp_server.zig)，试用的客户端可以使用 _telent_ （windows 和 linux 均可用）。
 
-const max_sockets = 1000;
-const POLLRDNORM: i16 = 0x0100;
-const POLLERR: i16 = 0x0001;
-const POLLHUP: i16 = 0x0002;
-const POLLNVAL: i16 = 0x0004;
+`poll` 函数导入：
 
-pub fn main() !void {
-    const address = try net.Address.parseIp4("127.0.0.1", 8080);
-    var server = net.StreamServer.init(net.StreamServer.Options{ .reuse_port = true });
-    defer server.deinit();
+<<< @/code/11/echo_tcp_server.zig#poll
 
-    try server.listen(address);
+`pollfd` 类型导入:
 
-    var sockfds: [max_sockets]posix.windows.ws2_32.pollfd = undefined;
-    var connections: [max_sockets]?net.StreamServer.Connection = undefined;
+<<< @/code/11/echo_tcp_server.zig#pollfd
 
-    var buf: [1024]u8 = std.mem.zeroes([1024]u8);
+_server_ 监听端口的实现：
 
-    for (0..max_sockets) |i| {
-        sockfds[i].fd = posix.windows.ws2_32.INVALID_SOCKET;
-        sockfds[i].events = POLLRDNORM;
-        connections[i] = null;
-    }
-    if (server.sockfd) |fd| {
-        sockfds[0].fd = fd;
-    } else {
-        @panic("server socket is null");
-    }
+<<< @/code/11/echo_tcp_server.zig#listen
 
-    std.log.info("start listening", .{});
+定义一些必要的数据：
 
-    while (true) {
-        const nums = windows.poll(&sockfds, max_sockets, -1);
-        if (nums == 0) {
-            continue;
-        }
-        if (nums < 0) {
-            @panic("An error occurred in poll");
-        }
+<<< @/code/11/echo_tcp_server.zig#data
 
-        for (1..max_sockets) |i| {
-            const sockfd = sockfds[i];
-            if (sockfd.fd == posix.windows.ws2_32.INVALID_SOCKET) {
-                continue;
-            }
-            if (sockfd.revents & (POLLRDNORM) != 0) {
-                const c = connections[i];
-                if (c) |connection| {
-                    const len = try connection.stream.read(&buf);
-                    _ = try connection.stream.write(buf[0..len]);
-                }
-            } else if (sockfd.revents & (POLLNVAL | POLLERR | POLLHUP) != 0) {
-                sockfds[i].fd = posix.windows.ws2_32.INVALID_SOCKET;
-                connections[i] = null;
-                std.log.info("client {} close", .{i});
-            }
-        }
+处理客户端发送的数据的实现：
 
-        if (sockfds[0].revents & POLLRDNORM != 0) {
-            const client = try server.accept();
-            for (1..max_sockets) |i| {
-                if (sockfds[i].fd == posix.windows.ws2_32.INVALID_SOCKET) {
-                    sockfds[i].fd = client.stream.handle;
-                    connections[i] = client;
-                    std.log.info("new client {} comes", .{i});
-                    break;
-                }
-                if (i == max_sockets) {
-                    @panic("too many clients");
-                }
-            }
-        }
-    }
+<<< @/code/11/echo_tcp_server.zig#exist-connections
 
-    try posix.windows.ws2_32.WSACleanup();
-}
-```
+处理新连接的实现：
+
+<<< @/code/11/echo_tcp_server.zig#new-connection
