@@ -3,8 +3,7 @@ node_modules
 course/.vitepress/cache/
 course/.vitepress/dist/
 package-lock.json
-zig-cache
 */zig-cache
-course/code/zig-out/bin
-zig-out/bin
+*/zig-out
+zig-out
 zig-cache

@@ -1,16 +1,17 @@
 const std = @import("std");
 
 pub fn build(b: *std.Build) void {
-    var target: std.zig.CrossTarget = .{
+    const target_query: std.Target.Query = .{
         .os_tag = .windows,
     };
     // const target = b.standardTargetOptions(.{});
+    const resolved_target: std.Build.ResolvedTarget = b.resolveTargetQuery(target_query);
     const optimize = b.standardOptimizeOption(.{});
 
     const exe = b.addExecutable(.{
         .name = "echo_tcp_server",
         .root_source_file = .{ .path = "src/main.zig" },
-        .target = target,
+        .target = resolved_target,
         .optimize = optimize,
     });
 
