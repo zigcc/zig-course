@@ -1,10 +1,7 @@
 const std = @import("std");
 
 pub fn build(b: *std.Build) void {
-    var target: std.zig.CrossTarget = .{
-        .os_tag = .windows,
-    };
-    // const target = b.standardTargetOptions(.{});
+    const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
     const exe = b.addExecutable(.{
