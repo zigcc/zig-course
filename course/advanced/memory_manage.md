@@ -35,6 +35,12 @@ outline: deep
 
 :::
 
+:::info 🅿️ 提示
+
+补充一点，zig 的内存分配并不会自动进行 0 填充，并且 zig 并没有提供 `calloc` 这种函数，故我们需要手动实现初始化为 0 的操作，不过好在 zig 提供了 [`std.mem.zeroes`](https://ziglang.org/documentation/master/std/#A;std:mem.zeroes) 函数，用于直接返回某种类型的 0 值。
+
+:::
+
 ## `GeneralPurposeAllocator`
 
 这是一个通用的分配器，当你需要动态内存时，并且还不知道自己应该用什么分配器模型，用这个准没错！
