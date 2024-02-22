@@ -28,17 +28,29 @@ const linux_context = struct {
     const INVALID_SOCKET = -1;
 };
 
-const context = if (builtin.os.tag == .windows)
-    windows_context
-else if (builtin.os.tag == .linux)
-    linux_context
-else
-    @compileError("not support current system");
+/// macOS context 定义
+const macos_context = struct {
+    const poll = std.os.darwin.poll;
+    const pollfd = std.os.darwin.pollfd;
+    const POLLIN: i16 = 0x0001;
+    const POLLERR: i16 = 0x0008;
+    const POLLHUP: i16 = 0x0010;
+    const POLLNVAL: i16 = 0x0020;
+    const INVALID_SOCKET = -1;
+};
+
+const context = switch (builtin.os.tag) {
+    .windows => windows_context,
+    .linux => linux_context,
+    .macos => macos_context,
+    else => @compileError("unsupported os"),
+};
 
 pub fn main() !void {
     // #region listen
     // 解析地址
-    const address = try net.Address.parseIp4("127.0.0.1", 8080);
+    const port = 8080;
+    const address = try net.Address.parseIp4("127.0.0.1", port);
     // 初始化一个server，这里就包含了 socket() 和 bind() 两个过程
     var server = net.StreamServer.init(net.StreamServer.Options{ .reuse_port = true });
     defer server.deinit();
@@ -67,7 +79,7 @@ pub fn main() !void {
         @panic("server socket is null");
     }
 
-    std.log.info("start listening", .{});
+    std.log.info("start listening at {d}...", .{port});
 
     // 无限循环，等待客户端连接或者已连接的客户端发送数据
     while (true) {
@@ -87,15 +99,17 @@ pub fn main() !void {
         // #region exist-connections
         // 遍历所有的连接，处理事件
         for (1..max_sockets) |i| {
-            // 处理完一个事件，nums 减一
             // 这里的 nums 是 poll 返回的事件数量
-            defer nums -= 1;
-
             // 在windows下，WSApoll允许返回0，未超时且没有套接字处于指定的状态
             if (nums == 0) {
                 break;
             }
             const sockfd = sockfds[i];
+            // 当前 sock 有 IO 事件时，处理完后将 nums 减一
+            defer if (sockfd.revents != 0) {
+                nums -= 1;
+            };
+
             // 检查是否是无效的 socket
             if (sockfd.fd == context.INVALID_SOCKET) {
                 continue;
@@ -113,8 +127,10 @@ pub fn main() !void {
                         connection.stream.close();
                         // 将 pollfd 和 connection 置为无效
                         sockfds[i].fd = context.INVALID_SOCKET;
+                        std.log.info("client from {any} close!", .{
+                            connection.address,
+                        });
                         connections[i] = null;
-                        std.log.info("client {} close", .{i});
                     } else {
                         // 如果读取到了数据，那么将数据写回去
                         // 但仅仅这样写一次并不安全
