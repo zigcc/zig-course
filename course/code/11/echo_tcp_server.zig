@@ -87,6 +87,11 @@ pub fn main() !void {
         // #region exist-connections
         // 遍历所有的连接，处理事件
         for (1..max_sockets) |i| {
+            // 处理完一个事件，nums 减一
+            // 这里的 nums 是 poll 返回的事件数量
+            defer nums -= 1;
+
+            // 在windows下，WSApoll允许返回0，未超时且没有套接字处于指定的状态
             if (nums == 0) {
                 break;
             }
@@ -112,6 +117,11 @@ pub fn main() !void {
                         std.log.info("client {} close", .{i});
                     } else {
                         // 如果读取到了数据，那么将数据写回去
+                        // 但仅仅这样写一次并不安全
+                        // 最优解应该是使用for循环检测写入的数据大小是否等于buf长度
+                        // 如果不等于就继续写入
+                        // 这是因为 TCP 是一个面向流的协议，它并不保证一次 write 调用能够发送所有的数据
+                        // 作为示例，我们不检查是否全部写入
                         _ = try connection.stream.write(buf[0..len]);
                     }
                 }
@@ -123,10 +133,6 @@ pub fn main() !void {
                 connections[i] = null;
                 std.log.info("client {} close", .{i});
             }
-
-            // 处理完一个事件，nums 减一
-            // 这里的 nums 是 poll 返回的事件数量
-            nums -= 1;
         }
         // #endregion exist-connections
 
@@ -146,7 +152,7 @@ pub fn main() !void {
                     break;
                 }
                 // 如果没有找到空的 pollfd，那么说明连接数已经达到了最大值
-                if (i == max_sockets-1) {
+                if (i == max_sockets - 1) {
                     @panic("too many clients");
                 }
             }
