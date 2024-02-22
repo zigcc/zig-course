@@ -85,7 +85,6 @@ pub fn main() !void {
     while (true) {
         // 调用 poll，nums 是返回的事件数量
         var nums = context.poll(&sockfds, max_sockets, -1);
-        // std.log.info("get io event, num:{d}", .{nums});
         if (nums == 0) {
             continue;
         }
@@ -106,7 +105,7 @@ pub fn main() !void {
                 break;
             }
             const sockfd = sockfds[i];
-            // 当前 sock 有 IO 事件，nums 减一
+            // 当前 sock 有 IO 事件时，处理完后将 nums 减一
             defer if (sockfd.revents != 0) {
                 nums -= 1;
             };
@@ -129,7 +128,7 @@ pub fn main() !void {
                         // 将 pollfd 和 connection 置为无效
                         sockfds[i].fd = context.INVALID_SOCKET;
                         std.log.info("client from {any} close!", .{
-                            connections[i].?.address,
+                            connection.address,
                         });
                         connections[i] = null;
                     } else {
