@@ -14,7 +14,6 @@
     "vitepress": "^1.0.0-rc.11"
   },
   "dependencies": {
-    "@giscus/vue": "^2.3.0",
-    "viewerjs": "^1.11.6"
+    "@giscus/vue": "^2.3.0"
   }
 }
