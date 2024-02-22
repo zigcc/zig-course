@@ -146,7 +146,7 @@ pub fn main() !void {
                     break;
                 }
                 // 如果没有找到空的 pollfd，那么说明连接数已经达到了最大值
-                if (i == max_sockets) {
+                if (i == max_sockets-1) {
                     @panic("too many clients");
                 }
             }
