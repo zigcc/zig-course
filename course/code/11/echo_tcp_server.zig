@@ -2,71 +2,36 @@ const std = @import("std");
 const builtin = @import("builtin");
 const net = std.net;
 const windows = std.os.windows;
+const linux = std.os.linux;
 
-// #region poll
-const poll =
-    if (builtin.os.tag == .windows)
-    // 如果是 windows，则调用 std.os.windows.poll
-    // 它是对 WSAPoll 的封装
-    std.os.windows.poll
-else if (builtin.os.tag == .linux)
-    // 如果是 linux，则调用 std.os.linux.poll
-    // 它是对 系统调用 poll 的封装
-    std.os.linux.poll
-else
-    @compileError("not support current system");
-// #endregion poll
+// POLLIN, POLLERR, POLLHUP, POLLNVAL 均是 poll 的事件
 
-// #region pollfd
-const pollfd =
-    if (builtin.os.tag == .windows)
-    // 如果是 windows
-    std.os.windows.ws2_32.pollfd
-else if (builtin.os.tag == .linux)
-    // 如果是 linux
-    std.os.linux.pollfd
-else
-    @compileError("not support current system");
-// #endregion pollfd
+/// windows context 定义
+const windows_context = struct {
+    const poll = windows.poll;
+    const pollfd = windows.ws2_32.pollfd;
+    const POLLIN: i16 = 0x0100;
+    const POLLERR: i16 = 0x0001;
+    const POLLHUP: i16 = 0x0002;
+    const POLLNVAL: i16 = 0x0004;
+    const INVALID_SOCKET = windows.ws2_32.INVALID_SOCKET;
+};
 
-// 以下定义的是poll的事件类型，在windows和linux下的值是不一样的
-const POLLIN: i16 =
-    if (builtin.os.tag == .windows)
-    0x0100
-else if (builtin.os.tag == .linux)
-    0x0001
-else
-    @compileError("not support current system");
+/// linux context 定义
+const linux_context = struct {
+    const poll = linux.poll;
+    const pollfd = linux.pollfd;
+    const POLLIN: i16 = 0x0001;
+    const POLLERR: i16 = 0x0008;
+    const POLLHUP: i16 = 0x0010;
+    const POLLNVAL: i16 = 0x0020;
+    const INVALID_SOCKET = -1;
+};
 
-const POLLERR: i16 =
-    if (builtin.os.tag == .windows)
-    0x0001
+const context = if (builtin.os.tag == .windows)
+    windows_context
 else if (builtin.os.tag == .linux)
-    0x0008
-else
-    @compileError("not support current system");
-const POLLHUP: i16 =
-    if (builtin.os.tag == .windows)
-    0x0002
-else if (builtin.os.tag == .linux)
-    0x0010
-else
-    @compileError("not support current system");
-
-const POLLNVAL: i16 =
-    if (builtin.os.tag == .windows)
-    0x0004
-else if (builtin.os.tag == .linux)
-    0x0020
-else
-    @compileError("not support current system");
-
-// 以下定义的是socket的无效值，在windows和linux下的值是不一样的
-const INVALID_SOCKET =
-    if (builtin.os.tag == .windows)
-    std.os.windows.ws2_32.INVALID_SOCKET
-else if (builtin.os.tag == .linux)
-    -1
+    linux_context
 else
     @compileError("not support current system");
 
@@ -89,11 +54,11 @@ pub fn main() !void {
     // 存储 accept 拿到的 connections
     var connections: [max_sockets]?net.StreamServer.Connection = undefined;
     // sockfds 用于存储 pollfd, 用于传递给 poll 函数
-    var sockfds: [max_sockets]pollfd = undefined;
+    var sockfds: [max_sockets]context.pollfd = undefined;
     // #endregion data
     for (0..max_sockets) |i| {
-        sockfds[i].fd = INVALID_SOCKET;
-        sockfds[i].events = POLLIN;
+        sockfds[i].fd = context.INVALID_SOCKET;
+        sockfds[i].events = context.POLLIN;
         connections[i] = null;
     }
     if (server.sockfd) |fd| {
@@ -107,7 +72,7 @@ pub fn main() !void {
     // 无限循环，等待客户端连接或者已连接的客户端发送数据
     while (true) {
         // 调用 poll，nums 是返回的事件数量
-        var nums = poll(&sockfds, max_sockets, -1);
+        var nums = context.poll(&sockfds, max_sockets, -1);
         if (nums == 0) {
             continue;
         }
@@ -127,11 +92,11 @@ pub fn main() !void {
             }
             const sockfd = sockfds[i];
             // 检查是否是无效的 socket
-            if (sockfd.fd == INVALID_SOCKET) {
+            if (sockfd.fd == context.INVALID_SOCKET) {
                 continue;
             }
             // 检查是否是 POLLIN 事件，即是否有数据可读
-            if (sockfd.revents & (POLLIN) != 0) {
+            if (sockfd.revents & (context.POLLIN) != 0) {
                 const c = connections[i];
                 if (c) |connection| {
                     const len = try connection.stream.read(&buf);
@@ -142,7 +107,7 @@ pub fn main() !void {
                         // 因为有可能是连接没有断开，但是出现了错误
                         connection.stream.close();
                         // 将 pollfd 和 connection 置为无效
-                        sockfds[i].fd = INVALID_SOCKET;
+                        sockfds[i].fd = context.INVALID_SOCKET;
                         connections[i] = null;
                         std.log.info("client {} close", .{i});
                     } else {
@@ -152,9 +117,9 @@ pub fn main() !void {
                 }
             }
             // 检查是否是 POLLNVAL | POLLERR | POLLHUP 事件，即是否有错误发生，或者连接断开
-            else if (sockfd.revents & (POLLNVAL | POLLERR | POLLHUP) != 0) {
+            else if (sockfd.revents & (context.POLLNVAL | context.POLLERR | context.POLLHUP) != 0) {
                 // 将 pollfd 和 connection 置为无效
-                sockfds[i].fd = INVALID_SOCKET;
+                sockfds[i].fd = context.INVALID_SOCKET;
                 connections[i] = null;
                 std.log.info("client {} close", .{i});
             }
@@ -169,12 +134,12 @@ pub fn main() !void {
         // 检查是否有新的连接
         // 这里的 sockfds[0] 是 server 的 pollfd
         // 这里的 nums 检查可有可无，因为我们只关心是否有新的连接，POLLIN 就足够了
-        if (sockfds[0].revents & POLLIN != 0 and nums > 0) {
+        if (sockfds[0].revents & context.POLLIN != 0 and nums > 0) {
             // 如果有新的连接，那么调用 accept
             const client = try server.accept();
             for (1..max_sockets) |i| {
                 // 找到一个空的 pollfd，将新的连接放进去
-                if (sockfds[i].fd == INVALID_SOCKET) {
+                if (sockfds[i].fd == context.INVALID_SOCKET) {
                     sockfds[i].fd = client.stream.handle;
                     connections[i] = client;
                     std.log.info("new client {} comes", .{i});

@@ -66,14 +66,6 @@ Poll For Linux: [poll(2) — Linux manual page](https://man7.org/linux/man-pages
 
 完整的代码在 [Github](https://github.com/zigcc/zig-course/tree/main/course/code/11/echo_tcp_server.zig)，试用的客户端可以使用 _telent_ （windows 和 linux 均可用）。
 
-`poll` 函数导入：
-
-<<< @/code/11/echo_tcp_server.zig#poll
-
-`pollfd` 类型导入:
-
-<<< @/code/11/echo_tcp_server.zig#pollfd
-
 _server_ 监听端口的实现：
 
 <<< @/code/11/echo_tcp_server.zig#listen
