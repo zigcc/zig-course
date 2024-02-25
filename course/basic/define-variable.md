@@ -68,8 +68,6 @@ pub fn main() void {
 }
 ```
 
-注意： 所有常量都是 [_编译期_](/advanced/comptime) 已知的！
-
 ### `undefined`
 
 我们可以使用 `undefined` 使变量保持未初始化状态。
