@@ -5,7 +5,7 @@ import giscus from "./giscus";
 
 import { h } from "vue";
 
-import RegisterSW from "./components/RegisterSW.vue";
+// import RegisterSW from "./components/RegisterSW.vue";
 
 export default {
   ...DefaultTheme,
@@ -15,7 +15,7 @@ export default {
   Layout() {
     return h(DefaultTheme.Layout, null, {
       "doc-after": () => h(giscus),
-      "layout-bottom": () => h(RegisterSW),
+      // "layout-bottom": () => h(RegisterSW),
     });
   },
 };
