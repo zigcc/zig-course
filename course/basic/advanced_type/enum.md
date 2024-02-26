@@ -115,7 +115,7 @@ const Color = enum {
 
 pub fn main() !void {
     const color1: Color = .auto; // 此处枚举进行了自动推断
-    const color2 = Color.auto; 
+    const color2 = Color.auto;
     _ = (color1 == color2); // 这里比较的结果是 true
 }
 ```
@@ -153,6 +153,34 @@ const is_one = switch (number) {
 };
 // is_one 也是true
 ```
+
+## `EnumLiteral`
+
+::: info 🅿️ 提示
+
+此部分内容并非是初学者需要掌握的内容，它涉及到 zig 本身的类型系统和 [编译期反射](../../more/reflection#构建新的类型)，可以暂且跳过！
+
+:::
+
+zig 还包含另外一个特殊的类型 `EnumLiteral`，它是 [`std.builtin.Type`](https://ziglang.org/documentation/master/std/#A;std:builtin.Type) 的一部分。
+
+可以将它称之为“枚举字面量”，它是一个与 `enum` 完全不同的类型，可以查看 zig 类型系统对 `enum` 的 [定义](https://ziglang.org/documentation/master/std/#A;std:builtin.Type.Enum)，并不包含 `EnumLiteral`！
+
+它的具体使用如下：
+
+```zig
+// 使用内建函数 @Type 构造出一个 EnumLiteral 类型
+// 这是目前官方文档中的使用方案
+const EnumLiteral: type = @Type(.EnumLiteral);
+
+// 定义一个常量 enum_literal，它的类型为 EnumLiteral，并赋值为 “.kkk”
+const enum_literal: EnumLiteral = .kkk;
+
+// 使用内建函数 @tagName 获取 enum_literal 的 tag name，并进行打印
+std.debug.print("enum_literal is {s}", .{@tagName(enum_literal)});
+```
+
+注意：此类型常用于作为函数参数！
 
 ## extern
 
