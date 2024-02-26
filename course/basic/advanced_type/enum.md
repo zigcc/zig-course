@@ -104,7 +104,7 @@ pub fn main() !void {
 
 ## 枚举推断
 
-枚举也支持让 zig 编译器自动进行推断：
+枚举也支持让 zig 编译器自动进行推断，即在已经知道枚举的类型情况下仅使用字段来指定枚举的值：
 
 ```zig
 const Color = enum {
@@ -114,8 +114,9 @@ const Color = enum {
 };
 
 pub fn main() !void {
-    const color1: Color = .auto;
-    _ = color1;
+    const color1: Color = .auto; // 此处枚举进行了自动推断
+    const color2 = Color.auto; 
+    _ = (color1 == color2); // 这里比较的结果是 true
 }
 ```
 
@@ -151,36 +152,6 @@ const is_one = switch (number) {
     else => false,
 };
 // is_one 也是true
-```
-
-## 枚举字面量
-枚举字面量允许在不指定枚举类型的情况下指定枚举字段的名称。
-枚举字面量为：`.枚举值`
-```zig
-const std = @import("std");
-const expect = std.testing.expect;
-
-const Color = enum {
-    auto,
-    off,
-    on,
-};
-
-test "enum literals" {
-    const color1: Color = .auto;  // 这里直接使用枚举字面量
-    const color2 = Color.auto;    // 这里使用枚举值
-    try expect(color1 == color2); // 两个值相等
-}
-
-test "switch using enum literals" {
-    const color = Color.on;
-    const result = switch (color) {
-        .auto => false,
-        .on => true,
-        .off => false,
-    };
-    try expect(result);
-}
 ```
 
 ## extern
