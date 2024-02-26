@@ -53,6 +53,8 @@ const Color = enum {
 };
 const color: Color = .@"really red";
 ```
+> 注意：这里的 `.@"really red"` 是一个枚举字面量，关于枚举字面量的详细信息，见 [_枚举_](/basic/advanced_type/enum) 部分！
+> 虽然少写了几个字，但是第一次接触zig的很容易懵逼啊有没有，再加上匿名元组。。。鸡肋糖，没有更好，语义上更加简洁清楚，也不在乎多这几个字母。
 
 ### 常量
 

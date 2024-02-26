@@ -153,6 +153,36 @@ const is_one = switch (number) {
 // is_one 也是true
 ```
 
+## 枚举字面量
+枚举字面量允许在不指定枚举类型的情况下指定枚举字段的名称。
+枚举字面量为：`.枚举值`
+```zig
+const std = @import("std");
+const expect = std.testing.expect;
+
+const Color = enum {
+    auto,
+    off,
+    on,
+};
+
+test "enum literals" {
+    const color1: Color = .auto;  // 这里直接使用枚举字面量
+    const color2 = Color.auto;    // 这里使用枚举值
+    try expect(color1 == color2); // 两个值相等
+}
+
+test "switch using enum literals" {
+    const color = Color.on;
+    const result = switch (color) {
+        .auto => false,
+        .on => true,
+        .off => false,
+    };
+    try expect(result);
+}
+```
+
 ## extern
 
 注意，我们不在这里使用 `extern` 关键字。
