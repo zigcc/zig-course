@@ -54,6 +54,12 @@ const Color = enum {
 const color: Color = .@"really red";
 ```
 
+::: info 🅿️ 提示
+
+注意，上方代码 `const color: Color = .@"really red";` 后面的 `.@"really red"` 是一个枚举推断，这是由编译器完成的，更多内容见 [_枚举_](/basic/advanced_type/enum) 部分！
+
+:::
+
 ### 常量
 
 zig 使用 `const` 作为关键字来声明常量，它无法再被更改，只有初次声明时可以赋值。
