@@ -52,10 +52,8 @@ pub fn main() !void {
     const port = 8080;
     const address = try net.Address.parseIp4("127.0.0.1", port);
     // 初始化一个server，这里就包含了 socket() 和 bind() 两个过程
-    var server = net.StreamServer.init(net.StreamServer.Options{ .reuse_port = true });
+    var server = try address.listen(.{ .reuse_port = true });
     defer server.deinit();
-    // 开始listen
-    try server.listen(address);
     // #endregion listen
 
     // #region data
@@ -64,7 +62,7 @@ pub fn main() !void {
     // buffer 用于存储 client 发过来的数据
     var buf: [1024]u8 = std.mem.zeroes([1024]u8);
     // 存储 accept 拿到的 connections
-    var connections: [max_sockets]?net.StreamServer.Connection = undefined;
+    var connections: [max_sockets]?net.Server.Connection = undefined;
     // sockfds 用于存储 pollfd, 用于传递给 poll 函数
     var sockfds: [max_sockets]context.pollfd = undefined;
     // #endregion data
@@ -73,11 +71,7 @@ pub fn main() !void {
         sockfds[i].events = context.POLLIN;
         connections[i] = null;
     }
-    if (server.sockfd) |fd| {
-        sockfds[0].fd = fd;
-    } else {
-        @panic("server socket is null");
-    }
+    sockfds[0].fd = server.stream.handle;
 
     std.log.info("start listening at {d}...", .{port});
 
@@ -160,6 +154,7 @@ pub fn main() !void {
         // 这里的 sockfds[0] 是 server 的 pollfd
         // 这里的 nums 检查可有可无，因为我们只关心是否有新的连接，POLLIN 就足够了
         if (sockfds[0].revents & context.POLLIN != 0 and nums > 0) {
+            std.log.info("new client", .{});
             // 如果有新的连接，那么调用 accept
             const client = try server.accept();
             for (1..max_sockets) |i| {

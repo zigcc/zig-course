@@ -28,13 +28,7 @@ outline: deep
 | `usize`        | `uintptr_t` `size_t` | 无符号指针大小的整数           |
 | `comptime_int` | 无                   | 编译期的整数，整数字面量的类型 |
 
-```zig
-// 下划线可以放在数字之间作为视觉分隔符
-const one_billion = 1_000_000_000;
-const binary_mask = 0b1_1111_1111;
-const permissions = 0o7_5_5;
-const big_address = 0xFF80_0000_0000_0000;
-```
+<<<@/code/11/number.zig#type
 
 同时 zig 支持任意位宽的整数，使用 `u` 或者 `i` 后面加数字即可，例如 `i7` 代表有符号的7位整数，整数类型允许的最大位宽为`65535`。
 
@@ -160,13 +154,7 @@ zig 中，有以下默认操作可以导致溢出：
 
 zig 并未像其他语言那样默认提供了 NaN、无穷大、负无穷大这些语法，如果需要使用它们，请使用标准库：
 
-```zig
-const std = @import("std");
-
-const inf = std.math.inf(f32);
-const negative_inf = -std.math.inf(f64);
-const nan = std.math.nan(f128);
-```
+<<<@/code/11/number.zig#float
 
 :::
 

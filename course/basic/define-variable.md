@@ -12,16 +12,7 @@ outline: deep
 
 在 zig 中，我们使用 `var` 来进行变量的声明，格式是 `var variable:type = value;`，以下是一个示例：
 
-```zig
-const std = @import("std");
-
-pub fn main() void {
-    // 声明变量 variable 类型为u16, 并指定值为 666
-    var variable: u16 = 666;
-
-    std.debug.print("变量 variable 是{}\n", .{variable});
-}
-```
+<<<@/code/11/define_variable.zig#define
 
 ::: info 🅿️ 提示
 
@@ -39,20 +30,7 @@ pub fn main() void {
 
 如果一定要使用不符合这些规定的名称（例如与外部库的链接），那么请使用 `@""` 语法。
 
-```zig
-const @"identifier with spaces in it" = 0xff;
-const @"1SmallStep4Man" = 112358;
-
-const c = @import("std").c;
-pub extern "c" fn @"error"() void;
-pub extern "c" fn @"fstat$INODE64"(fd: c.fd_t, buf: *c.Stat) c_int;
-
-const Color = enum {
-  red,
-  @"really red",
-};
-const color: Color = .@"really red";
-```
+<<<@/code/11/define_variable.zig#indentifier
 
 ::: info 🅿️ 提示
 
@@ -64,31 +42,13 @@ const color: Color = .@"really red";
 
 zig 使用 `const` 作为关键字来声明常量，它无法再被更改，只有初次声明时可以赋值。
 
-```zig
-const std = @import("std");
-
-pub fn main() void {
-    const constant: u16 = 666;
-
-    std.debug.print("常量 constant 是{}\n", .{constant});
-}
-```
+<<<@/code/11/define_variable.zig#const
 
 ### `undefined`
 
 我们可以使用 `undefined` 使变量保持未初始化状态。
 
-```zig
-const std = @import("std");
-
-pub fn main() void {
-    var variable: u16 = undefined;
-
-    variable = 666;
-
-    std.debug.print("变量 variable 是{}\n", .{variable});
-}
-```
+<<<@/code/11/define_variable.zig#undefined
 
 ::: warning ⚠️ 警告
 
@@ -113,14 +73,7 @@ x += 1;
 
 块也可以是一个表达式，当它有标签时，`break` 会从块中返回一个值出来。
 
-```zig
-var y: i32 = 123;
-
-const x = blk: {
-    y += 1;
-    break :blk y;
-};
-```
+<<<@/code/11/define_variable.zig#block
 
 上方的 `blk` 是标签名字，它可以是你设置的任何名字。
 
@@ -138,38 +91,11 @@ PS:说实话，我认为这个设计并不太好。
 
 `///` 就是文档注释，用于给函数、类型、变量等这些提供注释，文档注释记录了紧随其后的内容。
 
-```zig
-/// 存储时间戳的结构体，精度为纳秒
-/// (像这里就是多行文档注释)
-const Timestamp = struct {
-
-    /// 自纪元开始后的秒数 (此处也是一个文档注释).
-    seconds: i64,  // 我们可以以此代表1970年前 (此处是普通注释)
-
-    /// 纳秒数 (文档注释).
-    nanos: u32,
-
-    /// 返回一个 Timestamp 结构体代表 unix 纪元;
-    /// 1970年 1月1日 00:00:00 UTC (文档注释).
-    pub fn unixEpoch() Timestamp {
-        return Timestamp{
-            .seconds = 0,
-            .nanos = 0,
-        };
-    }
-};
-```
+<<<@/code/11/define_variable.zig#doc-comment
 
 `//!` 是顶层文档注释，通常用于记录一个文件的作用，**必须放在作用域的顶层，否则会编译错误**
 
-```zig
-//! 顶层文档注释
-//! 顶层文档注释
-
-const S = struct {
-    //! 顶层文档注释
-};
-```
+<<<@/code/11/define_variable.zig#top-level
 
 ::: details 小细节
 为什么是作用域顶层呢？实际上，zig 将一个源码文件看作是一个容器。

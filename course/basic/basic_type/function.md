@@ -10,11 +10,7 @@ outline: deep
 
 zig 的函数明显，你可以一眼就看出来它的组成，我们来用一个简单的函数作为说明：
 
-```zig
-pub fn add(a: u8, b: u8) u8 {
-    return a + b;
-}
-```
+<<<@/code/11/function.zig#add
 
 > 如果你有 C 的使用经验，一眼就可以看出来各自的作用。
 
@@ -32,11 +28,7 @@ pub fn add(a: u8, b: u8) u8 {
 
 你可能注意到了有的函数定义是这样子的：
 
-```zig
-fn max(comptime T: type, a: T, b: T) T {
-    return if (a > b) a else b;
-}
-```
+<<<@/code/11/function.zig#max
 
 其中的 `comptime T: type` 你可能很陌生，这是[编译期](../../advanced/comptime.md)参数，它是用来实现鸭子类型（泛型）的关键语法！
 
@@ -88,11 +80,7 @@ zig 在这方面的处理则是，原始类型（整型、布尔这种）传递�
 
 函数参数可以用 `anytype` 代替类型来声明。在这种情况下，调用函数时将推断参数类型。使用 `@TypeOf` 和 `@typeInfo` 获取有关推断类型的信息。
 
-```zig
-fn addFortyTwo(x: anytype) @TypeOf(x) {
-    return x + 42;
-}
-```
+<<<@/code/11/function.zig#addFortyTwo
 
 ### `noreturn`
 
@@ -108,25 +96,19 @@ fn addFortyTwo(x: anytype) @TypeOf(x) {
 
 该类型一般用在内核开发中，因为内核本身应当是一个不会退出的程序，还有一种使用场景是 `exit` 函数。
 
-```zig
-extern "kernel32" fn ExitProcess(exit_code: c_uint) callconv(WINAPI) noreturn;
-```
+<<<@/code/11/function.zig#ExitProcess
 
 ### `extern`
 
 `extern` 关键字保证函数可以在生成的 object 文件中可见，并且使用 C ABI。
 
-```zig
-export fn sub(a: i8, b: i8) i8 { return a - b; }
-```
+<<<@/code/11/function.zig#sub
 
 ::: info 🅿️ 提示
 
 extern 关键字后面带引号的标识符指定具有该函数的库，例如 `c` -> `libc.so`，`callconv` 说明符更改函数的调用约定。
 
-```zig
-extern "c" fn atan2(a: f64, b: f64) f64;
-```
+<<<@/code/11/function.zig#atan2
 
 :::
 
@@ -136,22 +118,12 @@ extern "c" fn atan2(a: f64, b: f64) f64;
 
 告诉优化器当前函数很少被调用（或不被调用），该函数仅在函数作用域内有效。
 
-```zig
-fn abort() noreturn {
-    @setCold(true);
-    while (true) {}
-}
-```
+<<<@/code/11/function.zig#abort
 
 ### `callconv`
 
 `callconv` 关键字告诉函数的调用约定，这在对外暴露函数或者裸汇编时会很有用。
 
-```zig
-// 强制该函数在所有被调用位置内联，否则失败。
-fn shiftLeftOne(a: u32) callconv(.Inline) u32 {
-    return a << 1;
-}
-```
+<<<@/code/11/function.zig#shiftLeftOne
 
 关于可以使用的调用约定格式，可以参考这里[`std.builtin.CallingConvention`](https://ziglang.org/documentation/master/std/#A;std:builtin.CallingConvention)。
