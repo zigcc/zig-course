@@ -212,6 +212,15 @@ export default [
     ],
   },
   {
+    text: "示例",
+    items: [
+      {
+        text: "echo server",
+        link: "/examples/echo_tcp_server",
+      },
+    ],
+  },
+  {
     text: "附录",
     items: [
       // {

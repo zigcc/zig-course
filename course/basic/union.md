@@ -21,8 +21,11 @@ const Payload = union {
 
 var payload = Payload{ .int = 1234 };
 
+// 重新赋值
+payload = Payload{ .int = 9 };
+
 // 或者是让 zig 编译期进行推倒
-var payload_1: Payload = .{ .int = 1234 };
+// var payload_1: Payload = .{ .int = 1234 };
 
 print("{}\n",.{payload.int});
 ```
@@ -38,7 +41,8 @@ const Payload = union {
 
 pub fn main() !void {
     var payload = Payload{ .int = 1234 };
-    var payload_1: Payload = .{ .int = 1234 };
+    payload = Payload{ .int = 9 };
+    // var payload_1: Payload = .{ .int = 1234 };
 
     print("{}\n", .{payload.int});
 }
@@ -70,18 +74,29 @@ const payload = @unionInit(Payload, "int", 666);
 
 ## 标记联合
 
-联合类型可以在定义时使用枚举进行标记，通过 `@as` 函数将联合类型作为声明的枚举来使用。
+联合类型可以在定义时使用枚举进行标记，并且可以通过 `@as` 函数将联合类型直接看作声明的枚举来使用（或比较）。
 
-示例
+换种说法，`union` 是普通的联合类型，它可以存储多种值，但它无法跟踪当前值的类型。而`tag union` 则在 `union` 的基础上可以跟踪当前值的类型，更加安全。
+
+::: info 🅿️ 提示
+
+简单来说，就是标记联合可以辨别当前存储的类型，易于使用。
+
+而普通的联合类型在 `ReleaseSmall` 和 `ReleaseFast` 的构建模式下，将无法检测出读取联合普通联合类型的错误，例如将一个 `u64` 存储在一个 `union` 中，然后尝试将其读取为一个 `f64`，这程序员的角度看是非法的，但运行确实正常的！
+
+:::
 
 ```zig [more]
 const std = @import("std");
 const expect = std.testing.expect;
 
+// 一个枚举，用于给联合类型挂上标记
 const ComplexTypeTag = enum {
     ok,
     not_ok,
 };
+
+// 带标记的联合类型
 const ComplexType = union(ComplexTypeTag) {
     ok: u8,
     not_ok: void,
@@ -89,8 +104,10 @@ const ComplexType = union(ComplexTypeTag) {
 
 pub fn main() !void {
     const c = ComplexType{ .ok = 42 };
+    // 可以直接将标记联合类型作为枚举来使用，这是合法的
     try expect(@as(ComplexTypeTag, c) == ComplexTypeTag.ok);
 
+    // 使用 switch 进行匹配
     switch (c) {
         ComplexTypeTag.ok => |value| try expect(value == 42),
         ComplexTypeTag.not_ok => unreachable,
@@ -101,16 +118,19 @@ pub fn main() !void {
 }
 ```
 
-如果要修改实际的载荷，你可以使用 `*` 语法捕获指针类型：
+如果要修改实际的载荷（即标记联合中的值），你可以使用 `*` 语法捕获指针类型：
 
 ```zig
 const std = @import("std");
 const expect = std.testing.expect;
 
+// 枚举，用于给联合类型打上标记
 const ComplexTypeTag = enum {
     ok,
     not_ok,
 };
+
+// 带标记的联合类型
 const ComplexType = union(ComplexTypeTag) {
     ok: u8,
     not_ok: void,
@@ -119,7 +139,9 @@ const ComplexType = union(ComplexTypeTag) {
 pub fn main() !void {
     var c = ComplexType{ .ok = 42 };
 
+    // 使用 switch 进行匹配
     switch (c) {
+        // 捕获了标记联合值的指针，用于修改值
         ComplexTypeTag.ok => |*value| value.* += 1,
         ComplexTypeTag.not_ok => unreachable,
     }
@@ -140,6 +162,12 @@ const Small2 = union(enum) {
 @tagName(Small2.a);
 // 这个返回值将会是 a
 ```
+
+::: info 🅿️ 提示
+
+上面的 `Small2` 也是一个标记联合类型，不过它的标记是一个匿名的枚举类型，并且该枚举类型成员为：`a`, `b`, `c`。
+
+:::
 
 ## 自动推断
 

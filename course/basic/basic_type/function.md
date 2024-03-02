@@ -122,7 +122,7 @@ extern 关键字后面带引号的标识符指定具有该函数的库，例如 
 
 ### `callconv`
 
-`callconv` 关键字告诉函数的调用约定，这在对外暴漏函数或者裸汇编时会很有用。
+`callconv` 关键字告诉函数的调用约定，这在对外暴露函数或者裸汇编时会很有用。
 
 <<<@/code/11/function.zig#shiftLeftOne
 

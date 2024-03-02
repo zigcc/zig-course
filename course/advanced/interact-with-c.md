@@ -29,7 +29,7 @@ zig 定义了几个对应 C ABI 的基本类型：
 - `c_ulonglong`
 - `c_longdouble`
 
-对应 C `void` 类型的时候，使用 `anyopaque` (大小为止的类型)。
+对应 C `void` 类型的时候，使用 `anyopaque` (大小未知的类型)。
 
 ## C Header 导入
 
