@@ -12,7 +12,7 @@ outline: deep
 
 在 zig 中，我们使用 `var` 来进行变量的声明，格式是 `var variable:type = value;`，以下是一个示例：
 
-<<<@/code/11/define_variable_1.zig
+<<<@/code/11/define_variable.zig#define
 
 ::: info 🅿️ 提示
 
@@ -30,26 +30,13 @@ outline: deep
 
 如果一定要使用不符合这些规定的名称（例如与外部库的链接），那么请使用 `@""` 语法。
 
-```zig
-const @"identifier with spaces in it" = 0xff;
-const @"1SmallStep4Man" = 112358;
-
-const c = @import("std").c;
-pub extern "c" fn @"error"() void;
-pub extern "c" fn @"fstat$INODE64"(fd: c.fd_t, buf: *c.Stat) c_int;
-
-const Color = enum {
-  red,
-  @"really red",
-};
-const color: Color = .@"really red";
-```
+<<<@/code/11/define_variable.zig#indentifier
 
 ### 常量
 
 zig 使用 `const` 作为关键字来声明常量，它无法再被更改，只有初次声明时可以赋值。
 
-<<<@/code/11/define_variable_2.zig
+<<<@/code/11/define_variable.zig#const
 
 注意： 所有常量都是 [_编译期_](/advanced/comptime) 已知的！
 
@@ -57,7 +44,7 @@ zig 使用 `const` 作为关键字来声明常量，它无法再被更改，只�
 
 我们可以使用 `undefined` 使变量保持未初始化状态。
 
-<<<@/code/11/define_variable_3.zig
+<<<@/code/11/define_variable.zig#undefined
 
 ::: warning ⚠️ 警告
 
@@ -82,14 +69,7 @@ x += 1;
 
 块也可以是一个表达式，当它有标签时，`break` 会从块中返回一个值出来。
 
-```zig
-var y: i32 = 123;
-
-const x = blk: {
-    y += 1;
-    break :blk y;
-};
-```
+<<<@/code/11/define_variable.zig#block
 
 上方的 `blk` 是标签名字，它可以是你设置的任何名字。
 
@@ -107,11 +87,11 @@ PS:说实话，我认为这个设计并不太好。
 
 `///` 就是文档注释，用于给函数、类型、变量等这些提供注释，文档注释记录了紧随其后的内容。
 
-<<<@/code/11/define_variable_4.zig#doc-comment
+<<<@/code/11/define_variable.zig#doc-comment
 
 `//!` 是顶层文档注释，通常用于记录一个文件的作用，**必须放在作用域的顶层，否则会编译错误**
 
-<<<@/code/11/define_variable_4.zig#top-level
+<<<@/code/11/define_variable.zig#top-level
 
 ::: details 小细节
 为什么是作用域顶层呢？实际上，zig 将一个源码文件看作是一个容器。
