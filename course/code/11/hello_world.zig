@@ -1,7 +1,7 @@
 pub fn main() !void {
     One.main();
-    Two.main();
-    Three.main();
+    try Two.main();
+    try Three.main();
 }
 
 const One = struct {
@@ -18,7 +18,7 @@ const Two = struct {
     // #region two
     const std = @import("std");
 
-    pub fn main() void {
+    pub fn main() !void {
         var out = std.io.getStdOut().writer();
         var err = std.io.getStdErr().writer();
 
@@ -32,7 +32,7 @@ const Three = struct {
     // #region three
     const std = @import("std");
 
-    pub fn main() void {
+    pub fn main() !void {
         const out = std.io.getStdOut().writer(); // [!code focus]
         const err = std.io.getStdErr().writer(); // [!code focus]
 
