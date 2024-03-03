@@ -9,6 +9,8 @@ on:
     paths:
       - "**.zig"
 
+  workflow_call:
+
 jobs:
   check_11:
     runs-on: ubuntu-latest
