@@ -1,4 +1,10 @@
-pub fn main() !void {}
+pub fn main() !void {
+    Basic.main();
+    Splat.main();
+    Reduce.main();
+    Shuffle.main();
+    Select.main();
+}
 
 const Basic = struct {
     // #region basic
@@ -79,7 +85,8 @@ const Shuffle = struct {
         const res2: @Vector(6, u8) = @shuffle(u8, a, b, mask2);
         // res2 的值是 world!
         //#endregion shuffle
-        print("{s},{s}\n", .{ res1, res2 });
+        _ = res1;
+        _ = res2;
     }
 };
 
