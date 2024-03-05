@@ -26,21 +26,7 @@ zig 本身支持指针运算（加减操作），但有一点需要注意：最�
 
 单项指针的类型为：`*T`，`T`是所指向内存区域的类型，解引用方法是 `ptr.*`。
 
-:::details 示例
-
-```zig
-const print = @import("std").debug.print;
-
-pub fn main() !void {
-    var integer: i16 = 666;
-    const ptr = &integer;
-    ptr.* = ptr.* + 1;
-
-    print("{}\n", .{integer});
-}
-```
-
-:::
+<<<@/code/11/pointer.zig#single_pointer
 
 :::info 🅿️ 提示
 
@@ -60,20 +46,7 @@ pub fn main() !void {
 - 切片语法 `ptr[start..end]`
 - 指针运算 `ptr + x`，`ptr - x`
 
-:::details 示例
-
-```zig
-const print = @import("std").debug.print;
-
-pub fn main() !void {
-    const array = [_]i32{ 1, 2, 3, 4 };
-    var ptr: [*]const i32 = &array;
-
-    print("第一个元素：{}\n", .{ptr[0]});
-}
-```
-
-:::
+<<<@/code/11/pointer.zig#multi_pointer
 
 :::info 🅿️ 提示
 
@@ -87,23 +60,7 @@ pub fn main() !void {
 
 :::details 示例
 
-```zig
-const print = @import("std").debug.print;
-
-pub fn main() !void {
-    var array = [_]i32{ 1, 2, 3, 4 };
-    var arr_ptr: *const [4]i32 = &array;
-
-    print("数组第一个元素为：{}\n", .{arr_ptr[0]});
-    print("数组长度为：{}\n", .{arr_ptr.len});
-
-    var slice = array[1 .. array.len - 1];
-    var slice_ptr: []i32 = slice;
-
-    print("切片第一个元素为：{}\n", .{slice_ptr[0]});
-    print("切片长度为：{}\n", .{slice_ptr.len});
-}
-```
+<<<@/code/11/pointer.zig#multi_pointer
 
 :::
 
@@ -117,16 +74,7 @@ pub fn main() !void {
 
 我们接下来演示一个示例，该示例中使用了 zig 可以无缝与 C 交互的特性，故你可以暂时略过这里！
 
-```zig
-const std = @import("std");
-
-// 我们也可以用 std.c.printf 代替
-pub extern "c" fn printf(format: [*:0]const u8, ...) c_int;
-
-pub fn main() anyerror!void {
-    _ = printf("Hello, world!\n"); // OK
-}
-```
+<<<@/code/11/pointer.zig#st_pointer
 
 以上代码编译需要额外连接 libc ，你只需要在你的 `build.zig` 中添加 `exe.linkLibC();` 即可。
 
@@ -142,17 +90,9 @@ pub fn main() anyerror!void {
 
 对指针的操作应假定为没有副作用。如果存在副作用，例如使用内存映射输入输出（Memory Mapped Input/Output），则需要使用 `volatile` 关键字来修饰。
 
-在以下代码中，保证使用 `mmio_ptr` 的值进行操作（这里你看起来可能会感到迷惑，在编译代码时，可以能会对值进行缓存，这里保证每次都使用 `mmio_ptr` 的值，以避免没有触发 “副作用”），并保证了代码执行的顺序。
+在以下代码中，保证使用 `mmio_ptr` 的值进行操作（这里你看起来可能会感到迷惑，在编译代码时，编译器可以能会让值在实际运行过程中进行缓存，这里保证每次都使用 `mmio_ptr` 的值，以避免无法正确触发 “副作用”），并保证了代码执行的顺序。
 
-```zig
-// 在这里我们使用了单元测试功能
-const expect = @import("std").testing.expect;
-
-test "volatile" {
-    const mmio_ptr: *volatile u8 = @ptrFromInt(0x12345678);
-    try expect(@TypeOf(mmio_ptr) == *volatile u8);
-}
-```
+<<<@/code/11/pointer.zig#volatile
 
 该节内容，仅仅讲述的少量内容，如果要了解更多，你可能需要查看[官方文档](https://ziglang.org/documentation/0.11.0/#toc-volatile)！
 
@@ -166,26 +106,7 @@ test "volatile" {
 
 在 Zig 中，指针类型具有对齐值。如果该值等于基础类型的对齐方式，则可以从类型中省略它：
 
-```zig
-const std = @import("std");
-const builtin = @import("builtin");
-const expect = std.testing.expect;
-
-test "variable alignment" {
-    var x: i32 = 1234;
-    // 获取内存对齐信息
-    const align_of_i32 = @alignOf(@TypeOf(x));
-    // 尝试比较类型
-    try expect(@TypeOf(&x) == *i32);
-    // 尝试在设置内存对齐后再进行类型比较
-    try expect(*i32 == *align(align_of_i32) i32);
-
-    if (builtin.target.cpu.arch == .x86_64) {
-        // 获取了 x86_64 架构的指针对齐大小
-        try expect(@typeInfo(*i32).Pointer.alignment == 4);
-    }
-}
-```
+<<<@/code/11/pointer.zig#align
 
 :::info 🅿️ 提示
 
@@ -195,34 +116,7 @@ test "variable alignment" {
 
 :::details 示例
 
-```zig
-const expect = @import("std").testing.expect;
-
-var foo: u8 align(4) = 100;
-
-test "global variable alignment" {
-    try expect(@typeInfo(@TypeOf(&foo)).Pointer.alignment == 4);
-    try expect(@TypeOf(&foo) == *align(4) u8);
-    const as_pointer_to_array: *align(4) [1]u8 = &foo;
-    const as_slice: []align(4) u8 = as_pointer_to_array;
-    const as_unaligned_slice: []u8 = as_slice;
-    try expect(as_unaligned_slice[0] == 100);
-}
-
-fn derp() align(@sizeOf(usize) * 2) i32 {
-    return 1234;
-}
-fn noop1() align(1) void {}
-fn noop4() align(4) void {}
-
-test "function alignment" {
-    try expect(derp() == 1234);
-    try expect(@TypeOf(noop1) == fn () align(1) void);
-    try expect(@TypeOf(noop4) == fn () align(4) void);
-    noop1();
-    noop4();
-}
-```
+<<<@/code/11/pointer.zig#align_cast
 
 :::
 
@@ -236,35 +130,10 @@ test "function alignment" {
 
 :::
 
-:::details 示例
-
-```zig
-const std = @import("std");
-const expect = std.testing.expect;
-
-test "allowzero" {
-    var zero: usize = 0;
-    var ptr: *allowzero i32 = @ptrFromInt(zero);
-    try expect(@intFromPtr(ptr) == 0);
-}
-```
-
-:::
+<<<@/code/11/pointer.zig#zero_pointer
 
 ### 编译期
 
 只要代码不依赖于未定义的内存布局，那么指针也可以在编译期发挥作用！
 
-```zig
-const expect = @import("std").testing.expect;
-
-test "comptime pointers" {
-    comptime {
-        var x: i32 = 1;
-        const ptr = &x;
-        ptr.* += 1;
-        x += 1;
-        try expect(ptr.* == 3);
-    }
-}
-```
+<<<@/code/11/pointer.zig#comptime_pointer

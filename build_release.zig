@@ -49,6 +49,8 @@ pub fn build_release(b: *Build) void {
                     .optimize = optimize,
                 });
 
+                exe.linkLibC();
+
                 // add to default install
                 b.installArtifact(exe);
 

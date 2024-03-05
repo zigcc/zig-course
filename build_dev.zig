@@ -67,6 +67,7 @@ pub fn build_dev(b: *Build) void {
                     .target = target,
                     .optimize = optimize,
                 });
+                exe.linkLibC();
 
                 // add to default install
                 b.installArtifact(exe);
