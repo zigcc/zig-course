@@ -22,45 +22,9 @@ outline: deep
 
 ::: code-group
 
-```zig [default]
-const Circle = struct {
-    radius: u8,
+<<<@/code/11/struct.zig#default_struct [default]
 
-    const PI: f16 = 3.14;
-
-    pub fn init(radius: u8) Circle {
-        return Circle{ .radius = radius };
-    }
-
-    fn area(self: *Circle) f16 {
-        return @as(f16, @floatFromInt(self.radius * self.radius)) * PI;
-    }
-};
-```
-
-```zig [more]
-const std = @import("std");
-
-const Circle = struct {
-    radius: u8,
-
-    const PI: f16 = 3.14;
-
-    pub fn init(radius: u8) Circle {
-        return Circle{ .radius = radius };
-    }
-
-    fn area(self: *Circle) f16 {
-        return @as(f16, @floatFromInt(self.radius * self.radius)) * PI;
-    }
-};
-
-pub fn main() void {
-    var radius: u8 = 5;
-    var circle = Circle.init(radius);
-    std.debug.print("The area of a circle with radius {} is {d:.2}\n", .{ radius, circle.area() });
-}
-```
+<<<@/code/11/struct.zig#more_struct [more]
 
 :::
 
@@ -81,21 +45,13 @@ pub fn main() void {
 
 通常自引用方式为函数参数第一个为结构体指针类型，例如：
 
-```zig
-const std = @import("std");
+::: code-group
 
-const TT = struct { // [!code focus]
-    pub fn print(self: *TT) void { // [!code focus]
-        _ = self; // [!code focus]
-        std.debug.print("Hello, world!\n", .{}); // [!code focus]
-    } // [!code focus]
-}; // [!code focus]
+<<<@/code/11/struct.zig#deault_self_reference1 [default]
 
-pub fn main() !void {
-    var tmp: TT = .{};
-    tmp.print();
-}
-```
+<<<@/code/11/struct.zig#more_self_reference1 [more]
+
+:::
 
 平常使用过程中会面临另外的一个情况，就是匿名结构体要如何实现自引用呢？
 
@@ -105,34 +61,13 @@ pub fn main() !void {
 
 例如：
 
-```zig
-const std = @import("std");
+::: code-group
 
-fn List(comptime T: type) type { // [!code focus]
-    return struct { // [!code focus]
-        const Self = @This(); // [!code focus]
+<<<@/code/11/struct.zig#deault_self_reference2 [default]
 
-        items: []T, // [!code focus]
+<<<@/code/11/struct.zig#more_self_reference2 [more]
 
-        fn length(self: Self) usize { // [!code focus]
-            return self.items.len; // [!code focus]
-        } // [!code focus]
-    }; // [!code focus]
-} // [!code focus]
-
-pub fn main() !void {
-    const int_list = List(u8);
-    var arr: [5]u8 = .{
-        1, 2, 3, 4, 5,
-    };
-
-    var list: int_list = .{
-        .items = &arr,
-    };
-
-    std.debug.print("list len is {}\n", .{list.length()});
-}
-```
+:::
 
 :::details 更复杂的例子
 
@@ -140,114 +75,9 @@ pub fn main() !void {
 
 ::: code-group
 
-```zig [default]
-const User = struct {
-    userName: []u8,
-    password: []u8,
-    email: []u8,
-    active: bool,
+<<<@/code/11/struct.zig#deault_self_reference3 [default]
 
-    pub const writer = "zig-course";
-
-    pub fn init(userName: []u8, password: []u8, email: []u8, active: bool) User {
-        return User{
-            .userName = userName,
-            .password = password,
-            .email = email,
-            .active = active,
-        };
-    }
-
-    pub fn print(self: *User) void {
-        std.debug.print(
-            \\username: {s}
-            \\password: {s}
-            \\email: {s}
-            \\active: {}
-            \\
-        , .{
-            self.userName,
-            self.password,
-            self.email,
-            self.active,
-        });
-    }
-};
-```
-
-```zig [more]
-const std = @import("std");
-
-var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-
-const User = struct {
-    userName: []u8,
-    password: []u8,
-    email: []u8,
-    active: bool,
-
-    pub const writer = "zig-course";
-
-    pub fn init(userName: []u8, password: []u8, email: []u8, active: bool) User {
-        return User{
-            .userName = userName,
-            .password = password,
-            .email = email,
-            .active = active,
-        };
-    }
-
-    pub fn print(self: *User) void {
-        std.debug.print(
-            \\username: {s}
-            \\password: {s}
-            \\email: {s}
-            \\active: {}
-            \\
-        , .{
-            self.userName,
-            self.password,
-            self.email,
-            self.active,
-        });
-    }
-};
-
-const name = "xiaoming";
-const passwd = "123456";
-const mail = "123456@qq.com";
-
-pub fn main() !void {
-    // var username = [_]8{};
-    const allocator = gpa.allocator();
-    defer {
-        const deinit_status = gpa.deinit();
-        //fail test; can't try in defer as defer is executed after we return
-        if (deinit_status == .leak) std.testing.expect(false) catch @panic("TEST FAIL");
-    }
-
-    const username = try allocator.alloc(u8, 20);
-    defer allocator.free(username);
-
-    @memset(username, 0);
-    @memcpy(username[0..name.len], name);
-
-    const password = try allocator.alloc(u8, 20);
-    defer allocator.free(password);
-
-    @memset(password, 0);
-    @memcpy(password[0..passwd.len], passwd);
-
-    const email = try allocator.alloc(u8, 20);
-    defer allocator.free(email);
-
-    @memset(email, 0);
-    @memcpy(email[0..mail.len], mail);
-
-    var user = User.init(username, password, email, true);
-    user.print();
-}
-```
+<<<@/code/11/struct.zig#more_self_reference3 [more]
 
 在以上的代码中，我们使用了内存分配的功能，并且使用了切片和多行字符串，以及 `defer` 语法（在当前作用域的末尾执行语句）。
 
@@ -257,14 +87,7 @@ pub fn main() !void {
 
 zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig 编译器推断出类型即可，例如：
 
-```zig
-const Point = struct { x: i32, y: i32 };
-
-var pt: Point = .{
-    .x = 13,
-    .y = 67,
-};
-```
+<<<@/code/11/struct.zig#auto_reference
 
 ## 泛型实现
 
@@ -274,21 +97,7 @@ var pt: Point = .{
 
 以下是一个链表的类型实现：
 
-```zig
-fn LinkedList(comptime T: type) type {
-    return struct {
-        pub const Node = struct {
-            prev: ?*Node,
-            next: ?*Node,
-            data: T,
-        };
-
-        first: ?*Node,
-        last:  ?*Node,
-        len:   usize,
-    };
-}
-```
+<<<@/code/11/struct.zig#linked_list
 
 :::info 🅿️ 提示
 
@@ -300,16 +109,7 @@ fn LinkedList(comptime T: type) type {
 
 结构体允许使用默认值，只需要在定义结构体的时候声明默认值即可：
 
-```zig
-const Foo = struct {
-    a: i32 = 1234,
-    b: i32,
-};
-
-const x = Foo{
-    .b = 5,
-};
-```
+<<<@/code/11/struct.zig#default_field
 
 ## 空结构体
 
@@ -317,23 +117,9 @@ const x = Foo{
 
 ::: code-group
 
-```zig [default]
-const Empty = struct {
-    // const PI = 3.14;
-};
-```
+<<<@/code/11/struct.zig#default_empty_struct [default]
 
-```zig [more]
-const std = @import("std");
-
-const Empty = struct {
-    // const PI = 3.14;
-};
-
-pub fn main() void {
-    std.debug.print("{}\n", .{@sizeOf(Empty)});
-}
-```
+<<<@/code/11/struct.zig#more_empty_struct [more]
 
 :::
 
@@ -347,17 +133,7 @@ pub fn main() void {
 
 为了获得最佳的性能，结构体字段的顺序是由编译器决定的，但是，我们可以仍然可以通过结构体字段的指针来获取到基指针！
 
-```zig
-const Point = struct {
-    x: f32,
-    y: f32,
-};
-
-fn setYBasedOnX(x: *f32, y: f32) void {
-    const point = @fieldParentPtr(Point, "x", x);
-    point.y = y;
-}
-```
+<<<@/code/11/struct.zig#base_ptr
 
 这里使用了内建函数 [`@fieldParentPtr`](https://ziglang.org/documentation/0.11.0/#toc-fieldParentPtr) ，它会根据给定字段指针，返回对应的结构体基指针。
 
@@ -367,30 +143,15 @@ fn setYBasedOnX(x: *f32, y: f32) void {
 
 由于没有字段名，zig 会为每个值分配一个整数的字段名，但是它无法通过正常的 `.` 语法来访问，但可以增加一个修饰符 `@""`，通过它使用 `.` 语法访问元组中的元素。
 
-```zig
-// 我们定义了一个元组类型
-const Tuple = struct{ u8, u8 };
+<<<@/code/11/struct.zig#tuple
 
-// 直接使用字面量来定义一个元组
-const values = .{
-    @as(u32, 1234),
-    @as(f64, 12.34),
-    true,
-    "hi",
-};
-
-const hi = values.@"3"; // "hi"
-```
-
-当然，以上的语法很啰嗦,所以 zig 提供了类似数组的语法来访问元组，例如 `values[3]` 的值就是 "hi"。
+当然，以上的语法很啰嗦,所以 zig 提供了类似**数组的语法**来访问元组，例如 `values[3]` 的值就是 "hi"。
 
 :::info 🅿️ 提示
 
-元组还有一个和数组一样的字段 `len`，并且支持 `++` 和 `**` 运算符，以及[内联 for](#)。
+元组还有一个和数组一样的字段 `len`，并且支持 `++` 和 `**` 运算符，以及[内联 for](../process_control/loop.md#内联-inline)。
 
 :::
-
-<!-- TODO：增加内联for的地址 -->
 
 ## 高级特性
 
@@ -529,22 +290,7 @@ test "overaligned pointer to packed struct" {
 
 ::: code-group
 
-```zig [default]
-const std = @import("std");
-
-pub fn main() void {
-    const Foo = struct {};
-    std.debug.print("variable: {s}\n", .{@typeName(Foo)});
-    std.debug.print("anonymous: {s}\n", .{@typeName(struct {})});
-    std.debug.print("function: {s}\n", .{@typeName(List(i32))});
-}
-
-fn List(comptime T: type) type {
-    return struct {
-        x: T,
-    };
-}
-```
+<<<@/code/11/struct.zig#name_principle
 
 ```sh [output]
 variable: struct_name.main.Foo
