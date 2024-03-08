@@ -346,11 +346,11 @@ const PackedCast = struct {
         const ordered: [2]u8 = @bitCast(full);
 
         switch (native_endian) {
-            .Big => {
+            .big => {
                 try expect(ordered[0] == 0x12);
                 try expect(ordered[1] == 0x34);
             },
-            .Little => {
+            .little => {
                 try expect(ordered[0] == 0x34);
                 try expect(ordered[1] == 0x12);
             },

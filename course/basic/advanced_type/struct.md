@@ -183,28 +183,7 @@ zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig
 
 :::details 示例
 
-```zig
-const std = @import("std");
-const expect = std.testing.expect;
-
-const BitField = packed struct {
-    a: u3,
-    b: u3,
-    c: u2,
-};
-
-test "pointer to non-bit-aligned field" {
-    comptime {
-        try expect(@bitOffsetOf(BitField, "a") == 0);
-        try expect(@bitOffsetOf(BitField, "b") == 3);
-        try expect(@bitOffsetOf(BitField, "c") == 6);
-
-        try expect(@offsetOf(BitField, "a") == 0);
-        try expect(@offsetOf(BitField, "b") == 0);
-        try expect(@offsetOf(BitField, "c") == 0);
-    }
-}
-```
+<<<@/code/11/struct.zig#packed_bit_offset
 
 :::
 
@@ -212,48 +191,7 @@ test "pointer to non-bit-aligned field" {
 
 :::details 示例
 
-```zig
-const std = @import("std");
-// 这里获取目标架构是字节排序方式，大端和小端
-const native_endian = @import("builtin").target.cpu.arch.endian();
-const expect = std.testing.expect;
-
-const Full = packed struct {
-    number: u16,
-};
-const Divided = packed struct {
-    half1: u8,
-    quarter3: u4,
-    quarter4: u4,
-};
-
-test "@bitCast between packed structs" {
-    try doTheTest();
-    try comptime doTheTest();
-}
-
-fn doTheTest() !void {
-    try expect(@sizeOf(Full) == 2);
-    try expect(@sizeOf(Divided) == 2);
-    var full = Full{ .number = 0x1234 };
-    var divided: Divided = @bitCast(full);
-    try expect(divided.half1 == 0x34);
-    try expect(divided.quarter3 == 0x2);
-    try expect(divided.quarter4 == 0x1);
-
-    var ordered: [2]u8 = @bitCast(full);
-    switch (native_endian) {
-        .Big => {
-            try expect(ordered[0] == 0x12);
-            try expect(ordered[1] == 0x34);
-        },
-        .Little => {
-            try expect(ordered[0] == 0x34);
-            try expect(ordered[1] == 0x12);
-        },
-    }
-}
-```
+<<<@/code/11/struct.zig#packed_cast
 
 :::
 
