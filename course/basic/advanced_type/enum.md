@@ -54,7 +54,9 @@ zig 允许我们不列出所有的枚举值，未列出枚举值可以使用 `_`
 
 :::info 🅿️ 提示
 
-`@enumFromInt` 允许我们通过一个整数来反推一个枚举，但需要注意不要超出枚举的大小空间，这会牵扯到 `@intCast` 到枚举大小等价整数类型的安全语义。
+`@enumFromInt` 允许我们通过一个整数来反推一个枚举，但需要注意，尝试转换一个在所选枚举类型中没有表示值的整数会导致[未定义行为（Undefined Behavior）](https://ziglang.org/documentation/master/#Undefined-Behavior)
+
+
 
 :::
 
