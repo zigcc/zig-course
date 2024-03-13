@@ -110,7 +110,7 @@ pub fn main() !void {
 
 以上的示例中，我们使用了`@typeInfo` 来获取类型 `T` 的信息，随后将其断言为一个 `Struct` 类型，然后再通过 `inline for` 打印输出其字段值。
 
-需要注意的是，我们在此处打印必须要要使用 `inline for`，否则将会编译无法通过，这是因为 结构体的 **“字段类型”** [`std.builtin.Type.StructField`](https://ziglang.org/documentation/master/std/#A;std:builtin.Type.StructField)，其中有一个字段是 `comptime_int`，使得无法在运行时计算索引来便利，只能通过 `inline for` 将其转换为编译期计算。
+需要注意的是，我们在此处打印必须要使用 `inline for`，否则将会编译无法通过，这是因为 结构体的 **“字段类型”** [`std.builtin.Type.StructField`](https://ziglang.org/documentation/master/std/#A;std:builtin.Type.StructField)，其中有一个字段是 `comptime_int`，使得无法在运行时计算索引来便利，只能通过 `inline for` 将其转换为编译期计算。
 
 ::: warning
 
