@@ -8,7 +8,7 @@ outline: deep
 
 _你可以对数组、切片、数组指针进行切片操作！_
 
-接下来我们演示以下切片的使用方式：
+接下来我们演示切片的使用方式：
 
 ```zig
 const print = @import("std").debug.print;

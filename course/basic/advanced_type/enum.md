@@ -50,11 +50,12 @@ outline: deep
 
 ## 非详尽枚举
 
-zig 允许我们不列出所有的枚举值，未列出枚举值可以使用 `_` 代替，但需明确指出枚举大小并且不能已经将整个大小空间消耗干净。
+zig 允许我们不列出所有的枚举值，未列出枚举值可以使用 `_` 代替。
 
 :::info 🅿️ 提示
 
-`@enumFromInt` 允许我们通过一个整数来反推一个枚举，但需要注意需要注意不要超出枚举的大小空间，这会牵扯到 `@intCast` 到枚举大小等价整数类型的安全语义。
+`@enumFromInt` 允许我们通过一个整数来反推一个枚举，但需要注意，尝试转换一个在所选枚举类型中没有表示值的整数会导致[未定义行为（Undefined Behavior）](https://ziglang.org/documentation/master/#Undefined-Behavior)
+
 
 :::
 
