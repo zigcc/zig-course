@@ -130,10 +130,16 @@ const AlignCast = struct {
 
         // 函数对齐
         try expect(derp() == 1234);
-        try expect(@TypeOf(noop1) == fn () align(1) void);
-        try expect(@TypeOf(noop4) == fn () align(4) void);
+        try expect(@TypeOf(derp) == fn () i32);
+        try expect(@TypeOf(&derp) == *align(@sizeOf(usize) * 2) const fn () i32);
+
         noop1();
+        try expect(@TypeOf(noop1) == fn () void);
+        try expect(@TypeOf(&noop1) == *align(1) const fn () void);
+
         noop4();
+        try expect(@TypeOf(noop4) == fn () void);
+        try expect(@TypeOf(&noop4) == *align(4) const fn () void);
     }
     // #endregion align_cast
 };
