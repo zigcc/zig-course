@@ -28,14 +28,14 @@ pub fn build_dev(b: *Build) void {
     // open release dir
     var dir_release = std.fs.openDirAbsolute(full_path_release, .{ .iterate = true }) catch |err| {
         log.err("open release path failed, err is {}", .{err});
-        std.os.exit(1);
+        std.process.exit(1);
     };
     defer dir_release.close();
 
     // open dev dir
     var dir_dev = std.fs.openDirAbsolute(full_path_dev, .{}) catch |err| {
         log.err("open dev path failed, err is {}", .{err});
-        std.os.exit(1);
+        std.process.exit(1);
     };
     defer dir_dev.close();
 
@@ -57,7 +57,7 @@ pub fn build_dev(b: *Build) void {
                 // connect path
                 const path = std.fs.path.join(b.allocator, &[_][]const u8{ if (is_there_dev) relative_path_dev else relative_path_release, name }) catch |err| {
                     log.err("fmt path for examples failed, err is {}", .{err});
-                    std.os.exit(1);
+                    std.process.exit(1);
                 };
 
                 // build exe
@@ -98,14 +98,14 @@ pub fn build_dev(b: *Build) void {
                     name,
                 }) catch |err| {
                     log.err("fmt path for examples failed, err is {}", .{err});
-                    std.os.exit(1);
+                    std.process.exit(1);
                 };
 
                 // open entry dir
                 const entry_dir = std.fs.openDirAbsolute(cwd, .{}) catch unreachable;
                 entry_dir.access("build.zig", .{}) catch {
                     log.err("not found build.zig in path {s}", .{cwd});
-                    std.os.exit(1);
+                    std.process.exit(1);
                 };
 
                 // set child cwd
@@ -121,6 +121,6 @@ pub fn build_dev(b: *Build) void {
         }
     } else |err| {
         log.err("iterate examples_path failed, err is {}", .{err});
-        std.os.exit(1);
+        std.process.exit(1);
     }
 }
