@@ -12,41 +12,9 @@ outline: deep
 
 ::: code-group
 
-```zig [default]
-const Payload = union {
-    int: i64,
-    float: f64,
-    boolean: bool,
-};
+<<<@/code/11/union.zig#default_basic [default]
 
-var payload = Payload{ .int = 1234 };
-
-// 重新赋值
-payload = Payload{ .int = 9 };
-
-// 或者是让 zig 编译期进行推倒
-// var payload_1: Payload = .{ .int = 1234 };
-
-print("{}\n",.{payload.int});
-```
-
-```zig [more]
-const print = @import("std").debug.print;
-
-const Payload = union {
-    int: i64,
-    float: f64,
-    boolean: bool,
-};
-
-pub fn main() !void {
-    var payload = Payload{ .int = 1234 };
-    payload = Payload{ .int = 9 };
-    // var payload_1: Payload = .{ .int = 1234 };
-
-    print("{}\n", .{payload.int});
-}
-```
+<<<@/code/11/union.zig#more_basic [more]
 
 :::
 
@@ -62,15 +30,7 @@ pub fn main() !void {
 @unionInit(comptime Union: type, comptime active_field_name: []const u8, init_expr) Union
 ```
 
-```zig
-const Payload = union {
-    int: i64,
-    float: f64,
-    boolean: bool,
-};
-// 通过 @unionInit 初始化一个联合类型
-const payload = @unionInit(Payload, "int", 666);
-```
+<<<@/code/11/union.zig#union_init
 
 ## 标记联合
 
@@ -86,82 +46,27 @@ const payload = @unionInit(Payload, "int", 666);
 
 :::
 
-```zig [more]
-const std = @import("std");
-const expect = std.testing.expect;
+::: code-group
 
-// 一个枚举，用于给联合类型挂上标记
-const ComplexTypeTag = enum {
-    ok,
-    not_ok,
-};
+<<<@/code/11/union.zig#default_tag [default]
 
-// 带标记的联合类型
-const ComplexType = union(ComplexTypeTag) {
-    ok: u8,
-    not_ok: void,
-};
+<<<@/code/11/union.zig#more_tag [more]
 
-pub fn main() !void {
-    const c = ComplexType{ .ok = 42 };
-    // 可以直接将标记联合类型作为枚举来使用，这是合法的
-    try expect(@as(ComplexTypeTag, c) == ComplexTypeTag.ok);
-
-    // 使用 switch 进行匹配
-    switch (c) {
-        ComplexTypeTag.ok => |value| try expect(value == 42),
-        ComplexTypeTag.not_ok => unreachable,
-    }
-
-    // 使用 zig 的 meta 库获取对应的 tag
-    try expect(std.meta.Tag(ComplexType) == ComplexTypeTag);
-}
-```
+:::
 
 如果要修改实际的载荷（即标记联合中的值），你可以使用 `*` 语法捕获指针类型：
 
-```zig
-const std = @import("std");
-const expect = std.testing.expect;
+::: code-group
 
-// 枚举，用于给联合类型打上标记
-const ComplexTypeTag = enum {
-    ok,
-    not_ok,
-};
+<<<@/code/11/union.zig#default_capture_payload [default]
 
-// 带标记的联合类型
-const ComplexType = union(ComplexTypeTag) {
-    ok: u8,
-    not_ok: void,
-};
+<<<@/code/11/union.zig#more_capture_payload [more]
 
-pub fn main() !void {
-    var c = ComplexType{ .ok = 42 };
-
-    // 使用 switch 进行匹配
-    switch (c) {
-        // 捕获了标记联合值的指针，用于修改值
-        ComplexTypeTag.ok => |*value| value.* += 1,
-        ComplexTypeTag.not_ok => unreachable,
-    }
-
-    try expect(c.ok == 43);
-}
-```
+:::
 
 还支持使用 [`@tagName`](https://ziglang.org/documentation/master/#tagName) 来获取到对应的 name（返回的是一个 comptime 的 `[:0]const u8`，也就是字符串）：
 
-```zig
-const Small2 = union(enum) {
-    a: i32,
-    b: bool,
-    c: u8,
-};
-
-@tagName(Small2.a);
-// 这个返回值将会是 a
-```
+<<<@/code/11/union.zig#tag_name
 
 ::: info 🅿️ 提示
 
@@ -173,15 +78,7 @@ const Small2 = union(enum) {
 
 zig 也支持自动推断联合类型：
 
-```zig
-const Number = union {
-    int: i32,
-    float: f64,
-};
-
-// 自动推断
-const i: Number = .{ .int = 42 };
-```
+<<<@/code/11/union.zig#auto_infer
 
 ## `extern union`
 
