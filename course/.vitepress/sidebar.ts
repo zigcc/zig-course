@@ -221,6 +221,16 @@ export default [
     ],
   },
   {
+    text: "更新日志",
+    collapsed: true,
+    items: [
+      {
+        text: "0.12.0",
+        link: "/update/0.12.0",
+      },
+    ],
+  },
+  {
     text: "附录",
     items: [
       // {
