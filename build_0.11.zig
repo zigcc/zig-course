@@ -2,13 +2,13 @@ const std = @import("std");
 const Build = std.Build;
 const ChildProcess = std.ChildProcess;
 
-const log = std.log.scoped(.For_release);
+const log = std.log.scoped(.For_0_12_0);
 
 const args = [_][]const u8{ "zig", "build" };
 
 const relative_path = "course/code/11";
 
-pub fn build_release(b: *Build) void {
+pub fn build(b: *Build) void {
     // get target and optimize
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
