@@ -40,9 +40,9 @@ export default defineConfig({
   title: "Zig 语言圣经",
   description: "简单、快速地学习 Zig，ziglang中文教程，zig中文教程",
   sitemap: {
-    hostname: "https://zigcc.github.io/zig-course/",
+    hostname: "https://course.ziglang.cc/",
   },
-  base: "/zig-course/",
+  base: "/",
   lastUpdated: true,
   themeConfig: themeConfig,
   head: [
