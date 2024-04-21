@@ -2,60 +2,42 @@ const std = @import("std");
 const Build = std.Build;
 const ChildProcess = std.ChildProcess;
 
-const log = std.log.scoped(.For_dev);
+const log = std.log.scoped(.For_0_13_0);
 
 const args = [_][]const u8{ "zig", "build" };
 
-const latest_release_minor_version = "11";
-const latest_dev_minor_version = "12";
+const version = "13";
 
-const relative_path_release = "course/code/" ++ latest_release_minor_version;
-const relative_path_dev = "course/code/" ++ latest_dev_minor_version;
+const relative_path = "course/code/" ++ version;
 
-pub fn build_dev(b: *Build) void {
+pub fn build(b: *Build) void {
     // get target and optimize
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    // get rlease path and dev path
-    var lazy_path_release = Build.LazyPath{ .path = relative_path_release };
-    var lazy_path_dev = Build.LazyPath{ .path = relative_path_dev };
+    var lazy_path = Build.LazyPath{ .path = relative_path };
 
-    // get absolute path
-    const full_path_release = lazy_path_release.getPath(b);
-    const full_path_dev = lazy_path_dev.getPath(b);
+    const full_path = lazy_path.getPath(b);
+    std.log.info("path is {s}", .{full_path});
 
-    // open release dir
-    var dir_release = std.fs.openDirAbsolute(full_path_release, .{ .iterate = true }) catch |err| {
-        log.err("open release path failed, err is {}", .{err});
+    // open dir
+    var dir = std.fs.openDirAbsolute(full_path, .{ .iterate = true }) catch |err| {
+        log.err("open 13 path failed, err is {}", .{err});
         std.process.exit(1);
     };
-    defer dir_release.close();
-
-    // open dev dir
-    var dir_dev = std.fs.openDirAbsolute(full_path_dev, .{}) catch |err| {
-        log.err("open dev path failed, err is {}", .{err});
-        std.process.exit(1);
-    };
-    defer dir_dev.close();
+    defer dir.close();
 
     // make a iterate for release ath
-    var iterate_release = dir_release.iterate();
+    var iterate = dir.iterate();
 
-    while (iterate_release.next()) |val| {
+    while (iterate.next()) |val| {
         if (val) |entry| {
             // get the entry name, entry can be file or directory
             const name = entry.name;
             if (entry.kind == .file) {
-                // This variable records whether the corresponding file exists in the dev folder
-                var is_there_dev: bool = true;
-                dir_dev.access(name, .{}) catch {
-                    log.info("file {s} not dev version", .{name});
-                    is_there_dev = false;
-                };
 
                 // connect path
-                const path = std.fs.path.join(b.allocator, &[_][]const u8{ if (is_there_dev) relative_path_dev else relative_path_release, name }) catch |err| {
+                const path = std.fs.path.join(b.allocator, &[_][]const u8{ relative_path, name }) catch |err| {
                     log.err("fmt path for examples failed, err is {}", .{err});
                     std.process.exit(1);
                 };
@@ -82,19 +64,13 @@ pub fn build_dev(b: *Build) void {
                 // add to default install
                 b.getInstallStep().dependOn(&b.addRunArtifact(unit_tests).step);
             } else if (entry.kind == .directory) {
-                // This variable records whether there is a corresponding folder in the dev folder
-                var is_there_dev: bool = true;
-                dir_dev.access(name, .{}) catch {
-                    log.info("directory {s} not dev version", .{name});
-                    is_there_dev = false;
-                };
 
                 // build child process
                 var child = ChildProcess.init(&args, b.allocator);
 
                 // build cwd
                 const cwd = std.fs.path.join(b.allocator, &[_][]const u8{
-                    if (is_there_dev) full_path_dev else full_path_release,
+                    full_path,
                     name,
                 }) catch |err| {
                     log.err("fmt path for examples failed, err is {}", .{err});
