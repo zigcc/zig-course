@@ -221,12 +221,16 @@ export default [
     ],
   },
   {
-    text: "更新日志",
+    text: "版本说明",
     collapsed: true,
     items: [
       {
-        text: "0.12.0",
-        link: "/update/0.12.0",
+        text: "0.12.0 升级指南",
+        link: "/update/upgrade-0.12.0",
+      },
+      {
+        text: "0.12.0 版本说明",
+        link: "/update/0.12.0-description",
       },
     ],
   },
