@@ -45,6 +45,7 @@ export default defineConfig({
   base: "/",
   lastUpdated: true,
   themeConfig: themeConfig,
+  cleanUrls: true,
   head: [
     ["link", { rel: "icon", href: "./favicon.ico" }],
     [
