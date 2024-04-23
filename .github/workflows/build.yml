@@ -1,48 +1,31 @@
 name: CI
 on:
-  push:
-    paths:
-      - "**.zig"
+    push:
+        paths:
+            - "**.zig"
+            - "**.zig.zon"
 
-  pull_request:
-    branches: [main]
-    paths:
-      - "**.zig"
+    pull_request:
+        branches: [main]
+        paths:
+            - "**.zig"
+            - "**.zig.zon"
+    schedule:
+        - cron: "0 2 * * *"
 
-  workflow_call:
+    workflow_call:
 
 jobs:
-  check_11:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: goto-bus-stop/setup-zig@v2
-        with:
-          version: 0.11.0
-      - name: build
-        run: zig build
-  check_12:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: goto-bus-stop/setup-zig@v2
-        with:
-          version: 0.12.0
-      - name: build
-        run: zig build
-  check_13:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: goto-bus-stop/setup-zig@v2
-      - name: build
-        run: zig build
+    build:
+        strategy:
+            matrix:
+                os: [ubuntu-latest, macos-latest, windows-latest]
+                version: [0.11.0, 0.12.0, ""]
+            fail-fast: false
+        runs-on: ${{ matrix.os }}
+        steps:
+            - name: Setup Zig
+              uses: goto-bus-stop/setup-zig@v2
+            - uses: actions/checkout@v4
+            - name: Build test
+              run: zig build
