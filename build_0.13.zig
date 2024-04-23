@@ -18,7 +18,6 @@ pub fn build(b: *Build) void {
     var lazy_path = Build.LazyPath{ .path = relative_path };
 
     const full_path = lazy_path.getPath(b);
-    std.log.info("path is {s}", .{full_path});
 
     // open dir
     var dir = std.fs.openDirAbsolute(full_path, .{ .iterate = true }) catch |err| {
