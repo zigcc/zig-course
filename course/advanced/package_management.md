@@ -37,9 +37,7 @@ zig 当前并没有一个中心化存储库，包可以来自任何来源，无�
 - `name`：当前你所开发的包的名字
 - `version`：包的版本，使用 [Semantic Version](https://semver.org/)。
 - `dependencies`：依赖项，内部是一连串的匿名结构体，字段 `dep_name` 是依赖包的名字，`url` 是源代码地址，`hash` 是对应的 hash（源文件内容的 hash）。
-- `paths`：显式声明包含的源文件，包含所有则指定为空，当前仅 `nightly` 可用。
-
-目前为止，`0.11` 版本支持两种打包格式的源文件：`tar.gz` 和 `tar.xz`。
+- `paths`：显式声明包含的源文件，包含所有则指定为空。
 
 ::: info 🅿️ 提示
 

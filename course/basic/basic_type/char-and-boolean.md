@@ -14,13 +14,13 @@ outline: deep
 
 具体可以参照以下例子：
 
-<<<@/code/11/char-and-boolean.zig#char
+<<<@/code/release/char-and-boolean.zig#char
 
 :::tip 🅿️ 提示
 
 由于 char 本质就是 `u8` 类型，所以你可以使用 ASCII 码表的值来替换字符，例如 h 在表中对应的值是 104,那么以下，两种输出方式的结果应该是一样的。
 
-<<<@/code/11/char-and-boolean.zig#char_ascii
+<<<@/code/release/char-and-boolean.zig#char_ascii
 
 :::
 

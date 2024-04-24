@@ -6,18 +6,12 @@ outline: deep
 
 我相信你一定是从 `Hello, World!` 开始学习其他语言的，在这里我们也不例外，我们来通过一个简单的程序，来向 zig 的世界打一声招呼！
 
-先使用 `zig init-exe` 命令初始化一个项目，再将以下内容覆写到 `src/main.zig` 中。
-
-::: warning
-
-当前 `nightly` 版本的 zig 已经将 `zig init-exe` 和 `zig init-lib` 合并为一个命令 `zig init`。
-
-:::
+先使用 `zig init` 命令初始化一个项目，再将以下内容覆写到 `src/main.zig` 中。
 
 <!-- 引入代码片段 -->
 <!-- 具体说明见：https://vitepress.dev/zh/guide/markdown#import-code-snippets -->
 
-<<<@/code/11/hello_world.zig#one
+<<<@/code/release/hello_world.zig#one
 
 _很简单，不是吗？_
 
@@ -55,7 +49,7 @@ zig 会自动为我们根据后面的参量表推导出对应的类型，当 zig
 
 首先，我要告诉你，zig 并没有一个内置的打印功能，包含“输出”功能的包只有 `log` 包和 `debug` 包，zig 并没有内置类似与 `@print()` 这种函数。再来一个简单的例子告诉你，如何打印东西（**_但是请记住，以下示例代码不应用于生产环境中_**）。
 
-<<<@/code/11/hello_world.zig#two
+<<<@/code/release/hello_world.zig#two
 
 :::info 🅿️ 提示
 
@@ -71,7 +65,7 @@ zig 会自动为我们根据后面的参量表推导出对应的类型，当 zig
 
 它们都是依靠系统调用来实现输出效果，但是这就面临着性能问题，我们知道系统调用会造成内核上下文切换的开销（系统调用的流程：执行系统调用，此时控制权会切换回内核，由内核执行完成进程需要的系统调用函数后再将控制权返回给进程），所以我们如何解决这个问题呢？可以增加一个缓冲区，等到要打印的内容都到一定程度后再一次性全部 `print`，那么此时的解决方式就如下：
 
-<<<@/code/11/hello_world.zig#three
+<<<@/code/release/hello_world.zig#three
 
 此时我们就分别得到了使用缓冲区的 `stdout` 和 `stderr`， 性能更高了！
 

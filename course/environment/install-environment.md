@@ -66,7 +66,7 @@ choco install zig
 
 ### 手动安装
 
-通过官方的[发布页面](https://ziglang.org/zh/download/)下载对应的 Zig 版本，普通用户选择 `zig-windows-x86_64` 即可。
+通过官方的 [发布页面](https://ziglang.org/zh/download/) 下载对应的 Zig 版本，普通用户选择 `zig-windows-x86_64` 即可。
 
 执行以下命令：
 

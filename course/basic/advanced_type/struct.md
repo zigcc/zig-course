@@ -22,9 +22,9 @@ outline: deep
 
 ::: code-group
 
-<<<@/code/11/struct.zig#default_struct [default]
+<<<@/code/release/struct.zig#default_struct [default]
 
-<<<@/code/11/struct.zig#more_struct [more]
+<<<@/code/release/struct.zig#more_struct [more]
 
 :::
 
@@ -47,9 +47,9 @@ outline: deep
 
 ::: code-group
 
-<<<@/code/11/struct.zig#deault_self_reference1 [default]
+<<<@/code/release/struct.zig#deault_self_reference1 [default]
 
-<<<@/code/11/struct.zig#more_self_reference1 [more]
+<<<@/code/release/struct.zig#more_self_reference1 [more]
 
 :::
 
@@ -63,9 +63,9 @@ outline: deep
 
 ::: code-group
 
-<<<@/code/11/struct.zig#deault_self_reference2 [default]
+<<<@/code/release/struct.zig#deault_self_reference2 [default]
 
-<<<@/code/11/struct.zig#more_self_reference2 [more]
+<<<@/code/release/struct.zig#more_self_reference2 [more]
 
 :::
 
@@ -75,9 +75,9 @@ outline: deep
 
 ::: code-group
 
-<<<@/code/11/struct.zig#deault_self_reference3 [default]
+<<<@/code/release/struct.zig#deault_self_reference3 [default]
 
-<<<@/code/11/struct.zig#more_self_reference3 [more]
+<<<@/code/release/struct.zig#more_self_reference3 [more]
 
 在以上的代码中，我们使用了内存分配的功能，并且使用了切片和多行字符串，以及 `defer` 语法（在当前作用域的末尾执行语句）。
 
@@ -87,7 +87,7 @@ outline: deep
 
 zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig 编译器推断出类型即可，例如：
 
-<<<@/code/11/struct.zig#auto_reference
+<<<@/code/release/struct.zig#auto_reference
 
 ## 泛型实现
 
@@ -97,7 +97,7 @@ zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig
 
 以下是一个链表的类型实现：
 
-<<<@/code/11/struct.zig#linked_list
+<<<@/code/release/struct.zig#linked_list
 
 :::info 🅿️ 提示
 
@@ -109,7 +109,7 @@ zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig
 
 结构体允许使用默认值，只需要在定义结构体的时候声明默认值即可：
 
-<<<@/code/11/struct.zig#default_field
+<<<@/code/release/struct.zig#default_field
 
 ## 空结构体
 
@@ -117,9 +117,9 @@ zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig
 
 ::: code-group
 
-<<<@/code/11/struct.zig#default_empty_struct [default]
+<<<@/code/release/struct.zig#default_empty_struct [default]
 
-<<<@/code/11/struct.zig#more_empty_struct [more]
+<<<@/code/release/struct.zig#more_empty_struct [more]
 
 :::
 
@@ -133,9 +133,9 @@ zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig
 
 为了获得最佳的性能，结构体字段的顺序是由编译器决定的，但是，我们可以仍然可以通过结构体字段的指针来获取到基指针！
 
-<<<@/code/11/struct.zig#base_ptr
+<<<@/code/release/struct.zig#base_ptr
 
-这里使用了内建函数 [`@fieldParentPtr`](https://ziglang.org/documentation/0.11.0/#toc-fieldParentPtr) ，它会根据给定字段指针，返回对应的结构体基指针。
+这里使用了内建函数 [`@fieldParentPtr`](https://ziglang.org/documentation/master/#toc-fieldParentPtr) ，它会根据给定字段指针，返回对应的结构体基指针。
 
 ## 元组
 
@@ -143,7 +143,7 @@ zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig
 
 由于没有字段名，zig 会为每个值分配一个整数的字段名，但是它无法通过正常的 `.` 语法来访问，但可以增加一个修饰符 `@""`，通过它使用 `.` 语法访问元组中的元素。
 
-<<<@/code/11/struct.zig#tuple
+<<<@/code/release/struct.zig#tuple
 
 当然，以上的语法很啰嗦,所以 zig 提供了类似**数组的语法**来访问元组，例如 `values[3]` 的值就是 "hi"。
 
@@ -179,19 +179,19 @@ zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig
 
 以上几个特性就有很多有意思的点值得我们使用和注意。
 
-1. zig 允许我们获取字段指针，但这些指针并不是普通指针（涉及到了位偏移），无法作为普通的函数参数使用，这个情况可以使用 [`@bitOffsetOf`](https://ziglang.org/documentation/0.11.0/#bitOffsetOf) 和 [`@offsetOf`](https://ziglang.org/documentation/0.11.0/#offsetOf) 观察到：
+1. zig 允许我们获取字段指针，但这些指针并不是普通指针（涉及到了位偏移），无法作为普通的函数参数使用，这个情况可以使用 [`@bitOffsetOf`](https://ziglang.org/documentation/master/#bitOffsetOf) 和 [`@offsetOf`](https://ziglang.org/documentation/master/#offsetOf) 观察到：
 
 :::details 示例
 
-<<<@/code/11/struct.zig#packed_bit_offset
+<<<@/code/release/struct.zig#packed_bit_offset
 
 :::
 
-2. 使用位转换 [`@bitCast`](https://ziglang.org/documentation/0.11.0/#bitCast) 和指针转换 [`@ptrCast`](https://ziglang.org/documentation/0.11.0/#ptrCast) 来强制对 `packed` 结构体进行转换操作：
+2. 使用位转换 [`@bitCast`](https://ziglang.org/documentation/master/#bitCast) 和指针转换 [`@ptrCast`](https://ziglang.org/documentation/master/#ptrCast) 来强制对 `packed` 结构体进行转换操作：
 
 :::details 示例
 
-<<<@/code/11/struct.zig#packed_cast
+<<<@/code/release/struct.zig#packed_cast
 
 :::
 
@@ -228,7 +228,7 @@ test "overaligned pointer to packed struct" {
 
 ::: code-group
 
-<<<@/code/11/struct.zig#name_principle
+<<<@/code/release/struct.zig#name_principle
 
 ```sh [output]
 variable: struct_name.main.Foo

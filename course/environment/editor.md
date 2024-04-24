@@ -88,7 +88,7 @@ windows 上最棒的开发 IDE，存在第三方插件：[ZigVS](https://marketp
 
 原本 CLion 仅仅是 C/C++ 的开发IDE，但在安装插件后可以作为 zig 的 IDE 使用。
 
-目前插件市场活跃的两个 zig 插件（均为第三方作者维护）分别是 [ZigBrains](https://plugins.jetbrains.com/plugin/22456-zigbrains) 和 [Zig Support](https://plugins.jetbrains.com/plugin/18062-zig-support)，均支持 zig 的 `0.11.0` 版本。
+目前插件市场活跃的两个 zig 插件（均为第三方作者维护）分别是 [ZigBrains](https://plugins.jetbrains.com/plugin/22456-zigbrains) 和 [Zig Support](https://plugins.jetbrains.com/plugin/18062-zig-support)，均支持 zig 的 `latest release` 版本。
 
 ## Sublime Text
 

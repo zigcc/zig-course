@@ -28,7 +28,7 @@ outline: deep
 | `usize`        | `uintptr_t` `size_t` | 无符号指针大小的整数           |
 | `comptime_int` | 无                   | 编译期的整数，整数字面量的类型 |
 
-<<<@/code/11/number.zig#type
+<<<@/code/release/number.zig#type
 
 同时 zig 支持任意位宽的整数，使用 `u` 或者 `i` 后面加数字即可，例如 `i7` 代表有符号的7位整数，整数类型允许的最大位宽为`65535`。
 
@@ -112,9 +112,9 @@ zig 中，有以下默认操作可以导致溢出：
 - `-`（取反）
 - `*`（乘法）
 - `/`（除法）
-- [`@divTrunc`](https://ziglang.org/documentation/0.11.0/#divTrunc)（除法）
-- [`@divFloor`](https://ziglang.org/documentation/0.11.0/#divFloor)（除法）
-- [`@divExact`](https://ziglang.org/documentation/0.11.0/#divExact)（除法）
+- [`@divTrunc`](https://ziglang.org/documentation/master/#divTrunc)（除法）
+- [`@divFloor`](https://ziglang.org/documentation/master/#divFloor)（除法）
+- [`@divExact`](https://ziglang.org/documentation/master/#divExact)（除法）
 
 还有在标准库 `@import("std").math` 中的函数可能导致溢出发生。
 
@@ -124,10 +124,10 @@ zig 中，有以下默认操作可以导致溢出：
 
 内置溢出处理函数：
 
-- [`@addWithOverflow`](https://ziglang.org/documentation/0.11.0/#addWithOverflow)
-- [`@subWithOverflow`](https://ziglang.org/documentation/0.11.0/#subWithOverflow)
-- [`@mulWithOverflow`](https://ziglang.org/documentation/0.11.0/#mulWithOverflow)
-- [`@shlWithOverflow`](https://ziglang.org/documentation/0.11.0/#shlWithOverflow)
+- [`@addWithOverflow`](https://ziglang.org/documentation/master/#addWithOverflow)
+- [`@subWithOverflow`](https://ziglang.org/documentation/master/#subWithOverflow)
+- [`@mulWithOverflow`](https://ziglang.org/documentation/master/#mulWithOverflow)
+- [`@shlWithOverflow`](https://ziglang.org/documentation/master/#shlWithOverflow)
 
 这些内建函数返回一个元组，其中包含是否存在溢出（作为 `u1`）以及操作中可能溢出的位.
 
@@ -148,13 +148,13 @@ zig 中，有以下默认操作可以导致溢出：
 
 浮点字面量则是具有 _任意浮点类型_，如果没有分母会被转换为 _任意整数类型_ 。
 
-浮点运算时遵循 `Strict` 模式，但是可以使用 `@setFloatMode(.Optimized)` 切换到 `Optimized` 模式，有关浮点运算的模式，详见 [`@setFloatMode`](https://ziglang.org/documentation/0.11.0/#setFloatMode)。
+浮点运算时遵循 `Strict` 模式，但是可以使用 `@setFloatMode(.Optimized)` 切换到 `Optimized` 模式，有关浮点运算的模式，详见 [`@setFloatMode`](https://ziglang.org/documentation/master/#setFloatMode)。
 
 ::: info 🅿️ 提示
 
 zig 并未像其他语言那样默认提供了 NaN、无穷大、负无穷大这些语法，如果需要使用它们，请使用标准库：
 
-<<<@/code/11/number.zig#float
+<<<@/code/release/number.zig#float
 
 :::
 
