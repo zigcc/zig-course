@@ -8,8 +8,6 @@ const linux = std.os.linux;
 
 /// windows context 定义
 const windows_context = struct {
-    const poll = windows.poll;
-    const pollfd = windows.ws2_32.pollfd;
     const POLLIN: i16 = 0x0100;
     const POLLERR: i16 = 0x0001;
     const POLLHUP: i16 = 0x0002;
@@ -19,8 +17,6 @@ const windows_context = struct {
 
 /// linux context 定义
 const linux_context = struct {
-    const poll = linux.poll;
-    const pollfd = linux.pollfd;
     const POLLIN: i16 = 0x0001;
     const POLLERR: i16 = 0x0008;
     const POLLHUP: i16 = 0x0010;
@@ -30,8 +26,6 @@ const linux_context = struct {
 
 /// macOS context 定义
 const macos_context = struct {
-    const poll = std.os.darwin.poll;
-    const pollfd = std.os.darwin.pollfd;
     const POLLIN: i16 = 0x0001;
     const POLLERR: i16 = 0x0008;
     const POLLHUP: i16 = 0x0010;
@@ -64,7 +58,7 @@ pub fn main() !void {
     // 存储 accept 拿到的 connections
     var connections: [max_sockets]?net.Server.Connection = undefined;
     // sockfds 用于存储 pollfd, 用于传递给 poll 函数
-    var sockfds: [max_sockets]context.pollfd = undefined;
+    var sockfds: [max_sockets]std.posix.pollfd = undefined;
     // #endregion data
     for (0..max_sockets) |i| {
         sockfds[i].fd = context.INVALID_SOCKET;
@@ -78,7 +72,7 @@ pub fn main() !void {
     // 无限循环，等待客户端连接或者已连接的客户端发送数据
     while (true) {
         // 调用 poll，nums 是返回的事件数量
-        var nums = context.poll(&sockfds, max_sockets, -1);
+        var nums = try std.posix.poll(&sockfds, -1);
         if (nums == 0) {
             continue;
         }
