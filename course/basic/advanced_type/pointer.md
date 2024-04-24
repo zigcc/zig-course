@@ -26,7 +26,7 @@ zig 本身支持指针运算（加减操作），但有一点需要注意：最�
 
 单项指针的类型为：`*T`，`T`是所指向内存区域的类型，解引用方法是 `ptr.*`。
 
-<<<@/code/11/pointer.zig#single_pointer
+<<<@/code/release/pointer.zig#single_pointer
 
 :::info 🅿️ 提示
 
@@ -38,7 +38,7 @@ zig 本身支持指针运算（加减操作），但有一点需要注意：最�
 
 多项指针指向位置数量的多个元素。
 
-多项指针的类型为：`[*]T`，`T`是所指向内存区域的类型，且该类型必须具有明确的大小（这意味着它不能是 [`anyopaque`](https://ziglang.org/documentation/0.11.0/#toc-C-Type-Primitives) 和其他任意[不透明类型](https://ziglang.org/documentation/0.11.0/#opaque)）。
+多项指针的类型为：`[*]T`，`T`是所指向内存区域的类型，且该类型必须具有明确的大小（这意味着它不能是 [`anyopaque`](https://ziglang.org/documentation/master/#toc-C-Type-Primitives) 和其他任意[不透明类型](https://ziglang.org/documentation/master/#opaque)）。
 
 解引用方法支持以下几种：
 
@@ -46,7 +46,7 @@ zig 本身支持指针运算（加减操作），但有一点需要注意：最�
 - 切片语法 `ptr[start..end]`
 - 指针运算 `ptr + x`，`ptr - x`
 
-<<<@/code/11/pointer.zig#multi_pointer
+<<<@/code/release/pointer.zig#multi_pointer
 
 :::info 🅿️ 提示
 
@@ -60,7 +60,7 @@ zig 本身支持指针运算（加减操作），但有一点需要注意：最�
 
 :::details 示例
 
-<<<@/code/11/pointer.zig#multi_pointer
+<<<@/code/release/pointer.zig#multi_pointer
 
 :::
 
@@ -74,7 +74,7 @@ zig 本身支持指针运算（加减操作），但有一点需要注意：最�
 
 我们接下来演示一个示例，该示例中使用了 zig 可以无缝与 C 交互的特性，故你可以暂时略过这里！
 
-<<<@/code/11/pointer.zig#st_pointer
+<<<@/code/release/pointer.zig#st_pointer
 
 以上代码编译需要额外连接 libc ，你只需要在你的 `build.zig` 中添加 `exe.linkLibC();` 即可。
 
@@ -120,9 +120,9 @@ zig 本身支持指针运算（加减操作），但有一点需要注意：最�
 
 在以下代码中，保证使用 `mmio_ptr` 的值进行操作（这里你看起来可能会感到迷惑，在编译代码时，编译器可以能会让值在实际运行过程中进行缓存，这里保证每次都使用 `mmio_ptr` 的值，以避免无法正确触发 “副作用”），并保证了代码执行的顺序。
 
-<<<@/code/11/pointer.zig#volatile
+<<<@/code/release/pointer.zig#volatile
 
-该节内容，仅仅讲述的少量内容，如果要了解更多，你可能需要查看[官方文档](https://ziglang.org/documentation/0.11.0/#toc-volatile)！
+该节内容，仅仅讲述的少量内容，如果要了解更多，你可能需要查看[官方文档](https://ziglang.org/documentation/master/#toc-volatile)！
 
 ### 对齐
 
@@ -134,7 +134,7 @@ zig 本身支持指针运算（加减操作），但有一点需要注意：最�
 
 在 Zig 中，指针类型具有对齐值。如果该值等于基础类型的对齐方式，则可以从类型中省略它：
 
-<<<@/code/11/pointer.zig#align
+<<<@/code/release/pointer.zig#align
 
 :::info 🅿️ 提示
 
@@ -144,13 +144,13 @@ zig 本身支持指针运算（加减操作），但有一点需要注意：最�
 
 :::details 示例
 
-<<<@/code/11/pointer.zig#align_cast
+<<<@/code/release/pointer.zig#align_cast
 
 :::
 
 ### 零指针
 
-零指针实际上是一个未定义的错误行为（[Pointer Cast Invalid Null](https://ziglang.org/documentation/0.11.0/#Pointer-Cast-Invalid-Null)），但是当我们给指针增加上 `allowzero` 修饰符后，它就变成合法的行为了！
+零指针实际上是一个未定义的错误行为（[Pointer Cast Invalid Null](https://ziglang.org/documentation/master/#Pointer-Cast-Invalid-Null)），但是当我们给指针增加上 `allowzero` 修饰符后，它就变成合法的行为了！
 
 :::warning 关于零指针的使用
 
@@ -158,10 +158,10 @@ zig 本身支持指针运算（加减操作），但有一点需要注意：最�
 
 :::
 
-<<<@/code/11/pointer.zig#zero_pointer
+<<<@/code/release/pointer.zig#zero_pointer
 
 ### 编译期
 
 只要代码不依赖于未定义的内存布局，那么指针也可以在编译期发挥作用！
 
-<<<@/code/11/pointer.zig#comptime_pointer
+<<<@/code/release/pointer.zig#comptime_pointer

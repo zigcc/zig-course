@@ -8,7 +8,7 @@ outline: deep
 
 这通常用于保证与不公开结构详细信息的 C 代码交互时的类型安全。
 
-<<<@/code/11/opaque.zig#opaque
+<<<@/code/release/opaque.zig#opaque
 
 ## anyopaque
 

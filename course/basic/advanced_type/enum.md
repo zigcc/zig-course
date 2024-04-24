@@ -12,15 +12,15 @@ outline: deep
 
 我们可以通过使用 `enum` 关键字来很轻松地声明并使用枚举：
 
-<<<@/code/11/enum.zig#basic_enum
+<<<@/code/release/enum.zig#basic_enum
 
 同时，zig 还允许我们访问并操作枚举的标记值：
 
-<<<@/code/11/enum.zig#enum_with_value
+<<<@/code/release/enum.zig#enum_with_value
 
 在此基础上，我们还可以覆盖枚举的标记值：
 
-<<<@/code/11/enum.zig#enum_with_value2
+<<<@/code/release/enum.zig#enum_with_value2
 
 ::: info 🅿️ 提示
 
@@ -32,7 +32,7 @@ outline: deep
 
 没错，枚举也可以拥有方法，实际上枚举仅仅是一种命名空间（你可以看作是一类 struct ）。
 
-<<<@/code/11/enum.zig#enum_with_method
+<<<@/code/release/enum.zig#enum_with_method
 
 ## 枚举大小
 
@@ -40,13 +40,13 @@ outline: deep
 
 以下示例中，我们使用了内建函数 `@typeInfo` 和 `@tagName` 来获取枚举的大小和对应的 tag name：
 
-<<<@/code/11/enum.zig#enum_size
+<<<@/code/release/enum.zig#enum_size
 
 ## 枚举推断
 
 枚举也支持让 zig 编译器自动进行推断，即在已经知道枚举的类型情况下仅使用字段来指定枚举的值：
 
-<<<@/code/11/enum.zig#enum_reference
+<<<@/code/release/enum.zig#enum_reference
 
 ## 非详尽枚举
 
@@ -58,7 +58,7 @@ zig 允许我们不列出所有的枚举值，未列出枚举值可以使用 `_`
 
 :::
 
-<<<@/code/11/enum.zig#non_exhaustive_enum
+<<<@/code/release/enum.zig#non_exhaustive_enum
 
 ## `EnumLiteral`
 
@@ -74,7 +74,7 @@ zig 还包含另外一个特殊的类型 `EnumLiteral`，它是 [`std.builtin.Ty
 
 它的具体使用如下：
 
-<<<@/code/11/enum.zig#enum_literal
+<<<@/code/release/enum.zig#enum_literal
 
 注意：此类型常用于作为函数参数！
 

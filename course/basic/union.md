@@ -12,9 +12,9 @@ outline: deep
 
 ::: code-group
 
-<<<@/code/11/union.zig#default_basic [default]
+<<<@/code/release/union.zig#default_basic [default]
 
-<<<@/code/11/union.zig#more_basic [more]
+<<<@/code/release/union.zig#more_basic [more]
 
 :::
 
@@ -30,7 +30,7 @@ outline: deep
 @unionInit(comptime Union: type, comptime active_field_name: []const u8, init_expr) Union
 ```
 
-<<<@/code/11/union.zig#union_init
+<<<@/code/release/union.zig#union_init
 
 ## 标记联合
 
@@ -48,9 +48,9 @@ outline: deep
 
 ::: code-group
 
-<<<@/code/11/union.zig#default_tag [default]
+<<<@/code/release/union.zig#default_tag [default]
 
-<<<@/code/11/union.zig#more_tag [more]
+<<<@/code/release/union.zig#more_tag [more]
 
 :::
 
@@ -58,15 +58,15 @@ outline: deep
 
 ::: code-group
 
-<<<@/code/11/union.zig#default_capture_payload [default]
+<<<@/code/release/union.zig#default_capture_payload [default]
 
-<<<@/code/11/union.zig#more_capture_payload [more]
+<<<@/code/release/union.zig#more_capture_payload [more]
 
 :::
 
 还支持使用 [`@tagName`](https://ziglang.org/documentation/master/#tagName) 来获取到对应的 name（返回的是一个 comptime 的 `[:0]const u8`，也就是字符串）：
 
-<<<@/code/11/union.zig#tag_name
+<<<@/code/release/union.zig#tag_name
 
 ::: info 🅿️ 提示
 
@@ -78,7 +78,7 @@ outline: deep
 
 zig 也支持自动推断联合类型：
 
-<<<@/code/11/union.zig#auto_infer
+<<<@/code/release/union.zig#auto_infer
 
 ## `extern union`
 

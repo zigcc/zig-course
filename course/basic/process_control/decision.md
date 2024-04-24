@@ -10,9 +10,9 @@ outline: deep
 
 ::: code-group
 
-<<<@/code/11/decision.zig#default_if [default]
+<<<@/code/release/decision.zig#default_if [default]
 
-<<<@/code/11/decision.zig#more_if [more]
+<<<@/code/release/decision.zig#more_if [more]
 
 :::
 
@@ -22,9 +22,9 @@ outline: deep
 
 ::: code-group
 
-<<<@/code/11/decision.zig#default_match_enum [default]
+<<<@/code/release/decision.zig#default_match_enum [default]
 
-<<<@/code/11/decision.zig#more_match_enum [more]
+<<<@/code/release/decision.zig#more_match_enum [more]
 
 :::
 
@@ -34,9 +34,9 @@ zig 中的三元表达式是通过 `if else` 来实现的：
 
 ::: code-group
 
-<<<@/code/11/decision.zig#default_ternary [default]
+<<<@/code/release/decision.zig#default_ternary [default]
 
-<<<@/code/11/decision.zig#more_ternary [more]
+<<<@/code/release/decision.zig#more_ternary [more]
 
 :::
 
@@ -48,13 +48,13 @@ zig 中的三元表达式是通过 `if else` 来实现的：
 
 事实上，解构可选类型操作很简单：
 
-<<<@/code/11/decision.zig#destruct_optional
+<<<@/code/release/decision.zig#destruct_optional
 
 以上代码的 `else` 分支并非必要，我们结构后获得 `real_b` 就是 `u32` 类型，但是注意我们获得的捕获是只读的！
 
 如果我们想操纵值的内容，可以选择捕获对应的指针：
 
-<<<@/code/11/decision.zig#capture_optional_pointer
+<<<@/code/release/decision.zig#capture_optional_pointer
 
 `*` 运算符就表示我们选择捕获这个值对应的指针，因此我们可以通过操控指针来修改其值。
 
@@ -62,17 +62,17 @@ zig 中的三元表达式是通过 `if else` 来实现的：
 
 解构错误联合类型类似于解构可选类型：
 
-<<<@/code/11/decision.zig#destruct_error_union
+<<<@/code/release/decision.zig#destruct_error_union
 
 以上代码中 `value` 类型为 `u32`，else 分支捕获的是错误，即 `err` 的类型将会是 `anyerror`，这是由我们之前显式声明的，否则将会是由编译器推导的。
 
 为了仅检测错误，我们可以这样做：
 
-<<<@/code/11/decision.zig#only_catch_error
+<<<@/code/release/decision.zig#only_catch_error
 
 同样支持捕获指针来操作值：
 
-<<<@/code/11/decision.zig#catch_pointer
+<<<@/code/release/decision.zig#catch_pointer
 
 ::: warning
 
@@ -80,13 +80,13 @@ zig 中的三元表达式是通过 `if else` 来实现的：
 
 答案是 if 会先尝试解构**错误联合类型**，再解构**可选类型**：
 
-<<<@/code/11/decision.zig#destruct_error_optional_union
+<<<@/code/release/decision.zig#destruct_error_optional_union
 
 以上代码中的 `optional_value` 就是可选类型 `?u32`，我们可以在内部继续使用 if 来解构它。
 
 在错误联合可选类型上也可以使用指针捕获：
 
-<<<@/code/11/decision.zig#destruct_error_optional_union_pointer
+<<<@/code/release/decision.zig#destruct_error_optional_union_pointer
 
 以上代码中，`*optional_value` 捕获的是可选类型的指针，我们在内部尝试解引用后再一次捕获指针来进行操作。
 
