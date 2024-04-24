@@ -58,7 +58,7 @@ pub fn main() !void {
     // 存储 accept 拿到的 connections
     var connections: [max_sockets]?net.Server.Connection = undefined;
     // sockfds 用于存储 pollfd, 用于传递给 poll 函数
-    var sockfds: [max_sockets]std.posix.pollfd = undefined;
+    var sockfds: [max_sockets]if (builtin.os.tag == .windows) windows.ws2_32.pollfd else std.posix.pollfd = undefined;
     // #endregion data
     for (0..max_sockets) |i| {
         sockfds[i].fd = context.INVALID_SOCKET;
@@ -72,7 +72,7 @@ pub fn main() !void {
     // 无限循环，等待客户端连接或者已连接的客户端发送数据
     while (true) {
         // 调用 poll，nums 是返回的事件数量
-        var nums = try std.posix.poll(&sockfds, -1);
+        var nums = if (builtin.os.tag == .windows) windows.poll(&sockfds, max_sockets, -1) else try std.posix.poll(&sockfds, -1);
         if (nums == 0) {
             continue;
         }
