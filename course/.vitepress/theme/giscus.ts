@@ -7,7 +7,6 @@ const is_dev = process.env.NODE_ENV === "development";
 
 export default defineComponent({
   setup() {
-    // const route = useRoute();
     const { isDark, title, frontmatter } = useData();
 
     return () =>
