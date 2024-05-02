@@ -885,6 +885,14 @@ pub const Options = struct {
 };
 ```
 
+### std.meta.trait
+
+`trait` 这个命名空间里提供了一些方法，用于对类型进行检查，比如 `isNumber`、`isZigString` 等，在 [#18061](https://github.com/ziglang/zig/pull/18061/files) 中 Andrew 把这个命名空间删除了，主要是因为现在的实现过于复杂，影响了编译时间。
+
+如果在之前的版本中用到了这里面的函数，需要手动实现一下，社区也有人把 trait 这个单独做成了一个包来用：
+
+- [wrongnull/zigtrait](https://github.com/wrongnull/zigtrait) A bunch of useful functions for working with zig types
+
 ### 指针保护锁（Pointer Stability Locks）
 
 > "Pointer Stability Locks" 是一种用于保护数据结构中的指针不被非法修改的机制。在Zig中，你可以使用 `std.debug.SafetyLock` 来锁定指针，防止它们在不应该被修改的时候被修改。如果尝试在锁定后修改这些指针，程序会抛出一个panic，而不是触发未定义的行为。这可以帮助开发者更容易地发现和修复可能的错误。
@@ -1338,6 +1346,12 @@ lib.installHeadersDirectory(upstream.path(""), "", .{
 
 - 添加了 `WriteFile.addCopyDirectory`，其功能与 `InstallDir` 非常相似。
 - `InstallArtifact` 已经更新，可以将打包的头文件与产物一起安装。打包的头文件将安装到由 `h_dir` 指定的目录（默认为 `zig-out/include`）。
+
+### 移除 vcpkg 的支持
+
+vcpkg 是微软提供的一个 C/C++ 包管理工具，在之前的版本中可以用 `addVcpkgPaths` 方法来链接使用 vcpkg 安装的包，但在 [579f572c](https://github.com/ziglang/zig/commit/579f572cf203eda11da7e4e919fdfc12e15f03e2) 这个 commit 中 Andrew 删除的对它的支持。推荐使用 zon 的方式来管理依赖。
+
+可以想到，这样短时间内会比较麻烦，如果自己用到的包没有用 zig build，需要自己包装一下，但长远来看是有利于 Zig 生态的，毕竟常用的包不会多，社区经过一段时间发展，常见的 C 库应该都会有对应的 Zig 版本。
 
 ### `dependencyFromBuildZig`
 
