@@ -1,5 +1,6 @@
 ---
 outline: deep
+showVersion: false
 ---
 
 # 社区

@@ -1,5 +1,6 @@
 ---
 outline: deep
+showVersion: false
 ---
 
 # 什么是 Zig

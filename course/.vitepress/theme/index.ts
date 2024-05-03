@@ -2,7 +2,7 @@
 import DefaultTheme from "vitepress/theme";
 
 import giscus from "./giscus";
-import version from "./version.vue";
+import version from "./version";
 
 import { h } from "vue";
 
