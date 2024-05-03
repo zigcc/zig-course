@@ -1,5 +1,6 @@
 ---
 outline: deep
+showVersion: false
 ---
 
 # 前言

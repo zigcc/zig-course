@@ -1,6 +1,7 @@
 ---
 outline: deep
 comments: false
+showVersion: false
 ---
 
 # 关于本站

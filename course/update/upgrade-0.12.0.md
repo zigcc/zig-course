@@ -1,5 +1,6 @@
 ---
 outline: deep
+showVersion: false
 ---
 
 本篇文档将介绍如何从 `0.11.0` 版本升级到 `0.12.0`。
