@@ -10,24 +10,13 @@ _你可以对数组、切片、数组指针进行切片操作！_
 
 接下来我们演示切片的使用方式：
 
-```zig
-const print = @import("std").debug.print;
+::: code-group
 
-pub fn main() !void {
-    var array = [_]i32{ 1, 2, 3, 4 };
+<<<@/code/release/slice.zig#basic [basic]
 
-    var len: usize = 3;
-    var slice = array[0..len];
+<<<@/code/release/slice.zig#basic_more [more]
 
-    for (slice, 0..) |ele, index| {
-        print("第{}个元素为：{}\n", .{ index + 1, ele });
-    }
-    print("slice 类型为{}\n", .{@TypeOf(slice)});
-
-    var slice_2 = array[0..array.len];
-    print("slice_2 类型为{}\n", .{@TypeOf(slice_2)});
-}
-```
+:::
 
 打印结果如下：
 
@@ -36,7 +25,7 @@ pub fn main() !void {
 第2个元素为：2
 第3个元素为：3
 slice 类型为[]i32
-slice 类型为*[4]i32
+slice_2 类型为[]i32
 ```
 
 切片的使用方式就是类似数组，不过`[]`中的是索引的边界值，遵循“左闭右开”规则。
@@ -61,20 +50,19 @@ slice 类型为*[4]i32
 
 同时，切片本身还有边界检查，但是对切片指针做操作则不会有边界检查！
 
-```zig
-const print = @import("std").debug.print;
+::: code-group
 
-pub fn main() !void {
-    var array = [_]i32{ 1, 2, 3, 4 };
+<<<@/code/release/slice.zig#pointer_slice [basic]
 
-    // 边界使用变量，保证切片不会被优化为数组指针
-    var len: usize = 3;
+<<<@/code/release/slice.zig#pointer_slice_more [more]
 
-    var slice = array[0..len];
+:::
 
-    print("slice.ptr 类型为{}\n", .{@TypeOf(slice.ptr)});
-    print("slice 的索引 0 取地址，得到指针类型为{}\n", .{@TypeOf(&slice[0])});
-}
+打印结果如下：
+
+```sh
+slice.ptr 类型为[*]i32
+slice 的索引 0 取地址，得到指针类型为*i32
 ```
 
 ## 哨兵切片
@@ -85,17 +73,17 @@ pub fn main() !void {
 
 哨兵切片认定哨兵位置处的元素是哨兵值，如果不是这种情况，则会触发安全保护中的未定义问题。
 
-```zig
-const print = @import("std").debug.print;
+::: code-group
 
-pub fn main() !void {
-    // 显示声明切片类型
-    const str_slice: [:0]const u8 = "hello";
-    print("str_slice类型：{}\n", .{@TypeOf(str_slice)});
+<<<@/code/release/slice.zig#terminated_slice [basic]
 
-    var array = [_]u8{ 3, 2, 1, 0, 3, 2, 1, 0 };
-    var runtime_length: usize = 3;
-    const slice = array[0..runtime_length :0];
-    print("slice类型：{}\n", .{@TypeOf(slice)});
-}
+<<<@/code/release/slice.zig#terminated_slice_more [more]
+
+:::
+
+打印结果如下：
+
+```sh
+str_slice类型：[:0]const u8
+slice类型：[:0]u8
 ```
