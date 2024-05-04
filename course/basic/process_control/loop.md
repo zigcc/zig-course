@@ -16,29 +16,13 @@ for 循环是另一种循环处理方式，主要用于迭代数组和切片。
 
 迭代数组和切片：
 
-```zig
-const items = [_]i32 { 4, 5, 3, 4, 0 };
-var sum: i32 = 0;
-
-for (items) |value| {
-    if (value == 0) {
-        continue;
-    }
-    sum += value;
-}
-```
+<<<@/code/release/loop.zig#for_array
 
 以上代码中的 value，我们称之为对 数组（切片）迭代的值捕获，注意它是只读的。
 
 在迭代时操作数组（切片）：
 
-```zig
-var items = [_]i32 { 3, 4, 2 };
-
-for (&items) |*value| {
-    value.* += 1;
-}
-```
+<<<@/code/release/loop.zig#for_handle_array
 
 以上代码中的value是一个指针，我们称之为对 数组（切片）迭代的指针捕获，注意它也是只读的，不过我们可以通过借引用指针来操作数组（切片）的值。
 
@@ -46,22 +30,13 @@ for (&items) |*value| {
 
 迭代连续的整数很简单，以下是示例：
 
-```zig
-for (0..5) |i| {
-    // do something
-}
-```
+<<<@/code/release/loop.zig#for_integer
 
 ### 迭代索引
 
 如果你想在迭代数组（切片）时，也可以访问索引，可以这样做：
 
-```zig
-const items = [_]i32 { 4, 5, 3, 4, 0 };
-for (items, 0..) |value, i| {
-    // do something
-}
-```
+<<<@/code/release/loop.zig#index_for
 
 以上代码中，其中 value 是值，而 i 是索引。
 
@@ -69,28 +44,13 @@ for (items, 0..) |value, i| {
 
 当然，你也可以同时迭代多个目标（数组或者切片），当然这两个迭代的目标要长度一致防止出现未定义的行为。
 
-```zig
-const items = [_]usize{ 1, 2, 3 };
-const items2 = [_]usize{ 4, 5, 6 };
-
-for (items, items2) |i, j| {
-// do something
-}
-```
+<<<@/code/release/loop.zig#multi_for
 
 ### 作为表达式使用
 
 当然，for 也可以作为表达式来使用，它的行为和 [while](#作为表达式使用) 一模一样。
 
-```zig
-var items = [_]?i32 { 3, 4, null, 5 };
-
-const result = for (items) |value| {
-    if (value == 5) {
-        break value;
-    }
-} else 0;
-```
+<<<@/code/release/loop.zig#for_as_expression
 
 ### 标记
 
@@ -100,27 +60,13 @@ const result = for (items) |value| {
 
 它们只会增加你的代码复杂性，非必要不使用！
 
-```zig
-var count: usize = 0;
-outer: for (1..6) |_| {
-    for (1..6) |_| {
-        count += 1;
-        break :outer;
-    }
-}
+::: code-group
 
+<<<@/code/release/loop.zig#label_for_1 [break]
 
-```
+<<<@/code/release/loop.zig#label_for_2 [continue]
 
-```zig
-var count: usize = 0;
-outer: for (1..9) |_| {
-    for (1..6) |_| {
-        count += 1;
-        continue :outer;
-    }
-}
-```
+:::
 
 ### 内联 `inline`
 
@@ -130,50 +76,9 @@ outer: for (1..9) |_| {
 
 :::code-group
 
-```zig [default]
-pub fn main() !void {
-    const nums = [_]i32{2, 4, 6};
-    var sum: usize = 0;
-    inline for (nums) |i| {
-        const T = switch (i) {
-            2 => f32,
-            4 => i8,
-            6 => bool,
-            else => unreachable,
-        };
-        sum += typeNameLength(T);
-    }
-    try expect(sum == 9);
-}
+<<<@/code/release/loop.zig#inline_for [basic]
 
-fn typeNameLength(comptime T: type) usize {
-    return @typeName(T).len;
-}
-```
-
-```zig [more]
-const std = @import("std");
-const expect = std.testing.expect;
-
-pub fn main() !void {
-    const nums = [_]i32{2, 4, 6};
-    var sum: usize = 0;
-    inline for (nums) |i| {
-        const T = switch (i) {
-            2 => f32,
-            4 => i8,
-            6 => bool,
-            else => unreachable,
-        };
-        sum += typeNameLength(T);
-    }
-    try expect(sum == 9);
-}
-
-fn typeNameLength(comptime T: type) usize {
-    return @typeName(T).len;
-}
-```
+<<<@/code/release/loop.zig#inline_for_more [more]
 
 :::
 
@@ -185,31 +90,9 @@ while 循环用于重复执行表达式，直到某些条件不再成立.
 
 :::code-group
 
-```zig [default]
-var i: usize = 0;
-while (i < 10) {
-    if (i == 5) {
-        continue;
-    }
-    std.debug.print("i is {}\n", .{i});
-    i += 1;
-}
-```
+<<<@/code/release/loop.zig#while_basic [basic]
 
-```zig [more]
-const std = @import("std");
-
-pub fn main() !void {
-    var i: usize = 0;
-    while (i < 10) {
-        if (i == 5) {
-            continue;
-        }
-        std.debug.print("i is {}\n", .{i});
-        i += 1;
-    }
-}
-```
+<<<@/code/release/loop.zig#while_more [more]
 
 :::
 
@@ -219,19 +102,9 @@ while 还支持一个被称为 continue 表达式的方法来便于我们控制�
 
 :::code-group
 
-```zig [单语句]
-var i: usize = 0;
-while (i < 10) : (i += 1) {}
-```
+<<<@/code/release/loop.zig#while_continue_1 [单语句]
 
-```zig [多语句]
-var i: usize = 1;
-var j: usize = 1;
-while (i * j < 2000) : ({ i *= 2; j *= 3; }) {
-    const my_ij = i * j;
-    try expect(my_ij < 2000);
-}
-```
+<<<@/code/release/loop.zig#while_continue_2 [多语句]
 
 :::
 
@@ -241,16 +114,7 @@ zig 还允许我们将 while 作为表达式来使用，此时需要搭配 `else
 
 这里的 `else` 是当 while 循环结束并且没有经过 `break` 返回值时触发，而 `break` 则类似于return，可以在 while 内部返回值。
 
-```zig
-fn rangeHasNumber(begin: usize, end: usize, number: usize) bool {
-    var i = begin;
-    return while (i < end) : (i += 1) {
-        if (i == number) {
-            break true;
-        }
-    } else false;
-}
-```
+<<<@/code/release/loop.zig#while_as_expression
 
 ### 标记
 
@@ -258,22 +122,19 @@ fn rangeHasNumber(begin: usize, end: usize, number: usize) bool {
 
 `break` 的效果就是在标记处的 while 执行 break 操作，当然，同样不推荐使用。
 
+::: info 🅿️ 提示
+
 它们只会增加你的代码复杂性，非必要不使用！
 
-```zig
-var i: usize = 0;
-outer: while (i < 10) : (i += 1) {
-    while (true) {
-        continue :outer;
-    }
-}
+:::
 
-outer: while (true) {
-        while (true) {
-            break :outer;
-        }
-    }
-```
+:::code-group
+
+<<<@/code/release/loop.zig#label_while_continue [continue]
+
+<<<@/code/release/loop.zig#label_while_break [break]
+
+:::
 
 ### 内联 `inline`
 
@@ -281,50 +142,9 @@ outer: while (true) {
 
 :::code-group
 
-```zig [default]
-pub fn main() !void {
-    comptime var i = 0;
-    var sum: usize = 0;
-    inline while (i < 3) : (i += 1) {
-        const T = switch (i) {
-            0 => f32,
-            1 => i8,
-            2 => bool,
-            else => unreachable,
-        };
-        sum += typeNameLength(T);
-    }
-    try expect(sum == 9);
-}
+<<<@/code/release/loop.zig#inline_while [basic]
 
-fn typeNameLength(comptime T: type) usize {
-    return @typeName(T).len;
-}
-```
-
-```zig [more]
-const std = @import("std");
-const expect = std.testing.expect;
-
-pub fn main() !void {
-    comptime var i = 0;
-    var sum: usize = 0;
-    inline while (i < 3) : (i += 1) {
-        const T = switch (i) {
-            0 => f32,
-            1 => i8,
-            2 => bool,
-            else => unreachable,
-        };
-        sum += typeNameLength(T);
-    }
-    try expect(sum == 9);
-}
-
-fn typeNameLength(comptime T: type) usize {
-    return @typeName(T).len;
-}
-```
+<<<@/code/release/loop.zig#inline_while_more [more]
 
 :::
 
@@ -341,39 +161,11 @@ fn typeNameLength(comptime T: type) usize {
 
 像 `if` 一样，`while` 也会尝试解构可选类型，并在遇到 `null` 时终止循环。
 
-::: code-group
+:::code-group
 
-```zig [default]
-while (eventuallyNullSequence()) |value| {
-    sum2 += value;
-} else {
-    std.debug.print("meet a null\n", .{});
-}
-// 还可以使用else分支，碰到第一个 null 时触发并退出循环
-```
+<<<@/code/release/loop.zig#while_optional [basic]
 
-```zig [more]
-const std = @import("std");
-
-var numbers_left: u32 = undefined;
-fn eventuallyNullSequence() ?u32 {
-    return if (numbers_left == 0) null else blk: {
-        numbers_left -= 1;
-        break :blk numbers_left;
-    };
-}
-
-pub fn main() !void {
-    var sum2: u32 = 0;
-    numbers_left = 3;
-    while (eventuallyNullSequence()) |value| {
-        sum2 += value;
-    } else {
-        std.debug.print("meet a null\n", .{});
-    }
-    // 还可以使用else分支，碰到第一个 null 时触发并退出循环
-}
-```
+<<<@/code/release/loop.zig#while_optional_more [more]
 
 :::
 
@@ -383,38 +175,12 @@ pub fn main() !void {
 
 和上面类似，同样可以解构错误联合类型，`while` 分别会捕获错误和有效负载，当错误发生时，转到 `else` 分支执行，并退出：
 
-::: code-group
+:::code-group
 
-```zig [default]
-while (eventuallyErrorSequence()) |value| {
-    sum1 += value;
-} else |err| {
-    std.debug.print("meet a err: {}\n", .{err});
-}
-```
+<<<@/code/release/loop.zig#while_error_union [basic]
 
-```zig [more]
-const std = @import("std");
-var numbers_left: u32 = undefined;
-
-fn eventuallyErrorSequence() anyerror!u32 {
-    return if (numbers_left == 0) error.ReachedZero else blk: {
-        numbers_left -= 1;
-        break :blk numbers_left;
-    };
-}
-
-pub fn main() !void {
-    var sum1: u32 = 0;
-    numbers_left = 3;
-    while (eventuallyErrorSequence()) |value| {
-        sum1 += value;
-    } else |err| {
-        std.debug.print("meet a err: {}\n", .{err});
-    }
-}
-```
-
-当 `else |x|` 时语法出现在 `while` 表达式上，`while` 条件必须是错误联合类型。
+<<<@/code/release/loop.zig#while_error_union_more [more]
 
 :::
+
+当 `else |x|` 时语法出现在 `while` 表达式上，`while` 条件必须是错误联合类型。
