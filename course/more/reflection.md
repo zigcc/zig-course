@@ -82,6 +82,10 @@ main.T.Y
 
 它是一个联合类型，有 Struct, Union, Enum, ErrorSet 等变体来储存结构体、联合、枚举、错误集等类型的类型信息。要判断类型的种类，可以使用 switch 或直接访问相应变体来断言之。
 
+对结构、联合、枚举和错误集合，它保证信息中字段的顺序与源码中出现的顺序相同。
+
+对结构、联合、枚举和透明类型，它保证信息中声明的顺序与源码中出现的顺序相同。
+
 如以下示例中，首先使用`@typeInfo` 来获取类型 `T` 的信息，然后将其断言为一个 `Struct` 类型，最后用 `inline for` 输出其字段值。
 
 ```zig
@@ -112,13 +116,69 @@ pub fn main() !void {
 
 ::: warning
 
-值得注意的是，我们观察并获得的类型信息是 **只读的**，无法以此来修改已有类型，这是由于 zig 是一门静态语言并不具有过多的运行时功能！
-
-但我们可以以此为基础在编译期构建新的类型！
+获得的类型信息不能用于修改已有类型，但我们可以用这些信息在编译期构建新的类型！
 
 :::
 
-TODO：增加新的示例，仅仅一个示例不足以说明 `@typeInfo` 的使用！
+在以下示例中，使用`@typeInfo`获得一个整数类型的长度，并返回和它的长度相同的`u8`数组类型。当位数不为8的整倍数时，产生一个编译错误。
+
+```zig
+const std = @import("std");
+
+fn IntToArray(comptime T: type) type {
+    // 获得类型信息，并断言为Int
+    const int_info = @typeInfo(T).Int;
+    // 获得Int位数
+    const bits = int_info.bits;
+    // 检查位数是否被8整除
+    if (bits % 8 != 0) @compileError("bit count not a multiple of 8");
+    // 生成新类型
+    return [bits/8]u8;
+}
+
+test {
+    try std.testing.expectEqual([1]u8, IntToArray(u8));
+    try std.testing.expectEqual([2]u8, IntToArray(u16));
+    try std.testing.expectEqual([3]u8, IntToArray(u24));
+    try std.testing.expectEqual([4]u8, IntToArray(u32));
+}
+```
+
+:::
+
+在以下示例中，使用`@typeInfo`获得一个结构体的信息，并使用`@Type`构造一个新的类型。构造的新结构体类型和原结构体的字段名和顺序相同，但结构体的内存布局被改为 extern，且每个字段的对齐被改为1。
+
+```zig
+const std = @import("std");
+
+fn ExternAlignOne(comptime T: type) type {
+    // 获得类型信息，并断言为Struct.
+    comptime var struct_info = @typeInfo(T).Struct;
+    // 将内存布局改为 extern
+    struct_info.layout = .@"extern";
+    // 复制字段信息（原为只读切片，故需复制）
+    comptime var new_fields = struct_info.fields[0..struct_info.fields.len].*;
+    // 修改每个字段对齐为1
+    inline for (&new_fields) |*f| f.alignment = 1;
+    // 替换字段定义
+    struct_info.fields = &new_fields;
+    // 重新构造类型
+    return @Type(.{ .Struct = struct_info });
+}
+
+const MyStruct = struct {
+    a: u32,
+    b: u32,
+};
+
+test {
+    const NewType = ExternAlignOne(MyStruct);
+    try std.testing.expectEqual(4, @alignOf(MyStruct));
+    try std.testing.expectEqual(1, @alignOf(NewType));
+}
+```
+
+在以上示例中，我们将原类型的类型信息稍作修改，构造了一个新的类型。可以看到，虽然我们修改了得到的`MyStruct`的类型信息，但`MyStruct`本身并没有变化。
 
 ### `@hasDecl`
 
