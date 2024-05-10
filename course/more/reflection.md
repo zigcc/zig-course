@@ -78,11 +78,11 @@ main.T.Y
 
 [`@typeInfo`](https://ziglang.org/documentation/master/#typeInfo)，该内建函数用于获取类型的信息。
 
-提供类型反射的具体功能，结构体、联合类型、枚举和错误集的类型信息具有保证与源文件中出现的顺序相同的字段，结构、联合、枚举和不透明的类型信息都有声明，也保证与源文件中出现的顺序相同。
+该函数返回一个 [`std.builtin.Type`](https://ziglang.org/documentation/master/std/#std.builtin.Type)，它包含了此类型的所有信息。
 
-实际上，该函数的效果是返回一个 [`std.builtin.Type`](https://ziglang.org/documentation/master/std/#A;std:builtin.Type)，该类型包含了所有 zig 当前可用的类型信息，并允许我们通过该类型观察并获取指定类型的具体信息。
+它是一个联合类型，有 Struct, Union, Enum, ErrorSet 等变体来储存结构体、联合、枚举、错误集等类型的类型信息。要判断类型的种类，可以使用 switch 或直接访问相应变体来断言之。
 
-以下是一个简单的示例：
+如以下示例中，首先使用`@typeInfo` 来获取类型 `T` 的信息，然后将其断言为一个 `Struct` 类型，最后用 `inline for` 输出其字段值。
 
 ```zig
 const std = @import("std");
@@ -108,9 +108,7 @@ pub fn main() !void {
 }
 ```
 
-以上的示例中，我们使用了`@typeInfo` 来获取类型 `T` 的信息，随后将其断言为一个 `Struct` 类型，然后再通过 `inline for` 打印输出其字段值。
-
-需要注意的是，我们在此处打印必须要使用 `inline for`，否则将会编译无法通过，这是因为 结构体的 **“字段类型”** [`std.builtin.Type.StructField`](https://ziglang.org/documentation/master/std/#A;std:builtin.Type.StructField)，其中有一个字段是 `comptime_int`，使得无法在运行时计算索引来遍历，只能通过 `inline for` 将其转换为编译期计算。
+需要注意的是，我们必须使用 `inline for` 才能编译通过，这是因为结构体的 **“字段类型”** [`std.builtin.Type.StructField`](https://ziglang.org/documentation/master/std/#std.builtin.Type.StructField)中的一个字段是`comptime_int`类型，使得StructField没有固定大小，从而不能在运行时遍历其数组，必须用`inline for`在编译期计算。
 
 ::: warning
 
