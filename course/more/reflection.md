@@ -112,7 +112,7 @@ pub fn main() !void {
 }
 ```
 
-需要注意的是，我们必须使用 `inline for` 才能编译通过，这是因为结构体的 **“字段类型”** [`std.builtin.Type.StructField`](https://ziglang.org/documentation/master/std/#std.builtin.Type.StructField)中的一个字段是`comptime_int`类型，使得StructField没有固定大小，从而不能在运行时遍历其数组，必须用`inline for`在编译期计算。
+需要注意的是，我们必须使用 `inline for` 才能编译通过，这是因为结构体的 **“字段类型”** [`std.builtin.Type.StructField`](https://ziglang.org/documentation/master/std/#std.builtin.Type.StructField)中的一个字段是`comptime_int`类型，使得StructField没有运行时大小，从而不能在运行时遍历其数组，必须用`inline for`在编译期计算。
 
 ::: warning
 
