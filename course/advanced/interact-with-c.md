@@ -259,4 +259,4 @@ CC='zig cc -target x86_64-linux-gnu' CXX='zig cc -target x86_64-linux-gnu' go bu
 CC='zig cc -target x86_64-linux-musl' CXX='zig cc -target x86_64-linux-musl' CGO_CFLAGS='-D_LARGEFILE64_SOURCE' go build -ldflags='-linkmode=external -extldflags -static'
 ```
 
-上方的 `CGO_CFLAGS` 是为了防止编译失败，`ldfalgs` 是为了指定静态链接！
+上方的 `CGO_CFLAGS` 是为了防止编译失败，`ldflags` 是为了指定静态链接！
