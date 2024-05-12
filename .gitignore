@@ -7,3 +7,4 @@ package-lock.json
 */zig-out
 zig-out
 zig-cache
+.direnv
