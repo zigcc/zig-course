@@ -82,10 +82,7 @@
     },
     "gitignore": {
       "inputs": {
-        "nixpkgs": [
-          "zls-overlay",
-          "nixpkgs"
-        ]
+        "nixpkgs": ["zls-overlay", "nixpkgs"]
       },
       "locked": {
         "lastModified": 1709087332,
@@ -207,10 +204,7 @@
       "inputs": {
         "flake-compat": "flake-compat_2",
         "flake-utils": "flake-utils_3",
-        "nixpkgs": [
-          "zls-overlay",
-          "nixpkgs"
-        ]
+        "nixpkgs": ["zls-overlay", "nixpkgs"]
       },
       "locked": {
         "lastModified": 1715041400,
