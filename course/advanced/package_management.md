@@ -14,23 +14,7 @@ zig 当前并没有一个中心化存储库，包可以来自任何来源，无�
 
 `build.zig.zon` 这个文件存储了包的信息，它是 zig 新引入的一种简单数据交换格式，使用了 zig 的匿名结构和数组初始化语法。
 
-```zig
-.{
-    .name = "my_package_name",
-    .version = "0.1.0",
-    .dependencies = .{
-        .dep_name = .{
-            .url = "https://link.to/dependency.tar.gz",
-            .hash = "12200f41f9804eb9abff259c5d0d84f27caa0a25e0f72451a0243a806c8f94fdc433",
-        },
-    },
-    // 这里的 paths 字段是当前 nightly 版本新引入的
-    // 它用于显式声明包含的源文件，如果包含全部则指定为空
-    .paths = .{
-        "",
-    },
-}
-```
+<<<@/code/release/package_management/build.zig.zon#package_management{zig}
 
 以上字段含义为：
 
@@ -69,24 +53,17 @@ zig 支持在一个 `build.zig` 中对外暴露出多个模块，也就是说一
 
 如何将模块对外暴露呢？
 
-可以使用 `build` 函数传入的参数 `b: *std.Build`，它包含一个方法 [`addModule`](https://ziglang.org/documentation/master/std/#A;std:Build.addModule)， 它的原型如下：
+可以使用 `build` 函数传入的参数 `b: *std.Build`，它包含一个方法 [`addModule`](https://ziglang.org/documentation/master/std/#std.Build.addModule)， 它的原型如下：
 
 ```zig
-fn addModule(b: *Build, name: []const u8, options: CreateModuleOptions) *Module
+pub fn addModule(b: *Build, name: []const u8, options: Module.CreateOptions) *Module
 ```
 
 使用起来也很简单，例如：
 
-```zig
-const std = @import("std");
+<<<@/code/release/package_management/build.zig#create_module
 
-pub fn build(b: *std.Build) void {
-    const lib_module = b.addModule("package", .{ .root_source_file = b.path("lib.zig") });
-    _ = lib_module;
-}
-```
-
-这就是一个最基本的包暴露实现，通过 `addModule` 函数暴露的模块是完全公开的。
+这就是一个最基本的包暴露实现，指定了包名和包的入口源文件地址（`b.path` 是相对当前项目路径取 `Path`），通过 `addModule` 函数暴露的模块是完全公开的。
 
 ::: info 🅿️ 提示
 
@@ -106,45 +83,7 @@ fn dependency(b: *Build, name: []const u8, args: anytype) *Dependency
 
 其中 `name` 是在在 `.zon` 中的包名字，它返回一个 [`*std.Build.Dependency`](https://ziglang.org/documentation/master/std/#std.Build.Dependency)，可以使用 `artifact` 和 `module` 方法来访问包的链接库和暴露的 `module`。
 
-```zig
-const std = @import("std");
-
-pub fn build(b: *std.Build) void {
-
-    // 默认构建目标
-    const target = b.standardTargetOptions(.{});
-    // 默认优化模式
-    const optimize = b.standardOptimizeOption(.{});
-
-    // ...
-
-    // 获取包
-    const package = b.dependency("package_name", .{});
-
-    // 获取包构建的library，例如链接库
-    const library_name = package.artifact("library_name");
-
-
-    // 获取包提供的模块
-    const module_name = package.module("module_name");
-
-    // ...
-
-    const exe = try b.addExecutable(.{
-        .name = "my_binary",
-        .root_source_file = .{ .path = "src/main.zig" },
-        .target = target,
-        .optimize = optimize,
-    });
-
-    // 引入模块
-    exe.root_module.addImport("module_name", module_name);
-
-    // 链接依赖提供的库
-    exe.linkLibrary(library_name);
-}
-
-```
+<<<@/code/release/package_management/build.zig#import_module
 
 ::: info 🅿️ 提示
 
