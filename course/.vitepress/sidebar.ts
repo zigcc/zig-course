@@ -237,10 +237,10 @@ export default [
   {
     text: "附录",
     items: [
-      // {
-      //   text: "后记",
-      //   link: "/epilogue",
-      // },
+      {
+        text: "贡献者公约",
+        link: "/appendix/contributor-covenant",
+      },
       {
         text: "社区",
         link: "/appendix/community",
