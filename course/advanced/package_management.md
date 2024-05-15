@@ -55,7 +55,7 @@ zig 当前并没有一个中心化存储库，包可以来自任何来源，无�
 
 ::: info 🅿️ 提示
 
-当前 `nightly` 的 zig 支持通过 [`zig fetch`](../environment/zig-command#zig-fetch) 来获取 hash 并写入到 `.zon` 中！
+目前 zig 已支持通过 [`zig fetch`](../environment/zig-command#zig-fetch) 来获取 hash 并写入到 `.zon` 中！
 
 :::
 
@@ -81,22 +81,16 @@ fn addModule(b: *Build, name: []const u8, options: CreateModuleOptions) *Module
 const std = @import("std");
 
 pub fn build(b: *std.Build) void {
-    const lib_module = b.addModule("package", .{ .source_file = .{ .path = "lib.zig" } });
+    const lib_module = b.addModule("package", .{ .root_source_file = b.path("lib.zig") });
     _ = lib_module;
 }
 ```
-
-:::warning
-
-注意：zig `nightly` 已经将上方代码中的 `source_file` 字段更换为 `root_source_file` ！
-
-:::
 
 这就是一个最基本的包暴露实现，通过 `addModule` 函数暴露的模块是完全公开的。
 
 ::: info 🅿️ 提示
 
-如果需要使用私有的模块，请使用 [`std.Build.createModule`](https://ziglang.org/documentation/master/std/#A;std:Build.createModule)，使用方式和 `addModule` 同理。
+如果需要使用私有的模块，请使用 [`std.Build.createModule`](https://ziglang.org/documentation/master/std/#std.Build.createModule)，使用方式和 `addModule` 同理。
 
 关于二进制构建结果（例如动态链接库和静态链接库），任何被执行 `install` 操作的构建结果均会被暴露出去（即引入该包的项目均可看到该包的构建结果，但需要手动 link ）。
 
@@ -104,13 +98,13 @@ pub fn build(b: *std.Build) void {
 
 ## 引入包
 
-可以使用 `build` 函数传入的参数 `b: *std.Build`，它包含一个方法 [`dependency`](https://ziglang.org/documentation/master/std/#A;std:Build.dependency)， 它的原型如下：
+可以使用 `build` 函数传入的参数 `b: *std.Build`，它包含一个方法 [`dependency`](https://ziglang.org/documentation/master/std/#std.Build.dependency)， 它的原型如下：
 
 ```zig
 fn dependency(b: *Build, name: []const u8, args: anytype) *Dependency
 ```
 
-其中 `name` 是在在 `.zon` 中的包名字，它返回一个 [`*std.Build.Dependency`](https://ziglang.org/documentation/master/std/#A;std:Build.Dependency)，可以使用 `artifact` 和 `module` 方法来访问包的链接库和暴露的 `module`。
+其中 `name` 是在在 `.zon` 中的包名字，它返回一个 [`*std.Build.Dependency`](https://ziglang.org/documentation/master/std/#std.Build.Dependency)，可以使用 `artifact` 和 `module` 方法来访问包的链接库和暴露的 `module`。
 
 ```zig
 const std = @import("std");
@@ -144,7 +138,7 @@ pub fn build(b: *std.Build) void {
     });
 
     // 引入模块
-    exe.addModule("module_name", module_name);
+    exe.root_module.addImport("module_name", module_name);
 
     // 链接依赖提供的库
     exe.linkLibrary(library_name);
@@ -152,17 +146,9 @@ pub fn build(b: *std.Build) void {
 
 ```
 
-如果需要引入一个本地包（且该包自己有 `build.zig`），那么可以使用 [`std.Build.anonymousDependency`](https://ziglang.org/documentation/master/std/#A;std:Build.anonymousDependency)， 它的原型为：
-
-```zig
-fn anonymousDependency(b: *Build, relative_build_root: []const u8, comptime build_zig: type, args: anytype) *Dependency
-```
-
-参数为包的包构建根目录和通过 `@import` 导入的包的 `build.zig` 。
-
 ::: info 🅿️ 提示
 
-`dependency` 和 `anonymousDependency` 都包含一个额外的参数 `args`，这是传给对应的包构建的参数（类似在命令行构建时使用的 `-D` 参数，通常是我们使用 `b.options` 获取，通过 [`std.Build.option`](https://ziglang.org/documentation/master/std/#A;std:Build.option) 实现），当前包的参数并不会向包传递，需要手动显式指定转发。
+`dependency` 包含一个额外的参数 `args`，这是传给对应的包构建的参数（类似在命令行构建时使用的 `-D` 参数，通常是我们使用 `b.options` 获取，通过 [`std.Build.option`](https://ziglang.org/documentation/master/std/#std.Build.option) 实现），当前包的参数并不会向包传递，需要手动显式指定转发。
 
 :::
 
