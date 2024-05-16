@@ -15,7 +15,7 @@ pub fn build(b: *Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    var lazy_path = Build.LazyPath{ .path = relative_path };
+    var lazy_path = b.path(relative_path);
 
     const full_path = lazy_path.getPath(b);
 
@@ -44,7 +44,7 @@ pub fn build(b: *Build) void {
                 // build exe
                 const exe = b.addExecutable(.{
                     .name = name,
-                    .root_source_file = .{ .path = path },
+                    .root_source_file = b.path(path),
                     .target = target,
                     .optimize = optimize,
                 });
@@ -55,7 +55,7 @@ pub fn build(b: *Build) void {
 
                 // build test
                 const unit_tests = b.addTest(.{
-                    .root_source_file = .{ .path = path },
+                    .root_source_file = b.path(path),
                     .target = target,
                     .optimize = optimize,
                 });
