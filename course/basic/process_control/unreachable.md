@@ -8,10 +8,4 @@ outline: deep
 
 在 `ReleaseFast` 和 `ReleaseSmall` 模式下，编译器假设永远不会执行到 `unreachable` 来对代码进行优化 。
 
-```zig
-const x = 1;
-const y = 2;
-if (x + y != 3) {
-    unreachable;
-}
-```
+<<<@/code/release/unreachable.zig#unreachable
