@@ -8,25 +8,7 @@ outline: deep
 
 如果存在多个 `defer`，它们将会按照出栈方式执行。
 
-```zig
-const std = @import("std");
-const print = std.debug.print;
-
-pub fn main() !void {
-    defer print("exec third", .{});
-
-    if (false) {
-        defer print("will not exec", .{});
-    }
-
-    defer {
-        print("exec second", .{});
-    }
-    defer {
-        print("exec first", .{});
-    }
-}
-```
+<<<@/code/release/defer.zig#Defer
 
 `defer` 分别可以执行单个语句和一个块，并且如果控制流不经过 `defer`，则不会执行。
 
