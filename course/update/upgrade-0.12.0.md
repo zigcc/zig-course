@@ -358,7 +358,7 @@ test "@errorCast error union payload" {
 
 ### `@abs`
 
-过去的版本包含了 `@fabs` 内置函数。这已被新的 `@abs` 内置函数替换，它能够对整数以及浮点数进行操作。
+在此之前的版本包含 `@fabs` 内置函数，`std.math.fabs()` 和 `std.math.abs()` 标准库函数。这已被新的 `@abs` 内置函数替换，它能够对整数以及浮点数进行操作。
 
 ```zig
 const expectEqual = @import("std").testing.expectEqual;
@@ -893,6 +893,16 @@ pub const Options = struct {
 如果在之前的版本中用到了这里面的函数，需要手动实现一下，社区也有人把 trait 这个单独做成了一个包来用：
 
 - [wrongnull/zigtrait](https://github.com/wrongnull/zigtrait) A bunch of useful functions for working with zig types
+
+### `std.mem.copy`
+
+> 过去用于进行内存拷贝！
+
+在新版中该标准库函数已被移除，与之对应的是使用 `@memcpy` 内置函数，或者是 [`std.mem.copyForwards`](https://ziglang.org/documentation/0.12.0/std/#std.mem.copyForwards) 和 [`std.mem.copyBackwards`](https://ziglang.org/documentation/0.12.0/std/#std.mem.copyBackwards) 函数，它们专门用于处理拷贝时出现内存重叠的情况。
+
+### `std.mem.writeIntSlice`
+
+该函数已删除，作为替代使用 [`std.mem.writeInt`](https://ziglang.org/documentation/0.12.0/std/#std.mem.writeInt)，该函数还支持指定大端或小端！
 
 ### 指针保护锁（Pointer Stability Locks）
 
