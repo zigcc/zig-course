@@ -1,6 +1,6 @@
 const std = @import("std");
 const Build = std.Build;
-const ChildProcess = std.ChildProcess;
+const ChildProcess = std.process.Child;
 
 const log = std.log.scoped(.For_0_13_0);
 
