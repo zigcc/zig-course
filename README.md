@@ -24,3 +24,5 @@ bun run preview // 运行预览
 ```
 
 注意：本文档所使用的构建工具为 [bunjs](https://bun.sh/)，在提交时请勿将其他nodejs的包管理工具的额外配置文件添加到仓库中。
+
+> 如需要更新依赖，请参照此处 [Lockfile](https://bun.sh/docs/install/lockfile) 先设置 git 使用 bun 来 diff 文件！
