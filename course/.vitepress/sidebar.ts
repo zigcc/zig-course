@@ -232,6 +232,14 @@ export default [
         text: "0.12.0 版本说明",
         link: "/update/0.12.0-description",
       },
+      {
+        text: "0.13.0 升级指南",
+        link: "/update/upgrade-0.13.0",
+      },
+      {
+        text: "0.13.0 版本说明",
+        link: "/update/0.13.0-description",
+      },
     ],
   },
   {
