@@ -22,19 +22,19 @@ export default defineComponent({
           : frontmatter.value.showVersion
       )
         ? h(
-          "div",
-          {
-            style: {
-              color: fontColor.value,
-              borderRadius: "15px",
-              backgroundColor: backgroundColor.value,
-              padding: "5px 10px",
-              marginBottom: "10px",
-              display: "inline-block",
+            "div",
+            {
+              style: {
+                color: fontColor.value,
+                borderRadius: "15px",
+                backgroundColor: backgroundColor.value,
+                padding: "5px 10px",
+                marginBottom: "10px",
+                display: "inline-block",
+              },
             },
-          },
-          `zig 版本：${currentVersion.value}`,
-        )
+            `zig 版本：${currentVersion.value}`,
+          )
         : h("div");
   },
 });
