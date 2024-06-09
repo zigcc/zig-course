@@ -4,7 +4,7 @@ pub fn main() !void {
     try FixedBufferAllocator.main();
     try ThreadSafeFixedBufferAllocator.main();
     try ArenaAllocator.main();
-    if (builtin.os.tag != .windows) {
+    if (builtin.os.tag == .windows) {
         try HeapAllocator.main();
     }
     try c_allocaotr.main();
