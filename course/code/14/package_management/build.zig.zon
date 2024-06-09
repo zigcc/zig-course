@@ -9,9 +9,9 @@
         // 包依赖项的名字
         .@"zig-msgpack" = .{
             // url 为包的下载地址
-            .url = "https://github.com/zigcc/zig-msgpack/archive/refs/tags/0.0.4.tar.gz",
+            .url = "https://github.com/zigcc/zig-msgpack/archive/refs/tags/0.0.5.tar.gz",
             // hash 为包的哈希值，但不是对整个包的哈希值，而是对包中的所有文件的哈希值
-            .hash = "12204ec362b0784a04825021b1bab2fe62d062db5f07052207363a835af7613bb12e",
+            .hash = "12207ec1296852c17c0424b5e650003bd9a3c4f35e9d0ab586d39ea0ab812c2d9f2c",
         },
     },
     // 包包含的源文件，一般用于在对外提供包时才使用

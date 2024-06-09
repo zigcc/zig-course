@@ -1,12 +1,12 @@
 const std = @import("std");
 const Build = std.Build;
-const ChildProcess = std.ChildProcess;
+const ChildProcess = std.process.Child;
 
-const log = std.log.scoped(.For_0_12_0);
+const log = std.log.scoped(.For_0_14_0);
 
 const args = [_][]const u8{ "zig", "build" };
 
-const version = "release";
+const version = "14";
 
 const relative_path = "course/code/" ++ version;
 
@@ -21,7 +21,7 @@ pub fn build(b: *Build) void {
 
     // open dir
     var dir = std.fs.openDirAbsolute(full_path, .{ .iterate = true }) catch |err| {
-        log.err("open 12 path failed, err is {}", .{err});
+        log.err("open 14 path failed, err is {}", .{err});
         std.process.exit(1);
     };
     defer dir.close();

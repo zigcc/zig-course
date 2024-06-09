@@ -6,7 +6,7 @@ const log = std.log.scoped(.For_0_13_0);
 
 const args = [_][]const u8{ "zig", "build" };
 
-const version = "13";
+const version = "release";
 
 const relative_path = "course/code/" ++ version;
 
