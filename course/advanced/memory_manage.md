@@ -26,12 +26,12 @@ outline: deep
 
 除了这些，还有一些你可能用不到的分配模型：
 
--   `std.testing.FailingAllocator`
--   `std.testing.allocator`
--   `std.heap.LoggingAllocator`
--   `std.heap.LogToWriterAllocator`
--   `std.heap.SbrkAllocator`
--   `std.heap.ScopedLoggingAllocator`
+- `std.testing.FailingAllocator`
+- `std.testing.allocator`
+- `std.heap.LoggingAllocator`
+- `std.heap.LogToWriterAllocator`
+- `std.heap.SbrkAllocator`
+- `std.heap.ScopedLoggingAllocator`
 
 :::
 

@@ -119,8 +119,12 @@ const ArenaAllocator = struct {
 const HeapAllocator = struct {
     // #region HeapAllocator
     const std = @import("std");
+    const builtin = @import("builtin");
 
     pub fn main() !void {
+        if (builtin.os.tag != .windows) {
+            return;
+        }
         // 获取分配器模型
         var heap = std.heap.HeapAllocator.init();
         // 善后工作，但有一点需要注意
@@ -145,7 +149,7 @@ const c_allocaotr = struct {
     pub fn main() !void {
         // 用起来和 C 一样纯粹
         const c_allocator = std.heap.c_allocator;
-        const num = c_allocator.alloc(u8, 1);
+        const num = try c_allocator.alloc(u8, 1);
         defer c_allocator.free(num);
     }
     // #endregion c_allocator
