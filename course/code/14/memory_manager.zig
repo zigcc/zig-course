@@ -1,9 +1,12 @@
+const builtin = @import("builtin");
 pub fn main() !void {
     try GPA.main();
     try FixedBufferAllocator.main();
     try ThreadSafeFixedBufferAllocator.main();
     try ArenaAllocator.main();
-    try HeapAllocator.main();
+    if (builtin.os.tag == .windows) {
+        try HeapAllocator.main();
+    }
     try c_allocaotr.main();
     try page_allocator.main();
     try StackFallbackAllocator.main();
@@ -145,7 +148,7 @@ const c_allocaotr = struct {
     pub fn main() !void {
         // 用起来和 C 一样纯粹
         const c_allocator = std.heap.c_allocator;
-        const num = c_allocator.alloc(u8, 1);
+        const num = try c_allocator.alloc(u8, 1);
         defer c_allocator.free(num);
     }
     // #endregion c_allocator
