@@ -4,7 +4,9 @@ course/.vitepress/cache/
 course/.vitepress/dist/
 package-lock.json
 */zig-cache
+*/.zig-cache
 */zig-out
 zig-out
 zig-cache
+.zig-cache
 .direnv

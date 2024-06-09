@@ -4,15 +4,12 @@ const Build = std.Build;
 
 const current_zig = builtin.zig_version;
 
-const build_11 = @import("build_0.11.zig").build;
-const build_12 = @import("build_0.12.zig").build;
-const build_13 = @import("build_0.13.zig").build;
-
 pub fn build(b: *Build) void {
     switch (current_zig.minor) {
-        11 => build_11(b),
-        12 => build_12(b),
-        13 => build_13(b),
+        11 => @import("build/0.11.zig").build(b),
+        12 => @import("build/0.12.zig").build(b),
+        13 => @import("build/0.13.zig").build(b),
+        14 => @import("build/0.14.zig").build(b),
         else => @compileError("unknown zig version"),
     }
 }
