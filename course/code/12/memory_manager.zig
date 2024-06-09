@@ -1,9 +1,12 @@
+const builtin = @import("builtin");
 pub fn main() !void {
     try GPA.main();
     try FixedBufferAllocator.main();
     try ThreadSafeFixedBufferAllocator.main();
     try ArenaAllocator.main();
-    try HeapAllocator.main();
+    if (builtin.os.tag != .windows) {
+        try HeapAllocator.main();
+    }
     try c_allocaotr.main();
     try page_allocator.main();
     try StackFallbackAllocator.main();
@@ -119,12 +122,8 @@ const ArenaAllocator = struct {
 const HeapAllocator = struct {
     // #region HeapAllocator
     const std = @import("std");
-    const builtin = @import("builtin");
 
     pub fn main() !void {
-        if (builtin.os.tag != .windows) {
-            return;
-        }
         // 获取分配器模型
         var heap = std.heap.HeapAllocator.init();
         // 善后工作，但有一点需要注意
