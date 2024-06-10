@@ -41,25 +41,7 @@ outline: deep
 
 它的实际作用就和使用 `addAssemblyFile` 的效果类似，在编译期它们会被提取出来作为单独的汇编文件进行编译和链接。
 
-```zig
-const std = @import("std");
-
-comptime {
-    asm (
-        \\.global my_func;
-        \\.type my_func, @function;
-        \\my_func:
-        \\  lea (%rdi,%rsi,1),%eax
-        \\  retq
-    );
-}
-
-extern fn my_func(a: i32, b: i32) i32;
-
-pub fn main() void {
-    std.debug.print("{}\n", .{my_func(2, 5)});
-}
-```
+<<<@/code/release/assembly.zig#external_assembly
 
 以上这段函数中，我们通过全局汇编定义了一个汇编函数，以实现加法功能，并在 `main` 中实现了调用，如果你想了解更多这些相关的内容，你可以继续查询有关**调用约定**（**Calling convention**）的资料。
 
@@ -67,39 +49,7 @@ pub fn main() void {
 
 内联汇编给予了我们可以将 `low-level` 的汇编代码和高级语言相组合，实现更加高效或者更直白的操作。
 
-```zig
-pub fn main() noreturn {
-    const msg = "hello world\n";
-    _ = syscall3(SYS_write, STDOUT_FILENO, @intFromPtr(msg), msg.len);
-    _ = syscall1(SYS_exit, 0);
-    unreachable;
-}
-
-pub const SYS_write = 1;
-pub const SYS_exit = 60;
-
-pub const STDOUT_FILENO = 1;
-
-pub fn syscall1(number: usize, arg1: usize) usize {
-    return asm volatile ("syscall"
-        : [ret] "={rax}" (-> usize),
-        : [number] "{rax}" (number),
-          [arg1] "{rdi}" (arg1),
-        : "rcx", "r11"
-    );
-}
-
-pub fn syscall3(number: usize, arg1: usize, arg2: usize, arg3: usize) usize {
-    return asm volatile ("syscall"
-        : [ret] "={rax}" (-> usize),
-        : [number] "{rax}" (number),
-          [arg1] "{rdi}" (arg1),
-          [arg2] "{rsi}" (arg2),
-          [arg3] "{rdx}" (arg3),
-        : "rcx", "r11"
-    );
-}
-```
+<<<@/code/release/assembly.zig#inline_assembly
 
 上面这段代码是通过内联汇编实现在 x86-64 linux 下输出 `hello world`，接下来讲解一下它们的组成和使用。
 
@@ -145,4 +95,4 @@ AssemblerTemplate
 
 :::
 
-了解更多？可以查看我的这篇文章 [Handle Interrupt on x86-64 kernel with zig](https://blog.nvimer.org/2023/11/12/handle-interrupt-on-x86-64-kernel-with-zig/)，这是一篇关于如何在 x86-64 内核上利用 zig 的特性实现中断处理的文章，在这其中我用了内联汇编，算是一个比较巧妙的例子。
+了解更多？可以查看我的这篇文章 [Handle Interrupt on x86-64 kernel with zig](https://nvimer.org/posts/handle-interrupt-on-x86-64-kernel-with-zig/)，这是一篇关于如何在 x86-64 内核上利用 zig 的特性实现中断处理的文章，在这其中我用了内联汇编，算是一个比较巧妙的例子。
