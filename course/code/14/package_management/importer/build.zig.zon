@@ -1,0 +1,17 @@
+.{
+    .name = "importer",
+
+    .version = "0.0.0",
+
+    .dependencies = .{
+        .@"tarball-exporter" = .{
+            .url = "../exporter.tar.gz",
+            .hash = "12206cae1ca596bcd38a20c4eb803da289d1aa59eaf63426512be0e1e995cb61e36f",
+        },
+        .@"path-exporter" = .{
+            .path = "../exporter",
+        },
+    },
+
+    .paths = .{""},
+}
