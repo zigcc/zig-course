@@ -11,7 +11,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    // #region import_tarball_module
+    // #region import_module
     // 通过 dependency 函数获取到依赖
     const pe = b.dependency("path-exporter", .{
         .target = target,

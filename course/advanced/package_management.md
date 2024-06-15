@@ -40,7 +40,7 @@ zig 当前并没有一个中心化存储库，包可以来自任何来源，无�
 
 例如 `https://github.com/limine-bootloader/limine-zig/archive/trunk.tar.gz` 就是获取 [limine-zig](https://github.com/limine-bootloader/limine-zig) 这个包的主分支源码打包。
 
-而若是想要离线使用本地包时则是先下载源码包并直接使用绝对或相对路径导入，例如使用项目的deps目录下的包的格式为：
+而若是想要离线使用本地包时则是先下载源码包并直接使用绝对或相对路径导入，例如在下载完包之后放在项目的deps目录下，那么使用本地包的格式为：
 
 `./deps/tunk.tar.gz`
 
@@ -92,7 +92,7 @@ fn dependency(b: *Build, name: []const u8, args: anytype) *Dependency
 
 其中 `name` 是在在 `.zon` 中的包名字，它返回一个 [`*std.Build.Dependency`](https://ziglang.org/documentation/master/std/#std.Build.Dependency)，可以使用 `artifact` 和 `module` 方法来访问包的链接库和暴露的 `module`。
 
-<<<@/code/release/package_management/build.zig#import_module{zig}
+<<<@/code/release/package_management/importer/build.zig#import_module{zig}
 
 ::: info 🅿️ 提示
 
