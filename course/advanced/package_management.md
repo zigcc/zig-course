@@ -14,13 +14,18 @@ zig 当前并没有一个中心化存储库，包可以来自任何来源，无�
 
 `build.zig.zon` 这个文件存储了包的信息，它是 zig 新引入的一种简单数据交换格式，使用了 zig 的匿名结构和数组初始化语法。
 
-<<<@/code/release/package_management/build.zig.zon#package_management{zig}
+<<<@/code/release/package_management/importer/build.zig.zon#package_management{zig}
 
 以上字段含义为：
 
 - `name`：当前你所开发的包的名字
 - `version`：包的版本，使用 [Semantic Version](https://semver.org/)。
-- `dependencies`：依赖项，内部是一连串的匿名结构体，字段 `dep_name` 是依赖包的名字，`url` 是源代码地址，`hash` 是对应的 hash（源文件内容的 hash）。
+- `dependencies`：依赖项，内部是一连串的匿名结构体，字段
+  `dep_name` 是依赖包的名字，
+  `url` 是源代码地址，
+  `hash` 是对应的 hash（源文件内容的 hash），
+  `path`是不使用源码包而是本地目录时目录的路径。
+  当使用目录方法导入包时就不能使用`url`和`hash`，反之同理。
 - `paths`：显式声明包含的源文件，包含所有则指定为空。
 
 ::: info 🅿️ 提示
@@ -34,6 +39,10 @@ zig 当前并没有一个中心化存储库，包可以来自任何来源，无�
 其中的 `username` 就是组织名或者用户名，`repo-name` 就是对应的仓库名，`branch` 就是分支名。
 
 例如 `https://github.com/limine-bootloader/limine-zig/archive/trunk.tar.gz` 就是获取 [limine-zig](https://github.com/limine-bootloader/limine-zig) 这个包的主分支源码打包。
+
+而若是想要离线使用本地包时则是先下载源码包并直接使用绝对或相对路径导入，例如在下载完包之后放在项目的deps目录下，那么使用本地包的格式为：
+
+`./deps/tunk.tar.gz`
 
 :::
 
@@ -61,7 +70,7 @@ pub fn addModule(b: *Build, name: []const u8, options: Module.CreateOptions) *Mo
 
 使用起来也很简单，例如：
 
-<<<@/code/release/package_management/build.zig#create_module
+<<<@/code/release/package_management/exporter/build.zig#create_module
 
 这就是一个最基本的包暴露实现，指定了包名和包的入口源文件地址（`b.path` 是相对当前项目路径取 `Path`），通过 `addModule` 函数暴露的模块是完全公开的。
 
@@ -83,7 +92,7 @@ fn dependency(b: *Build, name: []const u8, args: anytype) *Dependency
 
 其中 `name` 是在在 `.zon` 中的包名字，它返回一个 [`*std.Build.Dependency`](https://ziglang.org/documentation/master/std/#std.Build.Dependency)，可以使用 `artifact` 和 `module` 方法来访问包的链接库和暴露的 `module`。
 
-<<<@/code/release/package_management/build.zig#import_module
+<<<@/code/release/package_management/importer/build.zig#import_module
 
 ::: info 🅿️ 提示
 
