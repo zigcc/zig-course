@@ -23,7 +23,7 @@ pub fn build(b: *std.Build) void {
     });
     // 将 module 添加到 exe 的 root module 中
     exe.root_module.addImport("path_exporter", pe.module("exporter"));
-    exe.root_module.addImport("tarball_exporter", te.module("exporter"));
+    exe.root_module.addImport("tarball_exporter", te.module("msgpack"));
     // #endregion import_module
 
     b.installArtifact(exe);
