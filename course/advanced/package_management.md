@@ -99,5 +99,3 @@ fn dependency(b: *Build, name: []const u8, args: anytype) *Dependency
 `dependency` 包含一个额外的参数 `args`，这是传给对应的包构建的参数（类似在命令行构建时使用的 `-D` 参数，通常是我们使用 `b.options` 获取，通过 [`std.Build.option`](https://ziglang.org/documentation/master/std/#std.Build.option) 实现），当前包的参数并不会向包传递，需要手动显式指定转发。
 
 :::
-
-TODO：更多示例说明
