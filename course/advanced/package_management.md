@@ -14,7 +14,7 @@ zig 当前并没有一个中心化存储库，包可以来自任何来源，无�
 
 `build.zig.zon` 这个文件存储了包的信息，它是 zig 新引入的一种简单数据交换格式，使用了 zig 的匿名结构和数组初始化语法。
 
-<<<@/code/release/package_management/importer/build.zig.zon#package_management{zig}
+<<<@/code/release/package_management_importer/build.zig.zon#package_management{zig}
 
 以上字段含义为：
 
@@ -70,7 +70,7 @@ pub fn addModule(b: *Build, name: []const u8, options: Module.CreateOptions) *Mo
 
 使用起来也很简单，例如：
 
-<<<@/code/release/package_management/exporter/build.zig#create_module
+<<<@/code/release/package_management_exporter/build.zig#create_module
 
 这就是一个最基本的包暴露实现，指定了包名和包的入口源文件地址（`b.path` 是相对当前项目路径取 `Path`），通过 `addModule` 函数暴露的模块是完全公开的。
 
@@ -92,7 +92,7 @@ fn dependency(b: *Build, name: []const u8, args: anytype) *Dependency
 
 其中 `name` 是在在 `.zon` 中的包名字，它返回一个 [`*std.Build.Dependency`](https://ziglang.org/documentation/master/std/#std.Build.Dependency)，可以使用 `artifact` 和 `module` 方法来访问包的链接库和暴露的 `module`。
 
-<<<@/code/release/package_management/importer/build.zig#import_module
+<<<@/code/release/package_management_importer/build.zig#import_module
 
 ::: info 🅿️ 提示
 
