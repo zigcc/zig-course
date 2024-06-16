@@ -18,7 +18,11 @@
             .path = "../exporter",
         },
     },
-    // 包所包含的源文件，一般用于在对外提供包时才使用
-    .paths = .{""},
+    // 包所包含的源文件，一般用于在对外提供包时才使用，还是建议养成写清楚paths的习惯
+    .paths = .{
+        "src",
+        "build.zig",
+        "build.zig.on",
+    },
 }
 // #endregion package_management
