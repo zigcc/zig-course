@@ -1,0 +1,14 @@
+// #region package_management
+.{
+    // 包名字
+    .name = "exporter",
+    // 包版本
+    .version = "0.0.0",
+    // 包所包含的源文件，一般用于在对外提供包时才使用，还是建议养成写清楚paths的习惯
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
+// #endregion package_management
