@@ -45,8 +45,10 @@ scoop install versions/zig-dev
 :::
 
 ::: info 🅿️ 提示
-在使用 Scoop 时，推荐将 Zig 作为 global 安装，这样 Zig 会被自动添加进环境变量。
-:::
+
+- 使用 `scoop reset zig-dev` 或者 `scoop reset zig` 可以从 nightly 和 release 版本相互切换
+- 使用 `scoop install zig@0.11.0` 可以安装指定版本的 zig，同理 `scoop reset zig@0.11.0` 也能切换到指定版本！
+  :::
 
 ### 其他的包管理器
 
