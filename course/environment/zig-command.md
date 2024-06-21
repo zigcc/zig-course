@@ -76,10 +76,6 @@ outline: deep
 
 输出 Zig 的设计哲学。
 
-## `zig targets`
-
-输出 Zig 可编译的所有目标系统！
-
 ## `zig fetch`
 
 该命令用于获取包的 hash 或者添加包到 `build.zig.zon` 中！
