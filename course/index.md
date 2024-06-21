@@ -36,7 +36,6 @@ showVersion: false
 - 完善的堆栈跟踪（在裸机器上也可以）
 - 对交叉编译的一流支持
 - 标准库集成 libc ，但不依赖它
-- 类型作为一等公民
 - 可选类型代替 `null`，详见 [计算机科学中最严重的错误](https://www.lucidchart.com/techblog/2015/08/31/the-worst-mistake-of-computer-science/)
 - 编译期（可以简单看作在编译时执行的函数）执行实现泛型和反射
 - 无需 FFI/bindings 的 C 库集成
