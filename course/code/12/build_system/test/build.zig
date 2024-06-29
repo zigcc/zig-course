@@ -10,7 +10,7 @@ pub fn build(b: *std.Build) void {
     // 添加一个二进制可执行程序构建
     const exe = b.addExecutable(.{
         .name = "zig",
-        .root_source_file = .{ .path = "src/main.zig" },
+        .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
     });
@@ -22,7 +22,7 @@ pub fn build(b: *std.Build) void {
 
     // 构建一个单元测试的 Compile
     const exe_unit_tests = b.addTest(.{
-        .root_source_file = .{ .path = "src/main.zig" },
+        .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
     });
