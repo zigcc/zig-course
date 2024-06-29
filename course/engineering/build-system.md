@@ -196,7 +196,6 @@ zig 本身提供了一个实验性的文档生成器，它支持搜索查询，�
 
 ### `embedFile`
 
-
 [`@embedFile`](https://ziglang.org/documentation/master/#embedFile) 是由 zig 提供的一个内嵌文件的方式，它的引入规则与 `@import` 相同。
 
 在 `build.zig` 直接使用 [`addAnonymousImport`](https://ziglang.org/documentation/master/std/#std.Build.Module.addAnonymousImport) 添加一个匿名模块即可，如：
