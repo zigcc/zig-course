@@ -21,44 +21,24 @@ Zig 使用 `build.zig` 文件来描述一个项目的构建步骤。
 
 一个典型的构建文件如下：
 
-```zig
-const std = @import("std");
+<<<@/code/release/build_system/basic/build.zig
 
-pub fn build(b: *std.Build) void {
-    // 标准构建目标
-    const target = b.standardTargetOptions(.{});
-
-    // 标准构建模式
-    const optimize = b.standardOptimizeOption(.{});
-
-    // 添加一个二进制可执行程序构建
-    const exe = b.addExecutable(.{
-        .name = "zig",
-        .root_source_file = .{ .path = "src/main.zig" },
-        .target = target,
-        .optimize = optimize,
-    });
-
-    // 添加到顶级 install step 中作为依赖
-    b.installArtifact(exe);
-}
-```
-
-`build` 是构建的入口函数，而不是常见的 `main`，真正的 `main` 函数定义在 [build_runner.zig](https://github.com/ziglang/zig/blob/master/lib/compiler/build_runner.zig#L15) 中，这是由于 Zig 的构建分为两个阶段：
+`build` 是构建的入口函数，而不是常见的 `main`，真正的 `main` 函数定义在 [`build_runner.zig`](https://github.com/ziglang/zig/blob/master/lib/compiler/build_runner.zig#L15) 中，这是由于 Zig 的构建分为两个阶段：
 
 1. 生成由 [`std.Build.Step`](https://ziglang.org/documentation/master/std/#std.Build.Step) 构成有向无环图（DAG）
-2. 执行构建逻辑
+2. 执行真正的构建逻辑
 
-> [!TIP] 
-> 第一次接触 Zig 的构建流程，可能会觉得复杂，尤其是构建 Step 的依赖关系，但这是为了后续并发编译做基础。
+> [!TIP]
+> 第一次接触 Zig 的构建流程，可能会觉得复杂，尤其是构建 Step 的依赖关系，但这是为了后续并发编译作基础。
 >
-> 如果没有 `build_runner.zig` ，让开发者自己去处理并发编译，是件繁琐且容易出错的事情。
+> 如果没有 `build_runner.zig` ，让开发者自己去处理并发编译，将会是件繁琐且容易出错的事情。
 
 `Step` 会在下一小节中会重点讲述，这里介绍一下上面这个构建文件的其他部分：
 
 - `b.standardTargetOptions`: 允许构建器读取来自命令行参数的**构建目标三元组**。
 - `b.standardOptimizeOption`： 允许构建器读取来自命令行参数的**构建优化模式**。
 - `b.addExecutable`：创建一个 [`Build.Step.Compile`](https://ziglang.org/documentation/master/std/#std.Build.Step.Compile) 并返回对应的指针，其参数为 [`std.Build.ExecutableOptions`](https://ziglang.org/documentation/master/std/#std.Build.ExecutableOptions)。
+- `b.path`：该函数用于指定获取当前项目的源文件路径，请勿手动为 `root_source_file` 赋值！
 
 ::: info 🅿️ 提示
 
@@ -82,43 +62,7 @@ C --> B --> A
 
 例如我们可以在 `build.zig` 中添加一个运行程序的步骤：
 
-```zig
-const std = @import("std");
-
-pub fn build(b: *std.Build) void {
-
-    // 添加一个二进制可执行程序构建
-    const exe = b.addExecutable(.{
-        .name = "hello",
-        .root_source_file = .{ .path = "hello.zig" },
-    });
-
-    // 添加到顶级 install step 中作为依赖
-    b.installArtifact(exe);
-
-    // zig 提供了一个方便的函数允许我们直接运行构建结果 // [!code focus]
-    const run_exe = b.addRunArtifact(exe); // [!code focus]
-
-    // 注意：这个步骤不是必要的，显示声明运行依赖于构建 // [!code focus]
-    // 这会使运行是从构建输出目录（默认为 zig-out/bin ）运行而不是构建缓存中运行 // [!code focus]
-    // 不过，如果应用程序运行依赖于其他已存在的文件（例如某些 ini 配置文件）// [!code focus]
-    // 这可以确保它们正确的运行 // [!code focus]
-    run_exe.step.dependOn(b.getInstallStep()); // [!code focus]
-
-    // 注意：此步骤不是必要的
-    // 此操作允许用户通过构建系统的命令传递参数，例如 zig build  -- arg1 arg2
-    // 当前是将参数传递给运行构建结果
-    if (b.args) |args| {
-        run_exe.addArgs(args);
-    }
-
-    // 指定一个 step 为 run // [!code focus]
-    const run_step = b.step("run", "Run the application"); // [!code focus]
-
-    // 指定该 step 依赖于 run_exe，即实际的运行 // [!code focus]
-    run_step.dependOn(&run_exe.step); // [!code focus]
-}
-```
+<<<@/code/release/build_system/step/build.zig
 
 ::: info 🅿️ 提示
 
@@ -155,7 +99,7 @@ zig 提供了四种构建模式（**Build Mode**）：
 
 :::details 关于 Debug 不可复现的原因
 
-关于为什么 Debug 是不可复现的，ziglang 的文档并未给出具体说明，以下内容为询问社区获得。
+关于为什么 Debug 是不可复现的，zig 官方手册并未给出具体说明，以下内容为询问社区获得：
 
 在 Debug 构建模式下，编译器会添加一些随机因素进入到程序中（例如内存结构不同），所以任何没有明确说明内存布局的容器在 Debug 构建下可能会有所不同，这便于我们在 Debug 模式下快速暴露某些错误。
 
@@ -169,34 +113,7 @@ zig 提供了四种构建模式（**Build Mode**）：
 
 通过 `b.option` 使构建脚本部分配置由用户决定（通过命令行参数传递），这也可用于依赖于当前包的其他包。
 
-```zig
-const std = @import("std");
-
-pub fn build(b: *std.Build) void {
-    // 标准构建目标
-    const target = b.standardTargetOptions(.{});
-
-    // 标准构建模式
-    const optimize = b.standardOptimizeOption(.{});
-
-    // 添加一个二进制可执行程序构建
-    const exe = b.addExecutable(.{
-        .name = "zig",
-        .root_source_file = .{ .path = "src/main.zig" },
-        .target = target,
-        .optimize = optimize,
-    });
-
-    // 使用 option 来获取命令参数决定是否剥离调试信息 // [!code focus]
-    const is_strip = b.option(bool, "is_strip", "whether strip executable") orelse false; // [!code focus]
-
-    // 设置 exe 的 strip // [!code focus]
-    exe.strip = is_strip; // [!code focus]
-
-    // 添加到顶级 install step 中作为依赖
-    b.installArtifact(exe);
-}
-```
+<<<@/code/release/build_system/cli/build.zig
 
 以上，我们通过使用 `b.option` 来实现从命令行读取一个参数决定是否剥离二进制程序的调试信息，使用 `zig build --help` 可以看到输出多了一行：
 
@@ -211,49 +128,9 @@ Project-Specific Options:
 
 :::code-group
 
-```zig [main.zig]
-const std = @import("std");
-const timestamp = @import("timestamp");
+<<<@/code/release/build_system/options/src/main.zig [main.zig]
 
-pub fn main() !void {
-    std.debug.print("build time stamp is {}\n", .{timestamp.time_stamp});
-}
-```
-
-```zig [build.zig]
-const std = @import("std");
-
-pub fn build(b: *std.Build) void {
-    // 标准构建目标
-    const target = b.standardTargetOptions(.{});
-
-    // 标准构建模式
-    const optimize = b.standardOptimizeOption(.{});
-
-    // 添加一个二进制可执行程序构建
-    const exe = b.addExecutable(.{
-        .name = "zig",
-        .root_source_file = .{ .path = "src/main.zig" },
-        .target = target,
-        .optimize = optimize,
-    });
-
-    // 通过标准库获取时间戳 // [!code focus]
-    const timestamp = std.time.timestamp(); // [!code focus]
-
-    // 创建一个 options // [!code focus]
-    const options = b.addOptions(); // [!code focus]
-
-    // 向 options 添加 option, 变量名是time_stamp // [!code focus]
-    options.addOption(i64, "time_stamp", timestamp); // [!code focus]
-
-    // 向 exe 中添加 options // [!code focus]
-    exe.addOptions("timestamp", options); // [!code focus]
-
-    // 添加到顶级 install step 中作为依赖
-    b.installArtifact(exe);
-}
-```
+<<<@/code/release/build_system/options/build.zig [build.zig]
 
 :::
 
@@ -269,70 +146,15 @@ pub fn build(b: *std.Build) void {
 
 通常我们定义一个 `lib` 的方式如下：
 
-```zig
-const std = @import("std");
+<<<@/code/release/build_system/lib/build.zig
 
-pub fn build(b: *std.Build) void {
-    // 使用默认提供的构建目标，支持我们从命令行构建时指定构建目标（架构、系统、abi等等）
-    const target = b.standardTargetOptions(.{});
-
-    // 使用默认提供的优化方案，支持我们从命令行构建时指定构建模式
-    const optimize = b.standardOptimizeOption(.{});
-
-    // 尝试添加一个静态库 // [!code focus]
-    const lib = b.addStaticLibrary(.{ // [!code focus]
-        // 库的名字 // [!code focus]
-        .name = "example", // [!code focus]
-        // 源文件地址 // [!code focus]
-        .root_source_file = .{ .path = "src/main.zig" }, // [!code focus]
-        // 构建目标 // [!code focus]
-        .target = target, // [!code focus]
-        // 构建模式 // [!code focus]
-        .optimize = optimize, // [!code focus]
-    }); // [!code focus]
-
-    // 这代替原本的 lib.install，在构建时自动构建 lib // [!code focus]
-    // 但其实这是不必要的，因为如果有可执行二进制程序构建使用了 lib，那么它会自动被构建 // [!code focus]
-    b.installArtifact(lib); // [!code focus]
-
-    // 添加一个二进制可执行程序构建
-    const exe = b.addExecutable(.{
-        .name = "zig",
-        .root_source_file = .{ .path = "src/main.zig" },
-        .target = target,
-        .optimize = optimize,
-    });
-
-    // 链接 lib // [!code focus]
-    exe.linkLibrary(lib); // [!code focus]
-
-    // 添加到顶级 install step 中作为依赖，构建 exe
-    b.installArtifact(exe);
-}
-```
+对应地，如果要构建动态库可以使用 `b.addSharedLibrary`。
 
 通常，二进制可执行程序的构建结果会输出在 `zig-out/bin` 下，而链接库的构建结果会输出在 `zig-out/lib` 下。
 
 如果要连接到系统的库，则使用 `exe.linkSystemLibrary`，Zig 内部借助 pkg-config 实现该功能。示例：
 
-```zig
-const std = @import("std");
-
-pub fn build(b: *std.Build) void {
-    const exe = b.addExecutable(.{
-        .name = "zip",
-        .root_source_file = .{ .path = "zip.zig" },
-    });
-
-    // 链接到系统的 libz // [!code focus]
-    exe.linkSystemLibrary("z"); // [!code focus]
-
-    // 链接到 libc // [!code focus]
-    exe.linkLibC(); // [!code focus]
-
-    b.installArtifact(exe);
-}
-```
+<<<@/code/release/build_system/system_lib/build.zig
 
 这会链接一个名为 libz 的库，约定库的名字不包含“lib”。
 
@@ -340,29 +162,7 @@ pub fn build(b: *std.Build) void {
 
 zig 本身提供了一个实验性的文档生成器，它支持搜索查询，操作如下：
 
-```zig
-const std = @import("std");
-
-pub fn build(b: *std.Build) void {
-    // ...
-
-    // 添加 step // [!code focus]
-    const docs_step = b.step("docs", "Emit docs"); // [!code focus]
-
-    // 构建文档 // [!code focus]
-    const docs_install = b.addInstallDirectory(.{ // [!code focus]
-        // lib 库 // [!code focus]
-        .source_dir = lib.getEmittedDocs(), // [!code focus]
-        .install_dir = .prefix, // [!code focus]
-        // 文档子文件夹 // [!code focus]
-        .install_subdir = "docs", // [!code focus]
-    }); // [!code focus]
-
-    // 依赖step
-    docs_step.dependOn(&docs_install.step);
-    // ...
-}
-```
+<<<@/code/release/build_system/docs/build.zig
 
 以上代码定义了一个名为 `docs` 的 Step，并将 `addInstallDirectory` 操作作为依赖添加到 `docs` Step 上。
 
@@ -372,50 +172,7 @@ pub fn build(b: *std.Build) void {
 
 使用构建系统执行单元测试时，构建器和测试器会通过 stdin 和 stdout 进行通信，以便同时运行多个测试，并且可以有效地报告错误（不会将错误混到一起），但这导致了无法 [在单元测试中写入 stdin](https://github.com/ziglang/zig/issues/15091)，这会扰乱测试器的正常工作。另外， zig 将引入一个额外的机制，允许 [预测 `panic`](https://github.com/ziglang/zig/issues/1356)。
 
-```zig
-const std = @import("std");
-
-pub fn build(b: *std.Build) void {
-    // 标准构建目标
-    const target = b.standardTargetOptions(.{});
-
-    // 标准构建模式
-    const optimize = b.standardOptimizeOption(.{});
-
-    // 添加一个二进制可执行程序构建
-    const exe = b.addExecutable(.{
-        .name = "zig",
-        .root_source_file = .{ .path = "src/main.zig" },
-        .target = target,
-        .optimize = optimize,
-    });
-
-    // 添加到顶级 install step 中作为依赖
-    b.installArtifact(exe);
-
-    // 此处开始构建单元测试 // [!code focus]
-
-    // 构建一个单元测试的 Compile // [!code focus]
-    const exe_unit_tests = b.addTest(.{ // [!code focus]
-        .root_source_file = .{ .path = "src/main.zig" }, // [!code focus]
-        .target = target, // [!code focus]
-        .optimize = optimize, // [!code focus]
-    }); // [!code focus]
-
-    // 执行单元测试 // [!code focus]
-    const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests); // [!code focus]
-
-    // 如果想要跳过外部来自于其他包的单元测试（例如依赖中的包），可以使用 skip_foreign_checks // [!code focus]
-    run_exe_unit_tests.skip_foreign_checks = true; // [!code focus]
-
-    // 构建一个 step，用于执行测试 // [!code focus]
-    const test_step = b.step("test", "Run unit tests"); // [!code focus]
-
-    // 测试 step 依赖上方构建的 run_exe_unit_tests // [!code focus]
-    test_step.dependOn(&run_exe_unit_tests.step); // [!code focus]
-}
-
-```
+<<<@/code/release/build_system/test/build.zig
 
 以上代码中，先通过 `b.addTest` 构建一个单元测试的 `Compile`，随后进行执行并将其绑定到 `test` Step 上。
 
