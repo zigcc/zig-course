@@ -196,71 +196,18 @@ zig 本身提供了一个实验性的文档生成器，它支持搜索查询，�
 
 ### `embedFile`
 
-TODO: 修改
 
 [`@embedFile`](https://ziglang.org/documentation/master/#embedFile) 是由 zig 提供的一个内嵌文件的方式，它的引入规则与 `@import` 相同。
 
-在 `build.zig` 直接使用 [`b.anonymousDependency`](https://ziglang.org/documentation/master/std/#A;std:Build.anonymousDependency) 添加一个匿名模块即可，如：
+在 `build.zig` 直接使用 [`addAnonymousImport`](https://ziglang.org/documentation/master/std/#std.Build.Module.addAnonymousImport) 添加一个匿名模块即可，如：
 
 ::: code-group
 
-```zig [main.zig]
-const std = @import("std");
-const hello = @embedFile("hello"); // [!code focus]
-// const hello = @embedFile("hello.txt"); 均可以 // [!code focus]
+<<<@/code/release/build_system/embedfile/src/main.zig
 
-pub fn main() !void {
-    std.debug.print("{s}", .{hello}); // [!code focus]
-}
-```
+<<<@/code/release/build_system/embedfile/src/hello.txt
 
-```txt [hello.txt]
-Hello, World!
-```
-
-```zig [build.zig]
-const std = @import("std");
-
-pub fn build(b: *std.Build) void {
-    // 标准构建目标
-    const target = b.standardTargetOptions(.{});
-
-    // 标准构建模式
-    const optimize = b.standardOptimizeOption(.{});
-
-    // 添加一个二进制可执行程序构建
-    const exe = b.addExecutable(.{
-        .name = "zig",
-        .root_source_file = .{ .path = "src/main.zig" },
-        .target = target,
-        .optimize = optimize,
-    });
-
-    // 添加一个匿名的依赖 // [!code focus]
-    exe.addAnonymousModule("hello", .{ .source_file = .{ .path = "src/hello.txt" } }); // [!code focus]
-    // 注意：zig `nightly` 已经将上行代码中的 `source_file` 字段更换为 `root_source_file` ！ // [!code focus]
-
-    // 添加到顶级 install step 中作为依赖
-    b.installArtifact(exe);
-
-    // zig 提供了一个方便的函数允许我们直接运行构建结果
-    const run_cmd = b.addRunArtifact(exe);
-
-    // 指定依赖
-    run_cmd.step.dependOn(b.getInstallStep());
-
-    // 传递参数
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
-
-    // 指定一个 step 为 run
-    const run_step = b.step("run", "Run the app");
-
-    // 指定该 step 依赖于 run_exe，即实际的运行
-    run_step.dependOn(&run_cmd.step);
-}
-```
+<<<@/code/release/build_system/embedfile/build.zig
 
 :::
 
@@ -274,75 +221,9 @@ zig 的构建系统还允许我们执行一些额外的命令，录入根据 jso
 
 :::code-group
 
-```zig [main.zig]
-const std = @import("std");
-const hello = @embedFile("hello"); // [!code focus]
+<<<@/code/release/build_system/externalfile/src/main.zig
 
-pub fn main() !void {
-    std.debug.print("{s}", .{hello}); // [!code focus]
-}
-```
-
-```zig [build.zig]
-const std = @import("std");
-
-pub fn build(b: *std.Build) !void {
-    // 标准构建目标
-    const target = b.standardTargetOptions(.{});
-
-    // 标准构建模式
-    const optimize = b.standardOptimizeOption(.{});
-
-    // 添加一个二进制可执行程序构建
-    const exe = b.addExecutable(.{
-        .name = "zig",
-        .root_source_file = .{ .path = "src/main.zig" },
-        .target = target,
-        .optimize = optimize,
-    });
-
-    // 构建一个运行命令 // [!code focus]
-    const run_sys_cmd = b.addSystemCommand(&.{ // [!code focus]
-        "/bin/sh", // [!code focus]
-        "-c", // [!code focus]
-    }); // [!code focus]
-
-    // 添加参数，此方法允许添加多个参数 // [!code focus]
-    // 也可以使用 addArg 来添加单个参数 // [!code focus]
-    run_sys_cmd.addArgs(&.{ // [!code focus]
-        "echo hello", // [!code focus]
-    }); // [!code focus]
-
-    // 尝试运行命令并捕获标准输出 // [!code focus]
-    // 也可以使用 captureStdErr 来捕获标准错误输出 // [!code focus]
-    const output = run_sys_cmd.captureStdOut(); // [!code focus]
-
-    // 添加一个匿名的依赖 // [!code focus]
-    exe.addAnonymousModule("hello", .{ .source_file = output }); // [!code focus]
-    // 注意：zig `nightly` 已经将上行代码中的 `source_file` 字段更换为 `root_source_file` ！ // [!code focus]
-
-
-    // 添加到顶级 install step 中作为依赖
-    b.installArtifact(exe);
-
-    // zig 提供了一个方便的函数允许我们直接运行构建结果
-    const run_cmd = b.addRunArtifact(exe);
-
-   // 指定依赖
-    run_cmd.step.dependOn(b.getInstallStep());
-
-    // 传递参数
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
-
-    // 指定一个 step 为 run
-    const run_step = b.step("run", "Run the app");
-
-    // 指定该 step 依赖于 run_exe，即实际的运行
-    run_step.dependOn(&run_cmd.step);
-}
-```
+<<<@/code/release/build_system/externalfile/build.zig
 
 :::
 
@@ -723,6 +604,6 @@ zig 的工具链使用的是 `libc++`（LLVM ABI），而GNU的则是 `libstdc++
 
 :::
 
-# 更多参考
+## 更多参考
 
 - [Zig Build System ⚡ Zig Programming Language](https://ziglang.org/learn/build-system/)
