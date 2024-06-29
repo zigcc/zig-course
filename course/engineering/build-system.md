@@ -184,24 +184,15 @@ zig 本身提供了一个实验性的文档生成器，它支持搜索查询，�
 
 关于所有的 target，可以使用 `zig target` 查看。
 
-最常用的一个 target 设置可能是 `b.standardTargetOptions`，它会允许读取命令行输入来决定构建目标 target，它返回一个 [`CrossTarget`](https://ziglang.org/documentation/master/std/#std.zig.CrossTarget)。
+最常用的一个 target 设置可能是 `b.standardTargetOptions`，它会允许读取命令行输入来决定构建目标 target，它返回一个 [`ResolvedTarget`](https://ziglang.org/documentation/master/std/#std.Build.ResolvedTarget)。
 
-如果需要手动指定一个 target，可以手动构建一个 `CrossTarget` 传递给构建（`addExecutable` 和 `addStaticLibrary` 等），如:
+如果需要手动指定一个 target，可以手动构建一个 `std.Target.Query` 传递给构建（`addExecutable` 和 `addStaticLibrary` 等），如:
 
-```zig
-var target: std.zig.CrossTarget = .{
-    .cpu_arch = .x86_64,
-    .os_tag = .freestanding,
-    .abi = .none,
-};
+<<<@/code/release/build_system/build.zig#crossTarget
 
-const exe = b.addExecutable(.{
-    .name = "zig",
-    .root_source_file = .{ .path = "src/main.zig" },
-    .target = target,
-    .optimize = optimize,
-});
-```
+值得注意的是，目前 zig 已经将 `target query` 和 `resolved target` 完全分开，如果要手动指定构建目标，需要先创建一个 `Query`，再使用 `b.resolveTargetQuery` 进行解析。
+
+关于该部分的变动可以参考此处的 PR：[Move many settings from being per-Compilation to being per-Module](https://github.com/ziglang/zig/pull/18160).
 
 ### `embedFile`
 
