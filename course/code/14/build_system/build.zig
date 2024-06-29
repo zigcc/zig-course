@@ -15,6 +15,36 @@ const sys = [_][]const u8{
 };
 
 pub fn build(b: *std.Build) !void {
+    const optimize = b.standardOptimizeOption(.{});
+    // #region crossTarget
+    // 构建一个target
+    const target_query = std.Target.Query{
+        .cpu_arch = .x86_64,
+        .os_tag = .windows,
+        .abi = .gnu,
+    };
+
+    const ResolvedTarget = std.Build.ResolvedTarget;
+
+    // 解析的target
+    const resolved_target: ResolvedTarget = b.resolveTargetQuery(target_query);
+
+    // 解析结果
+    const target: std.Target = resolved_target.result;
+    _ = target;
+
+    // 构建 exe
+    const exe = b.addExecutable(.{
+        .name = "zig",
+        .root_source_file = b.path("main.zig"),
+        // 实际使用的是resolved_target
+        .target = resolved_target,
+        .optimize = optimize,
+    });
+    // #endregion crossTarget
+
+    b.installArtifact(exe);
+
     for (sys) |name| {
         var child = ChildProcess.init(&args, b.allocator);
 

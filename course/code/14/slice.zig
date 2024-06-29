@@ -59,7 +59,7 @@ const TerminatedSlice = struct {
 
         var array = [_]u8{ 3, 2, 1, 0, 3, 2, 1, 0 };
         const runtime_length: usize = 3;
-        const slice:[:0]u8 = array[0..runtime_length :0];
+        const slice: [:0]u8 = array[0..runtime_length :0];
         print("slice类型：{}\n", .{@TypeOf(slice)});
         // #endregion terminated_slice
     }
