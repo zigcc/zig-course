@@ -7,6 +7,8 @@ const sys = [_][]const u8{
     "basic",
     "cli",
     "docs",
+    "embedfile",
+    "externalfile",
     "lib",
     "options",
     "step",
