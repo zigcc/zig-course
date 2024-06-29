@@ -23,7 +23,7 @@ const external_assembly = struct {
 };
 
 const inline_assembly = struct {
-// #region inline_assembly
+    // #region inline_assembly
     pub fn main() noreturn {
         const msg = "hello world\n";
         _ = syscall3(SYS_write, STDOUT_FILENO, @intFromPtr(msg), msg.len);
@@ -55,5 +55,5 @@ const inline_assembly = struct {
             : "rcx", "r11"
         );
     }
-// #endregion inline_assembly
+    // #endregion inline_assembly
 };

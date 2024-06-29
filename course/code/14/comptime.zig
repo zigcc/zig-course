@@ -151,20 +151,20 @@ const GenericDataStruct = struct {
     };
     // #endregion GenericDataStruct
 
-// #region GenericDataStruct_node
-const Node = struct {
-    next: ?*Node,
-    name: []const u8,
-};
+    // #region GenericDataStruct_node
+    const Node = struct {
+        next: ?*Node,
+        name: []const u8,
+    };
 
-var node_a = Node{
-    .next = null,
-    .name = "Node A",
-};
+    var node_a = Node{
+        .next = null,
+        .name = "Node A",
+    };
 
-var node_b = Node{
-    .next = &node_a,
-    .name = "Node B",
-};
-// #endregion GenericDataStruct_node
+    var node_b = Node{
+        .next = &node_a,
+        .name = "Node B",
+    };
+    // #endregion GenericDataStruct_node
 };

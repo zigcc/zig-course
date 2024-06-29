@@ -33,7 +33,7 @@ const external = struct {
     pub extern "c" fn printf(format: [*:0]const u8, ...) c_int;
     // #endregion external_func
 
-// #region external
+    // #region external
     // 使用 callconv 声明函数调用约定为 C
     fn add(count: c_int, ...) callconv(.C) c_int {
         // 对应 C 的宏 va_start
@@ -48,5 +48,5 @@ const external = struct {
         }
         return sum;
     }
-// #endregion external
+    // #endregion external
 };

@@ -239,7 +239,7 @@ test "createFoo" {
 
 const ReferError = struct {
 
-// #region ReferError
+    // #region ReferError
     // 由编译器推导而出的错误集
     pub fn add_inferred(comptime T: type, a: T, b: T) !T {
         const ov = @addWithOverflow(a, b);
@@ -257,5 +257,5 @@ const ReferError = struct {
     const Error = error{
         Overflow,
     };
-// #endregion ReferError
+    // #endregion ReferError
 };

@@ -208,7 +208,7 @@ const Field = struct {
 };
 
 const fieldParentPtr = struct {
-// #region fieldParentPtr
+    // #region fieldParentPtr
     const std = @import("std");
 
     const Point = struct {
@@ -223,11 +223,11 @@ const fieldParentPtr = struct {
         // test is true
         std.debug.print("test is {}\n", .{res});
     }
-// #endregion fieldParentPtr
+    // #endregion fieldParentPtr
 };
 
 const call = struct {
-// #region call
+    // #region call
     const std = @import("std");
 
     fn add(a: i32, b: i32) i32 {
@@ -237,11 +237,11 @@ const call = struct {
     pub fn main() void {
         std.debug.print("call function add, the result is {}\n", .{@call(.auto, add, .{ 1, 2 })});
     }
-// #endregion call
+    // #endregion call
 };
 
 const Type = struct {
-// #region Type
+    // #region Type
     const std = @import("std");
 
     const T = @Type(.{
@@ -268,5 +268,5 @@ const Type = struct {
 
         std.debug.print("{}\n", .{D.b});
     }
-// #endregion Type
+    // #endregion Type
 };
