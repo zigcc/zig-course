@@ -23,6 +23,8 @@ const NoEffects = struct {
 
     test "no runtime side effects" {
         var data: i32 = 0;
+        // 此处的 foot 函数如果是正常执行会增加 data 的值
+        // 但是由于这里使用的是 @TypeOf 故会在编译期进行运算，所以不会出现运行时的副作用
         const T = @TypeOf(foo(i32, &data));
         try comptime expect(T == i32);
         try expect(data == 0);
@@ -218,9 +220,9 @@ const fieldParentPtr = struct {
     pub fn main() void {
         var p = Point{ .x = 0 };
 
+        // 根据子字段 x 的指针来获取父结构体 Point 的地址
         const res = &p == @as(*Point, @fieldParentPtr("x", &p.x));
 
-        // test is true
         std.debug.print("test is {}\n", .{res});
     }
     // #endregion fieldParentPtr
@@ -235,7 +237,9 @@ const call = struct {
     }
 
     pub fn main() void {
-        std.debug.print("call function add, the result is {}\n", .{@call(.auto, add, .{ 1, 2 })});
+        // 使用 @call 调用函数，其中 .auto 是自动指定调用约定
+        const result = @call(.auto, add, .{ 1, 2 });
+        std.debug.print("call function add, the result is {}\n", .{result});
     }
     // #endregion call
 };
@@ -246,25 +250,32 @@ const Type = struct {
 
     const T = @Type(.{
         .Struct = .{
+            // 结构体的内存布局
             .layout = .auto,
+            // 对应的字段
             .fields = &.{
                 .{
+                    // 字段的对其方式
                     .alignment = 8,
+                    // 字段名
                     .name = "b",
+                    // 字段类型
                     .type = u32,
+                    // 是否是编译期已知
                     .is_comptime = false,
+                    // 是否有默认值
                     .default_value = null,
                 },
             },
+            // 对应的方法和属性，不可构建
             .decls = &.{},
+            // 是否是元组
             .is_tuple = false,
         },
     });
 
     pub fn main() void {
-        const D = T{
-            .b = 666,
-        };
+        const D = T{ .b = 666 };
 
         std.debug.print("{}\n", .{D.b});
     }
