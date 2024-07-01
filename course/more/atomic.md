@@ -28,39 +28,39 @@ outline: deep
 
 保证原子操作是单调的，在一个线程中，所观察到的原子值在后续过程中必定是大于或等于当前值。但在多线程中，并不保证不会发生重排序 -->
 
-### `@atomicLoad`
+### [`@atomicLoad`](https://ziglang.org/documentation/master/#atomicLoad)
 
 函数原型：
 
 ```zig
-@atomicLoad(comptime T: type, ptr: *const T, comptime ordering: builtin.AtomicOrder) T
+@atomicLoad(comptime T: type, ptr: *const T, comptime ordering: AtomicOrder) T
 ```
 
 用于某个类型指针进行原子化的读取值。
 
-### `@atomicStore`
+### [`@atomicRmw`](https://ziglang.org/documentation/master/#atomicRmw)
 
 函数原型：
 
 ```zig
-`@atomicStore(comptime T: type, ptr: *T, value: T, comptime ordering: builtin.AtomicOrder) void`
-```
-
-用于对某个类型指针进行原子化的赋值。
-
-### `@atomicRmw`
-
-函数原型：
-
-```zig
-@atomicRmw(comptime T: type, ptr: *T, comptime op: builtin.AtomicRmwOp, operand: T, comptime ordering: builtin.AtomicOrder) T
+@atomicRmw(comptime T: type, ptr: *T, comptime op: AtomicRmwOp, operand: T, comptime ordering: AtomicOrder) T
 ```
 
 用于原子化的修改值并返回修改前的值。
 
 其还支持九种操作符，具体 [见此](https://ziglang.org/documentation/master/#atomicRmw)。
 
-### `@cmpxchgWeak`
+### [`@atomicStore`](https://ziglang.org/documentation/master/#atomicStore)
+
+函数原型：
+
+```zig
+@atomicStore(comptime T: type, ptr: *T, value: T, comptime ordering: AtomicOrder) void
+```
+
+用于对某个类型指针进行原子化的赋值。
+
+### [`@cmpxchgWeak`](https://ziglang.org/documentation/master/#cmpxchgWeak)
 
 函数原型：
 
@@ -70,7 +70,7 @@ outline: deep
 
 弱原子的比较与交换操作，如果目标指针是给定值，那么赋值为参数的新值，并返回null，否则仅读取值返回。
 
-### `@cmpxchgStrong`
+### [`@cmpxchgStrong`](https://ziglang.org/documentation/master/#cmpxchgStrong)
 
 函数原型：
 
@@ -80,7 +80,7 @@ outline: deep
 
 强原子的比较与交换操作，如果目标指针是给定值，那么赋值为参数的新值，并返回null，否则仅读取值返回。
 
-### `@fence`
+### [`@fence`](https://ziglang.org/documentation/master/#fence)
 
 函数原型：
 
@@ -94,64 +94,22 @@ outline: deep
 
 ### 原子数据结构
 
-可以使用 [`std.atomic.Value`](https://ziglang.org/documentation/master/std/#A;std:atomic.Value) 包裹某种类型获取到一个原子数据结构。
+可以使用 [`std.atomic.Value`](https://ziglang.org/documentation/master/std/#std.atomic.Value) 包裹某种类型获取到一个原子数据结构。
 
 示例：
 
-```zig
-const RefCount = struct {
-    count: Value(usize),
-    dropFn: *const fn (*RefCount) void,
+<<<@/code/release/atomic.zig#atomic_value
 
-    const RefCount = @This();
-
-    fn ref(rc: *RefCount) void {
-        // No ordering necessary; just updating a counter.
-        _ = rc.count.fetchAdd(1, .Monotonic);
-    }
-
-    fn unref(rc: *RefCount) void {
-        // Release ensures code before unref() happens-before the
-        // count is decremented as dropFn could be called by then.
-        if (rc.count.fetchSub(1, .Release) == 1) {
-            // Acquire ensures count decrement and code before
-            // previous unrefs()s happens-before we call dropFn
-            // below.
-            // Another alternative is to use .AcqRel on the
-            // fetchSub count decrement but it's extra barrier in
-            // possibly hot path.
-            rc.count.fence(.Acquire);
-            (rc.dropFn)(rc);
-        }
-    }
-
-    fn noop(rc: *RefCount) void {
-        _ = rc;
-    }
-};
-
-var ref_count: RefCount = .{
-    .count = Value(usize).init(0),
-    .dropFn = RefCount.noop,
-};
-ref_count.ref();
-ref_count.unref();
-```
+TODO: 增加适当的讲解
 
 ### `spinLoopHint` 自旋锁
 
-[`std.atomic.spinLoopHint`](https://ziglang.org/documentation/master/std/#A;std:atomic.spinLoopHint)
+[`std.atomic.spinLoopHint`](https://ziglang.org/documentation/master/std/#std.atomic.spinLoopHint)
 
 向处理器发出信号，表明调用者处于忙等待自旋循环内。
 
 示例：
 
-```zig
-test spinLoopHint {
-    for (0..10) |_| {
-        spinLoopHint();
-    }
-}
-```
+<<<@/code/release/atomic.zig#spinLoopHint
 
 TODO：增加更多的讲解，例如使用示例，原子级别讲解等！
