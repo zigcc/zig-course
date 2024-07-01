@@ -64,6 +64,8 @@ C --> B --> A
 
 <<<@/code/release/build_system/step/build.zig
 
+以上代码中，我们可以使用 `zig build run -- arg1` 向构建产物传递参数！
+
 ::: info 🅿️ 提示
 
 值得注意的是，`b.installArtifact` 是将构建放入 `install` 这一默认的 step 中。
