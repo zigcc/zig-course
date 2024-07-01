@@ -10,28 +10,7 @@ outline: deep
 
 在 zig 中，单元测试的是实现非常简单，只需要使用 `test` 关键字 + 字符串（测试名字，一般填测试的用途）+ 块即可。
 
-```zig
-const std = @import("std");
-
-test "expect addOne adds one to 41" {
-
-    // 标准库提供了不少有用的函数
-    // testing 下的函数均是测试使用的
-    // expect 会假定其参数为 true，如果不通过则报告错误
-    // try 用于当 expect 返回错误时，直接返回，并通知测试运行器测试结果未通过
-    try std.testing.expect(addOne(41) == 42);
-}
-
-test addOne {
-    // test 的名字也可以使用标识符，例如我们在这里使用的就是函数名字 addOne
-    try std.testing.expect(addOne(41) == 42);
-}
-
-/// 定义一个函数效果是给传入的参数执行加一操作
-fn addOne(number: i32) i32 {
-    return number + 1;
-}
-```
+<<<@/code/release/unit_test.zig#Basic
 
 假设以上这段代码在文件 `testing_introduction.zig` 中，则我们可以这样子来执行检测：
 
@@ -58,47 +37,7 @@ All 2 tests passed.
 
 `zig test` 执行时会仅执行文件内的顶级测试块，如果想执行非顶级的测试块，则可以定义一个名字为空的顶级测试块，在其内部引用你需要执行测试的容器即可。
 
-```zig
-const std = @import("std");
-const expect = std.testing.expect;
-
-test {
-    std.testing.refAllDecls(S);
-    _ = S;
-    _ = U;
-}
-
-const S = struct {
-    test "S demo test" {
-        try expect(true);
-    }
-
-    const SE = enum {
-        V,
-
-        // 此处测试由于未被引用，将不会执行.
-        test "This Test Won't Run" {
-            try expect(false);
-        }
-    };
-};
-
-const U = union { // U 被顶层测试块引用了
-    s: US,        // 并且US在此处被引用，则US容器中的测试块也会被执行测试
-
-    const US = struct {
-        test "U.US demo test" {
-            // This test is a top-level test declaration for the struct.
-            // The struct is nested (declared) inside of a union.
-            try expect(true);
-        }
-    };
-
-    test "U demo test" {
-        try expect(true);
-    }
-};
-```
+<<<@/code/release/unit_test.zig#Nestd
 
 注意，嵌套引用测试在全局测试块中引用另一个容器后，并不会递归，也就是说它仅仅会执行容器的顶层测试块和它引用的容器的顶层测试块。
 
@@ -108,14 +47,7 @@ zig 的标准库还为我们提供了一个函数 `std.testing.refAllDecls`，�
 
 但需要注意的是，`std.testing.refAllDecls` 的实现如下：
 
-```zig
-pub fn refAllDecls(comptime T: type) void {
-    if (!builtin.is_test) return;
-    inline for (comptime std.meta.declarations(T)) |decl| {
-        _ = &@field(T, decl.name);
-    }
-}
-```
+<<<@/code/release/unit_test.zig#allDecl
 
 它所使用的 `std.meta.declarations` 只能获取到公共成员（即被 `pub` 修饰的），非公共成员需要我们手动以 `_ = ..` 形式引入测试。
 
