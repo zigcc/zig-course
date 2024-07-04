@@ -144,7 +144,7 @@ Linux安装的话， 由于发行版的不同，安装的方式五花八门，�
 
 - [marler8997/zigup](https://github.com/marler8997/zigup): Download and manage zig compilers
 - [tristanisham/zvm](https://github.com/tristanisham/zvm): Lets you easily install/upgrade between different versions of Zig
-- [hendriknielaender/zvm](https://github.com/hendriknielaender/zvm): Fast and
+- [hendriknielaender/zvm](https://github.com/hendriknielaender/zvm): Fast and simple zig version manager
 
 读者可根据自身需求选择，这里介绍一个通用的版本管理工具：[asdf](https://asdf-vm.com/)。
 
