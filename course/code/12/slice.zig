@@ -53,7 +53,7 @@ const TerminatedSlice = struct {
 
     pub fn main() void {
         // #region terminated_slice
-        // 显示声明切片类型
+        // 显式声明切片类型
         const str_slice: [:0]const u8 = "hello";
         print("str_slice类型：{}\n", .{@TypeOf(str_slice)});
 

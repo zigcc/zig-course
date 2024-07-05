@@ -71,7 +71,7 @@ const byte: u8 = @intCast(spartan_count);
 
 上面这段代码毫无疑问会失败，因为 `u8` 类型无法容纳下 300 这个数。
 
-除非，我们显示强制截断位，使用 [`@truncate`](https://ziglang.org/documentation/master/#truncate)。
+除非，我们显式强制截断位，使用 [`@truncate`](https://ziglang.org/documentation/master/#truncate)。
 
 ## 整数溢出
 
