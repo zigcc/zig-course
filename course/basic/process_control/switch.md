@@ -58,7 +58,7 @@ switch 的分支可以标记为 `inline` 来要求编译器生成该分支对应
 
 <<<@/code/release/switch.zig#isFieldOptional
 
-`inline else` 可以展开所有的 else 分支，这样做的好处是，允许编译器在编译时显示生成所有分支，这样在编译时可以检查分支是否均能被正确地处理：
+`inline else` 可以展开所有的 else 分支，这样做的好处是，允许编译器在编译时显式生成所有分支，这样在编译时可以检查分支是否均能被正确地处理：
 
 <<<@/code/release/switch.zig#withSwitch
 
