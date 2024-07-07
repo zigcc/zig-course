@@ -75,7 +75,7 @@ export default [
           },
           {
             text: "切片",
-            link: "/basic/advanced_type/silce",
+            link: "/basic/advanced_type/slice",
           },
           {
             text: "结构体",

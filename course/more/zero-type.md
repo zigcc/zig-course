@@ -26,7 +26,7 @@ var map = std.AutoHashMap(i32, void).init(std.testing.allocator);
 
 ## 数组和切片
 
-[数组](../basic/advanced_type/array.md) 和 [切片](../basic/advanced_type/silce.md) 的长度为 0 时，就是**零位类型**。
+[数组](../basic/advanced_type/array.md) 和 [切片](../basic/advanced_type/slice.md) 的长度为 0 时，就是**零位类型**。
 
 另外，如果它们的元素类型是零位类型，则它们必定是**零位类型**，此时与数组（切片）长度无关。
 
