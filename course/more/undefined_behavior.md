@@ -48,7 +48,7 @@ error: the following test command crashed:
 
 ## 不可达代码
 
-即 `unreachabel`，如果程序执行到它，那么会触发完整的堆栈跟踪！
+即 `unreachable`，如果程序执行到它，那么会触发完整的堆栈跟踪！
 
 ## 索引越界访问
 
