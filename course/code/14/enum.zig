@@ -114,6 +114,33 @@ const Non_exhaustiveEnum = struct {
     };
     // is_one 也是true
     // #endregion non_exhaustive_enum
+
+    const std = @import("std");
+    const expect = std.testing.expect;
+
+    pub fn main() !void {
+        // #region enum_from_int
+        const Color = enum(u4) {
+            red,
+            green,
+            blue,
+            _,
+        };
+
+        // 明确列出的枚举值
+        const blue: Color = @enumFromInt(2);
+        try expect(blue == .blue);
+
+        // 未列出的枚举值：8 在 u4 的范围内（0~15）
+        const yellow: Color = @enumFromInt(8);
+        try expect(@TypeOf(yellow) == Color);
+        try expect(@intFromEnum(yellow) == 8);
+
+        // 42 超出了 u4 的范围，会触发未定义行为
+        // const ub: Color = @enumFromInt(42);
+
+        // #endregion enum_from_int
+    }
 };
 
 const EnumLiteral_ = struct {
