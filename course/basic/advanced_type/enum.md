@@ -4,7 +4,7 @@ outline: deep
 
 # 枚举
 
-> 举常常用来列出一个有限集合的任何成员，或者对某一种特定对象的计数。
+> 枚举常常用来列出一个有限集合的任何成员，或者对某一种特定对象的计数。
 
 枚举是一种相对简单，但用处颇多的类型。
 
@@ -50,15 +50,19 @@ outline: deep
 
 ## 非详尽枚举
 
-zig 允许我们不列出所有的枚举值，未列出枚举值可以使用 `_` 代替。
+zig 允许我们不列出所有的枚举值，未列出枚举值可以使用 `_` 代替。由于未列出枚举值的存在，枚举的大小无法自动推断，必须显式指定。
+
+<<<@/code/release/enum.zig#non_exhaustive_enum
 
 :::info 🅿️ 提示
 
-`@enumFromInt` 允许我们通过一个整数来反推一个枚举，但需要注意，尝试转换一个在所选枚举类型中没有表示值的整数会导致[未定义行为（Undefined Behavior）](https://ziglang.org/documentation/master/#Undefined-Behavior)
+`@enumFromInt` 能够将整数转换为枚举值。但需要注意，如果所选枚举类型中没有表示该整数的值，就会导致[未定义行为](../../more/undefined_behavior#无效枚举转换)。
+
+如果目标枚举类型是非详尽枚举，那么除了涉及 `@intCast` 相关的安全检查之外，`@enumFromInt` 始终能够得到有效的枚举值。
 
 :::
 
-<<<@/code/release/enum.zig#non_exhaustive_enum
+<<<@/code/release/enum.zig#enum_from_int
 
 ## `EnumLiteral`
 
