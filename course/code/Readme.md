@@ -1,5 +1,12 @@
 # 注意
 
-本文件存放的是 [Zig 语言圣经](https://zigcc.github.io/zig-course/)的所有示例代码。
+本文件存放的是 [Zig 语言圣经](https://zigcc.github.io/zig-course/) 的所有示例代码。
 
 不同版本对应不同的目录，最新的稳定版为 `release`!
+
+示例代码文件组织模式：`code` 目录下的文件夹对应着不同的 zig 版本，而在对应版本内的文件则是相应的示例文件
+
+如果一个示例只需要一个 zig 源文件就可以，那么可以直接放入文件，否则需要在对应的目录下创建完整的 zig 项目，
+例如 `release` 目录下的 `build_system` 表示构建系统的示例，属于一个完整的 zig 项目
+
+如果要修改代码，请保证当前在整个 `zig-course` 的根路径下运行 `zig build` 构建通过！
