@@ -146,7 +146,7 @@ zig 中，有以下默认操作可以导致溢出：
 
 值得注意的是，`comptime_float` 具有 `f128` 的精度和运算。
 
-浮点字面量则是具有 _任意浮点类型_，如果没有分母会被转换为 _任意整数类型_ 。
+浮点字面量可以隐式转换为 _任意浮点类型_，如果没有小数部分的话还能够隐式转换为 _任意整数类型_ 。
 
 浮点运算时遵循 `Strict` 模式，但是可以使用 `@setFloatMode(.Optimized)` 切换到 `Optimized` 模式，有关浮点运算的模式，详见 [`@setFloatMode`](https://ziglang.org/documentation/master/#setFloatMode)。
 
