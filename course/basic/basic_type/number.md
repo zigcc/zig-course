@@ -103,7 +103,7 @@ thread 2456131 panic: division by zero
 (process terminated by signal)
 ```
 
-### 溢出:
+### 溢出
 
 zig 中，有以下默认操作可以导致溢出：
 
