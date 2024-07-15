@@ -60,32 +60,32 @@ C 语言共享类型通常是通过引入头文件实现，这点在 zig 中可�
 
 :::
 
-## C Lib 导入
+## vcpkg C Lib 导入
 
 > [!IMPORTANT]
 > 该部分示例代码暂无 CI 测试，可能存在过期情况，请注意！
 
 既然可以引入头文件，那么毫无疑问同样可以引入由第三方写好的二进制lib库。
 
-以微软开发的跨平台开源c/c++包管理器*vcpkg*的库导入为例，具体安装以及设置环境变量的教程不在这里赘叙，只讲怎么zig使用已经编译好的lib。
+以微软开发的跨平台开源 c/c++ 包管理器 _vcpkg_ 的库导入为例，具体安装以及设置环境变量的教程不在这里赘叙，只讲怎么 zig 使用已经编译好的 lib。
 
-假如你所处的开发环境系统为"Windows"、处理器架构为"x64"、vcpkg安装目录为"D:\vcpkg"、并且操作模式为classic（Classic Mode）、要使用并且已安装的库为c运算库"gsl"。
+假如你所处的开发环境系统为 "Windows"、处理器架构为 "x64"、vcpkg 安装目录为 "D:\vcpkg"、并且操作模式为 classic（Classic Mode）、要使用并且已安装的库为c运算库 `gsl`。
 
-那么在build.zig文件中，
+那么在 `build.zig` 文件中，
 
-<<<@/code/release/c_lib_import_build.zig#c_import
+<<<@/code/release/import_vcpkg/build.zig#c_import
 
-假设你想要借用"gsl"库来对数值进行傅里叶变换，那么可以先导入
+假设你想要借用 `gsl` 库来对数值进行傅里叶变换，那么可以先导入
 
-<<<@/code/release/c_lib_import_gsl_fft.zig#import_gsl
+<<<@/code/release/import_vcpkg/src/main.zig#import_gsl
 
-然后使用*gsl_fft_complex_radix2_forward*函数计算从1到n的复数数组的离散傅里叶变换
+然后使用 `gsl_fft_complex_radix2_forward` 函数计算从1到n的复数数组的离散傅里叶变换
 
-<<<@/code/release/c_lib_import_gsl_fft.zig#use_gsl_fft
+<<<@/code/release/import_vcpkg/src/main.zig#use_gsl_fft
 
 ::: info 🅿️ 提示
 
-zig使用c++库的方式同c一样，需要保证该库`extern "C"`，并且在需要使用动态库的时候也同样不能少。
+zig 使用 c++ 库的方式同c一样，需要保证该库 `extern "C"`，并且在需要使用动态库的时候也同样不能少。
 
 :::
 
