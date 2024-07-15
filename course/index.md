@@ -54,3 +54,4 @@ _Zig 会要求你显式传递和管理你的内存，并且编译时就会跟踪
 
 - [zig-playground](https://playground.zigtools.org/)
 - [zig-play](https://zig-play.dev/)
+- [Riju](https://riju.codes/zig)
