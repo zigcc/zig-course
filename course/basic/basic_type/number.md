@@ -212,6 +212,8 @@ or
 
 ::: tip 🅿️ 提示
 
-如果你有使用复数的需求，那么你需要自己实现相关的结构体了（我还未在社区发现高质量的相关包）。
+如果你有使用复数的需求，可以使用标准库中的 [`std.math.Complex`](https://ziglang.org/documentation/master/std/#std.math.complex.Complex)。
+
+<<<@/code/release/number.zig#complex
 
 :::
