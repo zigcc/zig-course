@@ -72,9 +72,9 @@ zig 允许我们不列出所有的枚举值，未列出枚举值可以使用 `_`
 
 :::
 
-zig 还包含另外一个特殊的类型 `EnumLiteral`，它是 [`std.builtin.Type`](https://ziglang.org/documentation/master/std/#A;std:builtin.Type) 的一部分。
+zig 还包含另外一个特殊的类型 `EnumLiteral`，它是 [`std.builtin.Type`](https://ziglang.org/documentation/master/std/#std.builtin.Type) 的一部分。
 
-可以将它称之为“枚举字面量”，它是一个与 `enum` 完全不同的类型，可以查看 zig 类型系统对 `enum` 的 [定义](https://ziglang.org/documentation/master/std/#A;std:builtin.Type.Enum)，并不包含 `EnumLiteral`！
+可以将它称之为“枚举字面量”，它是一个与 `enum` 完全不同的类型，可以查看 zig 类型系统对 `enum` 的 [定义](https://ziglang.org/documentation/master/std/#std.builtin.Type.Enum)，并不包含 `EnumLiteral`！
 
 它的具体使用如下：
 

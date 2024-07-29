@@ -51,7 +51,7 @@ outline: deep
 
 ## `FixedBufferAllocator`
 
-这个分配器是固定大小的内存缓冲区，无法扩容，常常在你需要缓冲某些东西时使用，注意默认情况下它不是线程安全的，但是存在着变体 [`ThreadSafeAllocator`](https://ziglang.org/documentation/master/std/#A;std:heap.ThreadSafeAllocator)，使用 `ThreadSafeAllocator` 包裹一下它即可。
+这个分配器是固定大小的内存缓冲区，无法扩容，常常在你需要缓冲某些东西时使用，注意默认情况下它不是线程安全的，但是存在着变体 [`ThreadSafeAllocator`](https://ziglang.org/documentation/master/std/#std.heap.ThreadSafeAllocator)，使用 `ThreadSafeAllocator` 包裹一下它即可。
 
 ::: code-group
 
