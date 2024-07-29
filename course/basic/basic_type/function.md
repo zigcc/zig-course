@@ -126,4 +126,4 @@ extern 关键字后面带引号的标识符指定具有该函数的库，例如 
 
 <<<@/code/release/function.zig#shiftLeftOne
 
-关于可以使用的调用约定格式，可以参考这里[`std.builtin.CallingConvention`](https://ziglang.org/documentation/master/std/#A;std:builtin.CallingConvention)。
+关于可以使用的调用约定格式，可以参考这里[`std.builtin.CallingConvention`](https://ziglang.org/documentation/master/std/#std.builtin.CallingConvention)。
