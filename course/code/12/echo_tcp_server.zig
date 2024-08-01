@@ -87,8 +87,7 @@ pub fn main() !void {
         // #region exist-connections
         // 遍历所有的连接，处理事件
         for (1..max_sockets) |i| {
-            // 这里的 nums 是 poll 返回的事件数量
-            // 在windows下，WSApoll允许返回0，未超时且没有套接字处于指定的状态
+            // 在windows下，WSApoll允许返回0，超时前没有套接字变成所要查询的状态
             if (nums == 0) {
                 break;
             }
