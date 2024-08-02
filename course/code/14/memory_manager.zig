@@ -46,7 +46,7 @@ const FixedBufferAllocator = struct {
 
     pub fn main() !void {
         var buffer: [1000]u8 = undefined;
-        // 一块内存区域，传入到fiexed buffer中
+        // 一块内存区域，传入到fixed buffer中
         var fba = std.heap.FixedBufferAllocator.init(&buffer);
 
         // 获取内存allocator
@@ -66,7 +66,7 @@ const ThreadSafeFixedBufferAllocator = struct {
 
     pub fn main() !void {
         var buffer: [1000]u8 = undefined;
-        // 一块内存区域，传入到fiexed buffer中
+        // 一块内存区域，传入到fixed buffer中
         var fba = std.heap.FixedBufferAllocator.init(&buffer);
 
         // 获取内存allocator
