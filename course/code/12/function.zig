@@ -15,6 +15,25 @@ pub fn main() !void {
     _ = shiftLeftOne(1);
 }
 
+// #region closure
+fn bar(comptime x: i32) fn (i32) i32 {
+    // #region lambda
+    const res = struct {
+        pub fn foo(y: i32) i32 {
+            var counter = 0;
+            for (x..y) |i| {
+                if ((i % 2) == 0) {
+                    counter += i * i;
+                }
+            }
+            return counter;
+        }
+    }.foo;
+    // #endregion lambda
+    return res;
+}
+// #endregion closure
+
 // #region add
 pub fn add(a: u8, b: u8) u8 {
     return a + b;
