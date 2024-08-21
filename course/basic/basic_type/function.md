@@ -128,12 +128,12 @@ Zig 语言不允许在函数内声明函数，也不允许直接创建匿名函�
 
 关于闭包的更多内容可以参考以下文章或者帖子：
 
-- [https://zig.news/andrewgossage/implementing-closures-and-monads-in-zig-23kf](Implementing Closures and Monads in Zig)
-- [https://zig.news/houghtonap/closure-pattern-in-zig-19i3#zig-closure-pattern](Closure Pattern in Zig Zig)
+- [Implementing Closures and Monads in Zig](https://zig.news/andrewgossage/implementing-closures-and-monads-in-zig-23kf)
+- [Closure Pattern in Zig Zig](https://zig.news/houghtonap/closure-pattern-in-zig-19i3#zig-closure-pattern)
 
 关于安德鲁拒绝匿名函数提案的解释：
 
-- [https://github.com/ziglang/zig/issues/1717#issuecomment-1627790251](RFC: Make function definitions expressions)
+- [RFC: Make function definitions expressions](https://github.com/ziglang/zig/issues/1717#issuecomment-1627790251)
 
 ### `anytype`
 
