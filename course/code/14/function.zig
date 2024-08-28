@@ -50,7 +50,7 @@ extern "c" fn atan2(a: f64, b: f64) f64;
 
 // #region abort
 fn abort() noreturn {
-    @setCold(true);
+    @branchHint(.cold);
     while (true) {}
 }
 // #endregion abort
