@@ -1,6 +1,7 @@
 pub fn main() !void {
     try SinglePointer.main();
-    try MutliPointer.main();
+    try MultiPointer.main();
+    try ArrayAndSlice.main();
     try Slice.main();
     try STPointer.main();
     try Volatile.main();
@@ -23,7 +24,7 @@ const SinglePointer = struct {
     }
     // #endregion single_pointer
 };
-const MutliPointer = struct {
+const MultiPointer = struct {
     // #region multi_pointer
     const print = @import("std").debug.print;
 
@@ -34,6 +35,21 @@ const MutliPointer = struct {
         print("第一个元素：{}\n", .{ptr[0]});
     }
     // #endregion multi_pointer
+};
+const ArrayAndSlice = struct {
+    // #region array_and_slice
+    const expect = @import("std").testing.expect;
+
+    pub fn main() !void {
+        var array: [5]u8 = "hello".*;
+
+        const array_pointer = &array;
+        try expect(array_pointer.len == 5);
+
+        const slice: []u8 = array[1..3];
+        try expect(slice.len == 2);
+    }
+    // #endregion array_and_slice
 };
 
 const Slice = struct {
