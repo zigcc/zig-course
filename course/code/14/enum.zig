@@ -67,9 +67,9 @@ const EnumSize = struct {
     };
 
     pub fn main() !void {
-        try expect(@typeInfo(Small).Enum.tag_type == u2);
-        try expect(@typeInfo(Small).Enum.fields.len == 4);
-        try expect(mem.eql(u8, @typeInfo(Small).Enum.fields[1].name, "two"));
+        try expect(@typeInfo(Small).@"enum".tag_type == u2);
+        try expect(@typeInfo(Small).@"enum".fields.len == 4);
+        try expect(mem.eql(u8, @typeInfo(Small).@"enum".fields[1].name, "two"));
         try expect(mem.eql(u8, @tagName(Small.three), "three"));
     }
     // #endregion enum_size

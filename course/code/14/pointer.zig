@@ -114,7 +114,7 @@ const Align = struct {
 
         if (builtin.target.cpu.arch == .x86_64) {
             // 获取了 x86_64 架构的指针对齐大小
-            try expect(@typeInfo(*i32).Pointer.alignment == 4);
+            try expect(@typeInfo(*i32).pointer.alignment == 4);
         }
     }
     // #endregion align
@@ -137,7 +137,7 @@ const AlignCast = struct {
 
     pub fn main() !void {
         // 全局变量对齐
-        try expect(@typeInfo(@TypeOf(&foo)).Pointer.alignment == 4);
+        try expect(@typeInfo(@TypeOf(&foo)).pointer.alignment == 4);
         try expect(@TypeOf(&foo) == *align(4) u8);
         const as_pointer_to_array: *align(4) [1]u8 = &foo;
         const as_slice: []align(4) u8 = as_pointer_to_array;

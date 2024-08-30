@@ -53,7 +53,7 @@ const ComptimeAccessOptionalType = struct {
         foo = 1234;
 
         // 使用编译期反射来获取 foo 的类型信息
-        try comptime expect(@typeInfo(@TypeOf(foo)).Optional.child == i32);
+        try comptime expect(@typeInfo(@TypeOf(foo)).optional.child == i32);
         // #endregion comptime_access_optional_type
     }
 };

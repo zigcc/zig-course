@@ -63,7 +63,7 @@ const typeInfo = struct {
         // 通过 @typeInfo 获取类型信息
         const type_info = @typeInfo(T);
         // 断言它为 struct
-        const struct_info = type_info.Struct;
+        const struct_info = type_info.@"struct";
 
         // inline for 打印该结构体内部字段的信息
         inline for (struct_info.fields) |field| {
@@ -82,7 +82,7 @@ const TypeInfo2 = struct {
 
     fn IntToArray(comptime T: type) type {
         // 获得类型信息，并断言为Int
-        const int_info = @typeInfo(T).Int;
+        const int_info = @typeInfo(T).int;
         // 获得Int位数
         const bits = int_info.bits;
         // 检查位数是否被8整除
@@ -106,7 +106,7 @@ const TypeInfo3 = struct {
 
     fn ExternAlignOne(comptime T: type) type {
         // 获得类型信息，并断言为Struct.
-        comptime var struct_info = @typeInfo(T).Struct;
+        comptime var struct_info = @typeInfo(T).@"struct";
         // 将内存布局改为 extern
         struct_info.layout = .@"extern";
         // 复制字段信息（原为只读切片，故需复制）
@@ -116,7 +116,7 @@ const TypeInfo3 = struct {
         // 替换字段定义
         struct_info.fields = &new_fields;
         // 重新构造类型
-        return @Type(.{ .Struct = struct_info });
+        return @Type(.{ .@"struct" = struct_info });
     }
 
     const MyStruct = struct {
@@ -245,7 +245,7 @@ const Type = struct {
     const std = @import("std");
 
     const T = @Type(.{
-        .Struct = .{
+        .@"struct" = .{
             .layout = .auto,
             .fields = &.{
                 .{
