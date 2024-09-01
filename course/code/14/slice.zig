@@ -36,10 +36,12 @@ const PointerSlice = struct {
         var array = [_]i32{ 1, 2, 3, 4 };
 
         // 边界使用变量，保证切片不会被优化为数组指针
-        const len: usize = 3;
+        var len: usize = 3;
+        _ = &len;
 
-        var slice: []i32 = array[0..len];
+        var slice = array[0..len];
 
+        print("slice 类型为{}\n", .{@TypeOf(slice)});
         print("slice.ptr 类型为{}\n", .{@TypeOf(slice.ptr)});
         print("slice 的索引 0 取地址，得到指针类型为{}\n", .{@TypeOf(&slice[0])});
         // #endregion pointer_slice
