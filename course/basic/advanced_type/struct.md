@@ -197,23 +197,7 @@ zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig
 
 3. 还可以对 `packed` 的结构体的指针设置内存对齐来访问对应的字段：
 
-> 这里说明可能有些不清楚，请见谅！
-
-```zig
-const std = @import("std");
-const expect = std.testing.expect;
-
-const S = packed struct {
-    a: u32,
-    b: u32,
-};
-test "overaligned pointer to packed struct" {
-    var foo: S align(4) = .{ .a = 1, .b = 2 };
-    const ptr: *align(4) S = &foo;
-    const ptr_to_b: *u32 = &ptr.b;
-    try expect(ptr_to_b.* == 2);
-}
-```
+<<<@/code/release/struct.zig#aligned_struct
 
 ### 命名规则
 
