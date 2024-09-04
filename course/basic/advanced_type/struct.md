@@ -197,23 +197,42 @@ zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig
 
 3. 还可以对 `packed` 的结构体的指针设置内存对齐来访问对应的字段：
 
-> 这里说明可能有些不清楚，请见谅！
+:::details 示例
 
-```zig
-const std = @import("std");
-const expect = std.testing.expect;
+<<<@/code/release/struct.zig#aligned_struct
 
-const S = packed struct {
-    a: u32,
-    b: u32,
-};
-test "overaligned pointer to packed struct" {
-    var foo: S align(4) = .{ .a = 1, .b = 2 };
-    const ptr: *align(4) S = &foo;
-    const ptr_to_b: *u32 = &ptr.b;
-    try expect(ptr_to_b.* == 2);
-}
+:::
+
+4. 默认情况下 zig 还会对字段进行重新排序，但是在 packed 下并不会重新排序。
+
+:::details 示例
+
+<<<@/code/release/struct.zig#reorder_struct
+
+输出为：
+
+```sh
+16
+12
+0
+4
 ```
+
+在 64 位系统上，Foo 的内存布局是：
+
+```sh
+|   4(i32)  |  8(pointer)    |   4(padding)  |
+```
+
+如果去掉 packed，则是
+
+```sh
+|   8(pointer  |  4(int32)    |   4(padding)  |
+```
+
+可以看到， Zig 会对字段进行重新排序。
+
+:::
 
 ### 命名规则
 

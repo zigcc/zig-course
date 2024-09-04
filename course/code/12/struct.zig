@@ -363,3 +363,40 @@ const PackedCast = struct {
     }
     // #endregion packed_cast
 };
+
+const aligned_struct = struct {
+    // #region aligned_struct
+    const std = @import("std");
+    const expect = std.testing.expect;
+
+    const S = packed struct {
+        a: u32,
+        b: u32,
+    };
+    test "overaligned pointer to packed struct" {
+        var foo: S align(4) = .{ .a = 1, .b = 2 };
+        const ptr: *align(4) S = &foo;
+        const ptr_to_b: *u32 = &ptr.b;
+        try expect(ptr_to_b.* == 2);
+    }
+    // #endregion aligned_struct
+};
+
+const reorder_struct = struct {
+    // #region reorder_struct
+    const std = @import("std");
+
+    const Foo = packed struct {
+        x: i32,
+        y: [*]i32, // 一个多项指针
+    };
+
+    pub fn main() !void {
+        std.debug.print("{any}\n", .{@sizeOf(Foo)});
+        std.debug.print("{any}\n", .{@bitSizeOf(Foo) / 8});
+
+        std.debug.print("{any}\n", .{@bitOffsetOf(Foo, "x") / 8});
+        std.debug.print("{any}\n", .{@bitOffsetOf(Foo, "y") / 8});
+    }
+    // #endregion reorder_struct
+};
