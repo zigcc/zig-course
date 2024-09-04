@@ -381,3 +381,22 @@ const aligned_struct = struct {
     }
     // #endregion aligned_struct
 };
+
+const reorder_struct = struct {
+    // #region reorder_struct
+    const std = @import("std");
+
+    const Foo = packed struct {
+        x: i32,
+        y: [*]i32, // 一个多项指针
+    };
+
+    pub fn main() !void {
+        std.debug.print("{any}\n", .{@sizeOf(Foo)});
+        std.debug.print("{any}\n", .{@bitSizeOf(Foo) / 8});
+
+        std.debug.print("{any}\n", .{@bitOffsetOf(Foo, "x") / 8});
+        std.debug.print("{any}\n", .{@bitOffsetOf(Foo, "y") / 8});
+    }
+    // #endregion reorder_struct
+};
