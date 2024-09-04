@@ -197,7 +197,11 @@ zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig
 
 3. 还可以对 `packed` 的结构体的指针设置内存对齐来访问对应的字段：
 
+:::details 示例
+
 <<<@/code/release/struct.zig#aligned_struct
+
+:::
 
 ### 命名规则
 
