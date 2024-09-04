@@ -179,7 +179,7 @@ zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig
 
 以上几个特性就有很多有意思的点值得我们使用和注意。
 
-1. zig 允许我们获取字段指针，但这些指针并不是普通指针（涉及到了位偏移），无法作为普通的函数参数使用，这个情况可以使用 [`@bitOffsetOf`](https://ziglang.org/documentation/master/#bitOffsetOf) 和 [`@offsetOf`](https://ziglang.org/documentation/master/#offsetOf) 观察到：
+1. zig 允许我们获取字段指针。如果字段涉及位偏移，那么该字段的指针就无法赋值给普通指针（因为位偏移也是指针对齐信息的一部分）。这个情况可以使用 [`@bitOffsetOf`](https://ziglang.org/documentation/master/#bitOffsetOf) 和 [`@offsetOf`](https://ziglang.org/documentation/master/#offsetOf) 观察到：
 
 :::details 示例
 
