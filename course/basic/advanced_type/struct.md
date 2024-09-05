@@ -224,6 +224,8 @@ zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig
 |   4(i32)  |  8(pointer)    |   4(padding)  |
 ```
 
+额外的讨论信息：[github issue #20265](https://github.com/ziglang/zig/issues/20265)
+
 :::
 
 ### 命名规则
