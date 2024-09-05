@@ -203,7 +203,7 @@ zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig
 
 :::
 
-4. 默认情况下 zig 还会对字段进行重新排序，但是在 packed 下并不会重新排序。
+4. `packed struct` 会保证字段的顺序以及在字段间不存在额外的填充，但针对结构体本身可能仍然存在额外的填充：
 
 :::details 示例
 
@@ -224,13 +224,7 @@ zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig
 |   4(i32)  |  8(pointer)    |   4(padding)  |
 ```
 
-如果去掉 packed，则是
-
-```sh
-|   8(pointer  |  4(int32)    |   4(padding)  |
-```
-
-可以看到， Zig 会对字段进行重新排序。
+额外的讨论信息：[github issue #20265](https://github.com/ziglang/zig/issues/20265)
 
 :::
 
