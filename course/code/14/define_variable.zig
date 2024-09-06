@@ -15,6 +15,7 @@ pub fn main() !void {
     DefineVar.main();
     Const.main();
     Undefined.main();
+    UseUndefined.main();
     Block.main();
 }
 
@@ -79,7 +80,32 @@ const Undefined = struct {
     // #endregion undefined
 };
 
-// #region indentifier
+const UseUndefined = struct {
+    // #region use-undefined
+    const std = @import("std");
+
+    // 填充连续递增的数字
+    // 注意该函数中并没有对 output 进行读操作，所以 output 的初始值不重要
+    fn iota(init: u8, output: []u8) void {
+        for (output, init..) |*e, v| {
+            e.* = @intCast(v);
+        }
+    }
+
+    pub fn main() void {
+        // buffer 定义时不需要初始化
+        var buffer: [8]u8 = undefined;
+
+        // 因为 iota() 会为 buffer 里的元素赋值
+        iota(7, &buffer);
+
+        // 输出 { 7, 8, 9, 10, 11, 12, 13, 14 }
+        std.debug.print("{any}\n", .{buffer});
+    }
+    // #endregion use-undefined
+};
+
+// #region identifier
 const @"identifier with spaces in it" = 0xff;
 const @"1SmallStep4Man" = 112358;
 
@@ -92,7 +118,7 @@ const Color = enum {
     @"really red",
 };
 const color: Color = .@"really red";
-// #endregion indentifier
+// #endregion identifier
 
 const Block = struct {
     pub fn main() void {
