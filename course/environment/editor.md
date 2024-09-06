@@ -97,3 +97,39 @@ windows 上最棒的开发 IDE，存在第三方插件：[ZigVS](https://marketp
 ::: danger ⛔ 危险
 值得注意的是，该插件已经有两年无人维护！
 :::
+
+## zls 体验优化
+
+当前的 zls 已经支持保存时自动检查代码，但默认关闭。
+
+仅仅需要在 zls 的配置文件（可以通过 `zls --show-config-path`）中加入以下内容即可：
+
+```json
+{
+  "enable_build_on_save": true,
+  "build_on_save_step": "check"
+}
+```
+
+同时对应的项目的 `build.zig` 也需要进行部分调整：
+
+```zig
+const exe_check = b.addExecutable(.{
+    .name = "foo",
+    .root_source_file = b.path("src/main.zig"),
+    .target = target,
+    .optimize = optimize,
+});
+
+const check = b.step("check", "Check if foo compiles");
+check.dependOn(&exe_check.step);
+```
+
+这意味着要求编译器在编译时会添加 `-fno-emit-bin`，然后 Zig 将仅仅分析代码，但它不会调用 LLVM，所以并不会生成实际的文件
+
+但需要注意的是，我们对 `zls` 的设置是全局的，也就意味着我们需要给所有项目添加上述 `build.zig` 的内容，否则诊断功能将会失效。
+
+更多资料：
+
+- [Improving Your Zig Language Server Experience](https://kristoff.it/blog/improving-your-zls-experience/)
+- [Local ZLS config per project](https://github.com/zigtools/zls/issues/1687) （针对本地项目的 zls 配置）

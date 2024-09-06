@@ -14,11 +14,11 @@ export default [
     text: "环境配置",
     items: [
       {
-        text: "安装 Zig 环境",
+        text: "环境部署",
         link: "/environment/install-environment",
       },
       {
-        text: "编辑器选择",
+        text: "编辑器",
         link: "/environment/editor",
       },
       {
