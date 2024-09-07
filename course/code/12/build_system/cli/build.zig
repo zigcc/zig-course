@@ -8,7 +8,9 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
 
     // 使用 option 来获取命令参数决定是否剥离调试信息
-    const is_strip = b.option(bool, "is_strip", "whether strip executable") orelse false;
+    const is_strip =
+        b.option(bool, "is_strip", "whether strip executable") orelse
+        false;
 
     // 添加一个二进制可执行程序构建
     const exe = b.addExecutable(.{

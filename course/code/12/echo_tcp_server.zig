@@ -58,7 +58,10 @@ pub fn main() !void {
     // 存储 accept 拿到的 connections
     var connections: [max_sockets]?net.Server.Connection = undefined;
     // sockfds 用于存储 pollfd, 用于传递给 poll 函数
-    var sockfds: [max_sockets]if (builtin.os.tag == .windows) windows.ws2_32.pollfd else std.posix.pollfd = undefined;
+    var sockfds: [max_sockets]if (builtin.os.tag == .windows)
+        windows.ws2_32.pollfd
+    else
+        std.posix.pollfd = undefined;
     // #endregion data
     for (0..max_sockets) |i| {
         sockfds[i].fd = context.INVALID_SOCKET;
@@ -126,14 +129,17 @@ pub fn main() !void {
                         // 但仅仅这样写一次并不安全
                         // 最优解应该是使用for循环检测写入的数据大小是否等于buf长度
                         // 如果不等于就继续写入
-                        // 这是因为 TCP 是一个面向流的协议，它并不保证一次 write 调用能够发送所有的数据
+                        // 这是因为 TCP 是一个面向流的协议
+                        // 它并不保证一次 write 调用能够发送所有的数据
                         // 作为示例，我们不检查是否全部写入
                         _ = try connection.stream.write(buf[0..len]);
                     }
                 }
             }
             // 检查是否是 POLLNVAL | POLLERR | POLLHUP 事件，即是否有错误发生，或者连接断开
-            else if (sockfd.revents & (context.POLLNVAL | context.POLLERR | context.POLLHUP) != 0) {
+            else if ((sockfd.revents &
+                (context.POLLNVAL | context.POLLERR | context.POLLHUP)) != 0)
+            {
                 // 将 pollfd 和 connection 置为无效
                 sockfds[i].fd = context.INVALID_SOCKET;
                 connections[i] = null;

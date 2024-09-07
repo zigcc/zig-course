@@ -33,7 +33,11 @@ outline: deep
 函数原型：
 
 ```zig
-@atomicLoad(comptime T: type, ptr: *const T, comptime ordering: AtomicOrder) T
+@atomicLoad(
+    comptime T: type,
+    ptr: *const T,
+    comptime ordering: AtomicOrder
+) T
 ```
 
 用于某个类型指针进行原子化的读取值。
@@ -43,7 +47,13 @@ outline: deep
 函数原型：
 
 ```zig
-@atomicRmw(comptime T: type, ptr: *T, comptime op: AtomicRmwOp, operand: T, comptime ordering: AtomicOrder) T
+@atomicRmw(
+    comptime T: type,
+    ptr: *T,
+    comptime op: AtomicRmwOp,
+    operand: T,
+    comptime ordering: AtomicOrder
+) T
 ```
 
 用于原子化的修改值并返回修改前的值。
@@ -55,7 +65,12 @@ outline: deep
 函数原型：
 
 ```zig
-@atomicStore(comptime T: type, ptr: *T, value: T, comptime ordering: AtomicOrder) void
+@atomicStore(
+    comptime T: type,
+    ptr: *T,
+    value: T,
+    comptime ordering: AtomicOrder
+) void
 ```
 
 用于对某个类型指针进行原子化的赋值。
@@ -65,7 +80,14 @@ outline: deep
 函数原型：
 
 ```zig
-@cmpxchgWeak(comptime T: type, ptr: *T, expected_value: T, new_value: T, success_order: AtomicOrder, fail_order: AtomicOrder) ?T
+@cmpxchgWeak(
+    comptime T: type,
+    ptr: *T,
+    expected_value: T,
+    new_value: T,
+    success_order: AtomicOrder,
+    fail_order: AtomicOrder
+) ?T
 ```
 
 弱原子的比较与交换操作，如果目标指针是给定值，那么赋值为参数的新值，并返回null，否则仅读取值返回。
@@ -75,7 +97,14 @@ outline: deep
 函数原型：
 
 ```zig
-@cmpxchgStrong(comptime T: type, ptr: *T, expected_value: T, new_value: T, success_order: AtomicOrder, fail_order: AtomicOrder) ?T
+@cmpxchgStrong(
+    comptime T: type,
+    ptr: *T,
+    expected_value: T,
+    new_value: T,
+    success_order: AtomicOrder,
+    fail_order: AtomicOrder
+) ?T
 ```
 
 强原子的比较与交换操作，如果目标指针是给定值，那么赋值为参数的新值，并返回null，否则仅读取值返回。

@@ -173,7 +173,10 @@ const StackFallbackAllocator = struct {
     pub fn main() !void {
         // 初始化一个优先使用栈区的分配器
         // 栈区大小为256个字节，如果栈区不够用，就会使用page allocator
-        var stack_alloc = std.heap.stackFallback(256 * @sizeOf(u8), std.heap.page_allocator);
+        var stack_alloc = std.heap.stackFallback(
+            256 * @sizeOf(u8),
+            std.heap.page_allocator,
+        );
         // 获取分配器
         const stack_allocator = stack_alloc.get();
         // 申请内存

@@ -30,7 +30,8 @@ pub fn build(b: *std.Build) void {
     // 执行单元测试
     const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests);
 
-    // 如果想要跳过外部来自于其他包的单元测试（例如依赖中的包），可以使用 skip_foreign_checks
+    // 如果想要跳过外部来自于其他包的单元测试（例如依赖中的包）
+    // 可以使用 skip_foreign_checks
     run_exe_unit_tests.skip_foreign_checks = true;
 
     // 构建一个 step，用于执行测试

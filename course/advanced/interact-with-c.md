@@ -166,7 +166,8 @@ pub export fn foo() c_int {
     _ = &b;
     return a + b;
 }
-pub const MAKELOCAL = @compileError("unable to translate C expr: unexpected token .Equal");
+pub const MAKELOCAL =
+    @compileError("unable to translate C expr: unexpected token .Equal");
 ```
 
 :::
@@ -245,7 +246,10 @@ CC='zig cc -target x86_64-linux-gnu' CXX='zig cc -target x86_64-linux-gnu' go bu
 再进一步，我们还可以构建出 linux 的使用 cgo 的静态链接的二进制可执行文件：
 
 ```sh
-CC='zig cc -target x86_64-linux-musl' CXX='zig cc -target x86_64-linux-musl' CGO_CFLAGS='-D_LARGEFILE64_SOURCE' go build -ldflags='-linkmode=external -extldflags -static'
+CC='zig cc -target x86_64-linux-musl' \
+CXX='zig cc -target x86_64-linux-musl' \
+CGO_CFLAGS='-D_LARGEFILE64_SOURCE' \
+go build -ldflags='-linkmode=external -extldflags -static'
 ```
 
 `CGO_CFLAGS` 是为了防止编译失败，`ldflags` 是为了指定静态链接！

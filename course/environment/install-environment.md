@@ -77,7 +77,8 @@ choco install zig
 ```powershell [System]
 [Environment]::SetEnvironmentVariable(
    "Path",
-   [Environment]::GetEnvironmentVariable("Path", "Machine") + ";C:\your-path\zig-windows-x86_64-your-version",
+   [Environment]::GetEnvironmentVariable("Path", "Machine")
+   + ";C:\your-path\zig-windows-x86_64-your-version",
    "Machine"
 )
 ```
@@ -85,7 +86,8 @@ choco install zig
 ```powershell [User]
 [Environment]::SetEnvironmentVariable(
    "Path",
-   [Environment]::GetEnvironmentVariable("Path", "User") + ";C:\your-path\zig-windows-x86_64-your-version",
+   [Environment]::GetEnvironmentVariable("Path", "User")
+   + ";C:\your-path\zig-windows-x86_64-your-version",
    "User"
 )
 ```
