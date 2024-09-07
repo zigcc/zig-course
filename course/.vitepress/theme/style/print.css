@@ -4,4 +4,7 @@
   .VPDocFooter {
     display: none !important;
   }
+  .version_tag {
+    display: none !important;
+  }
 }

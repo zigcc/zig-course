@@ -24,6 +24,7 @@ export default defineComponent({
         ? h(
             "div",
             {
+              class: "version_tag",
               style: {
                 color: fontColor.value,
                 borderRadius: "15px",

@@ -7,7 +7,15 @@ import sidebar from "./sidebar";
 let links: string[] = [];
 
 function ExtractLinks(item: DefaultTheme.SidebarItem) {
-  if (item.link) links.push(item.link);
+  if (item.link) {
+    if (item.link === "/") {
+      // 此处额外打了一个补丁，因为首页的链接是 /index
+      links.push("/index");
+    } else {
+      links.push(item.link);
+    }
+  }
+
   if (item.items)
     for (const key in item.items) {
       ExtractLinks(item.items[key]);
@@ -35,6 +43,7 @@ export default defineUserConfig({
   },
   routePatterns: [
     "/**",
+    "!/",
     "!/404.html",
     "!/epilogue",
     "!/about",
@@ -43,6 +52,7 @@ export default defineUserConfig({
     "!/appendix/**",
   ],
   sorter: (pageA, pageB) => {
+    // console.log("比较", pageA, pageB);
     const aIndex = links.findIndex((route) => route === pageA.path);
     const bIndex = links.findIndex((route) => route === pageB.path);
     return aIndex - bIndex;
