@@ -1,0 +1,10 @@
+@media print {
+  .VPNav,
+  .VPLocalNav,
+  .VPDocFooter {
+    display: none !important;
+  }
+  .version_tag {
+    display: none !important;
+  }
+}

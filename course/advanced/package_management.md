@@ -65,7 +65,11 @@ zig 支持在一个 `build.zig` 中对外暴露出多个模块，也就是说一
 可以使用 `build` 函数传入的参数 `b: *std.Build`，它包含一个方法 [`addModule`](https://ziglang.org/documentation/master/std/#std.Build.addModule)， 它的原型如下：
 
 ```zig
-pub fn addModule(b: *Build, name: []const u8, options: Module.CreateOptions) *Module
+pub fn addModule(
+  b: *Build,
+  name: []const u8,
+  options: Module.CreateOptions
+) *Module
 ```
 
 使用起来也很简单，例如：

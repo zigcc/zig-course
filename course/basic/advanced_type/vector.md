@@ -61,7 +61,12 @@ Zig 支持任何已知的最大 2^32-1 向量长度。请注意，过长的向�
 ## `@shuffle`
 
 ```zig
-@shuffle(comptime E: type, a: @Vector(a_len, E), b: @Vector(b_len, E), comptime mask: @Vector(mask_len, i32)) @Vector(mask_len, E)
+@shuffle(
+    comptime E: type,
+    a: @Vector(a_len, E),
+    b: @Vector(b_len, E),
+    comptime mask: @Vector(mask_len, i32)
+) @Vector(mask_len, E)
 ```
 
 根据掩码`mask`（一个向量 Vector），返回向量 a 或者向量 b 的值，组成一个新的向量，mask 的长度决定返回的向量的长度，并且逐个根据 mask 中的值，来从 a 或 b选出值，正数是从 a 选出指定索引的值（从 0 开始，变大），负数是从 b 选出指定索引的值（从 -1 开始，变小）。
@@ -80,7 +85,12 @@ Zig 支持任何已知的最大 2^32-1 向量长度。请注意，过长的向�
 ## `@select`
 
 ```zig
-@select(comptime T: type, pred: @Vector(len, bool), a: @Vector(len, T), b: @Vector(len, T)) @Vector(len, T)
+@select(
+    comptime T: type,
+    pred: @Vector(len, bool),
+    a: @Vector(len, T),
+    b: @Vector(len, T)
+) @Vector(len, T)
 ```
 
 根据 pred（一个元素全为布尔类型的向量）从 a 或 b 中按元素选择值。如果 `pred[i]` 为 `true`，则结果中的相应元素将为 `a[i]`，否则为 `b[i]`。

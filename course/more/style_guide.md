@@ -68,7 +68,10 @@ fn functionName(param_name: TypeName) void {
 const functionAlias = functionName;
 
 // 可被调用，且返回类型，使用 TitleCase 命名法
-fn ListTemplateFunction(comptime ChildType: type, comptime fixed_size: usize) type {
+fn ListTemplateFunction(
+    comptime ChildType: type,
+    comptime fixed_size: usize,
+) type {
     return List(ChildType, fixed_size);
 }
 

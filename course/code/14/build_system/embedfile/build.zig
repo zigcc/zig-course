@@ -15,7 +15,10 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    exe.root_module.addAnonymousImport("hello", .{ .root_source_file = b.path("src/hello.txt") });
+    exe.root_module.addAnonymousImport(
+        "hello",
+        .{ .root_source_file = b.path("src/hello.txt") },
+    );
 
     // 添加到顶级 install step 中作为依赖
     b.installArtifact(exe);

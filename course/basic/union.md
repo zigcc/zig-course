@@ -27,7 +27,11 @@ outline: deep
 如果要初始化一个在编译期已知的字段名的联合类型，可以使用 [`@unionInit`](https://ziglang.org/documentation/master/#unionInit)：
 
 ```zig
-@unionInit(comptime Union: type, comptime active_field_name: []const u8, init_expr) Union
+@unionInit(
+    comptime Union: type,
+    comptime active_field_name: []const u8,
+    init_expr
+) Union
 ```
 
 <<<@/code/release/union.zig#union_init

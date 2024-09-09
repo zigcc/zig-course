@@ -143,7 +143,8 @@ const tag_union_enum = struct {
         try expect(e == E.two);
 
         const three = E.three;
-        const u_2: U = three; // 将枚举转换为联合类型，注意这里 three 并没有对应的类型，故可以直接转换
+        // 将枚举转换为联合类型，注意这里 three 并没有对应的类型，故可以直接转换
+        const u_2: U = three;
         try expect(u_2 == E.three);
 
         const u_3: U = .three; // 字面量供 zig 编译器来自动推导

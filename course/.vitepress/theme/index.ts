@@ -3,6 +3,7 @@ import DefaultTheme from "vitepress/theme";
 
 import giscus from "./giscus";
 import version from "./version";
+import "./style/print.css";
 
 import { h } from "vue";
 

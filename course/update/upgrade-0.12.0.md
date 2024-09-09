@@ -551,7 +551,10 @@ var read_buffer: [8000]u8 = undefined;
 ```
 
 ```zig
-pub fn serve(context: *Context, request: *std.http.Server.Request) ServeError!void {
+pub fn serve(
+    context: *Context,
+    request: *std.http.Server.Request,
+) ServeError!void {
     // ...
     return request.respond(content, .{
         .status = status,
@@ -856,33 +859,37 @@ pub const Options = struct {
 
     fmt_max_depth: usize = fmt.default_max_depth,
 
-    cryptoRandomSeed: fn (buffer: []u8) void = @import("crypto/tlcsprng.zig").defaultRandomSeed,
+    cryptoRandomSeed: fn (buffer: []u8) void =
+        @import("crypto/tlcsprng.zig").defaultRandomSeed,
 
     crypto_always_getrandom: bool = false,
 
     crypto_fork_safety: bool = true,
 
-    /// By default Zig disables SIGPIPE by setting a "no-op" handler for it.  Set this option
-    /// to `true` to prevent that.
+    /// By default Zig disables SIGPIPE by setting a "no-op" handler for it.
+    /// Set this option to `true` to prevent that.
     ///
-    /// Note that we use a "no-op" handler instead of SIG_IGN because it will not be inherited by
-    /// any child process.
+    /// Note that we use a "no-op" handler instead of SIG_IGN
+    /// because it will not be inherited by any child process.
     ///
-    /// SIGPIPE is triggered when a process attempts to write to a broken pipe. By default, SIGPIPE
-    /// will terminate the process instead of exiting.  It doesn't trigger the panic handler so in many
-    /// cases it's unclear why the process was terminated.  By capturing SIGPIPE instead, functions that
-    /// write to broken pipes will return the EPIPE error (error.BrokenPipe) and the program can handle
+    /// SIGPIPE is triggered when a process attempts to write to a broken pipe.
+    /// By default, SIGPIPE will terminate the process instead of exiting.
+    /// It doesn't trigger the panic handler
+    /// so in many cases it's unclear why the process was terminated.
+    /// By capturing SIGPIPE instead, functions that write to broken pipes
+    /// will return the EPIPE error (error.BrokenPipe) and the program can handle
     /// it like any other error.
     keep_sigpipe: bool = false,
 
-    /// By default, std.http.Client will support HTTPS connections.  Set this option to `true` to
-    /// disable TLS support.
+    /// By default, std.http.Client will support HTTPS connections.
+    /// Set this option to `true` to disable TLS support.
     ///
-    /// This will likely reduce the size of the binary, but it will also make it impossible to
-    /// make a HTTPS connection.
+    /// This will likely reduce the size of the binary,
+    /// but it will also make it impossible to make a HTTPS connection.
     http_disable_tls: bool = false,
 
-    side_channels_mitigations: crypto.SideChannelsMitigations = crypto.default_side_channels_mitigations,
+    side_channels_mitigations: crypto.SideChannelsMitigations =
+        crypto.default_side_channels_mitigations,
 };
 ```
 

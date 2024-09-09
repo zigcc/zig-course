@@ -4,12 +4,14 @@
     "dev": "vitepress dev course",
     "build": "vitepress build course",
     "preview": "vitepress preview course",
-    "check": "prettier --check ."
+    "check": "prettier --check .",
+    "export-pdf": "press-export-pdf export course"
   },
   "devDependencies": {
-    "@types/node": "^20.16.4",
+    "@types/node": "^20.16.5",
     "prettier": "^3.3.3",
-    "vitepress": "^1.3.4"
+    "vitepress": "^1.3.4",
+    "vitepress-export-pdf": "^1.0.0"
   },
   "dependencies": {
     "@giscus/vue": "^3.0.0"
