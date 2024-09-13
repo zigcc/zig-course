@@ -78,6 +78,10 @@ export default [
             link: "/basic/advanced_type/slice",
           },
           {
+            text: "字符串",
+            link: "/basic/advanced_type/string",
+          },
+          {
             text: "结构体",
             link: "/basic/advanced_type/struct",
           },
@@ -193,10 +197,6 @@ export default [
         text: "原子操作",
         link: "/more/atomic",
       },
-      // {
-      //   text: "WASM",
-      //   link: "/more/wasm",
-      // },
       {
         text: "未定义行为",
         link: "/more/undefined_behavior",
