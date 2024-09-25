@@ -7,4 +7,14 @@
   .version_tag {
     display: none !important;
   }
+  .vp-code-group .tabs {
+    display: none !important;
+  }
+  .vp-code-group div[class*="language-"],
+  .vp-block {
+    display: block !important;
+    margin-top: 0 !important;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+  }
 }
