@@ -8,12 +8,19 @@ pub fn main() !void {
         const RefCount = @This();
 
         fn ref(rc: *RefCount) void {
+            // no synchronization necessary; just updating a counter.
             _ = rc.count.fetchAdd(1, .monotonic);
         }
 
         fn unref(rc: *RefCount) void {
+            // release ensures code before unref() happens-before the
+            // count is decremented as dropFn could be called by then.
             if (rc.count.fetchSub(1, .release) == 1) {
-                rc.count.fence(.acquire);
+                // seeing 1 in the counter means that other unref()s have happened,
+                // but it doesn't mean that uses before each unref() are visible.
+                // The load acquires the release-sequence created by previous unref()s
+                // in order to ensure visibility of uses before dropping.
+                _ = rc.count.load(.acquire);
                 (rc.dropFn)(rc);
             }
         }
