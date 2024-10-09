@@ -157,18 +157,20 @@ Zig 语言不允许在函数内声明函数，也不允许直接创建匿名函�
 
 <<<@/code/release/function.zig#ExitProcess
 
-### `extern`
+### `export`
 
-`extern` 关键字保证函数可以在生成的 object 文件中可见，并且使用 C ABI。
+`export` 关键字保证函数可以在生成的 object 文件中可见，并且使用 C ABI。
 
 <<<@/code/release/function.zig#sub
 
-::: info 🅿️ 提示
+### `extern`
 
-extern 关键字后面带引号的标识符指定具有该函数的库，例如 `c` -> `libc.so`，`callconv` 说明符更改函数的调用约定。
+`extern` 说明符用于声明一个将在链接时解析的函数（也就是该函数并非由 zig 定义，而是由外部库定义，一般遵循 C ABI，但 C ABI 本身有多种规范），链接可以是静态链接，也可以是动态链接。`extern` 关键字后面的引号中的标识符指定了包含该函数的库（例如 `c` -> `libc.so` ）。`callconv` 说明符用于更改函数的调用约定。
 
 <<<@/code/release/function.zig#atan2
 
+::: tip
+`extern` 和 `export` 的区别就是 `extern` 来引用非 Zig 实现的库，而 `export` 是 zig 将函数对外暴露供其他语言使用！
 :::
 
 ### `@setCold`
