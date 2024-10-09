@@ -78,7 +78,7 @@ const Shuffle = struct {
 
         const mask1 = @Vector(5, i32){ 2, 3, 1, 1, 0 };
         const res1: @Vector(5, u8) = @shuffle(u8, a, undefined, mask1);
-        // res的值是 hello
+        // res1 的值是 hello
 
         // Combining two vectors
         const mask2 = @Vector(6, i32){ -1, 0, 4, 1, -2, -3 };
