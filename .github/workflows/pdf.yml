@@ -1,0 +1,39 @@
+name: Generate PDF
+
+permissions:
+  contents: write
+  discussions: write
+
+on:
+  push:
+    tags:
+      - "v*" # 仅在推送标签时触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install Chinese fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fonts-wqy-zenhei
+
+      - name: Install dependencies with Bun
+        run: bun install
+
+      - name: Export PDF with Bun
+        run: bun export-pdf
+
+      - name: Create and Upload Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: PDF/zig_course.pdf
