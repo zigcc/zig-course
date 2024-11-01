@@ -64,7 +64,7 @@ comptime {
 var z: u32 = undefined;
 const x, var y, z = [3]u32{ 1, 2, 3 };
 y += 10;
-// x 是 1，y 是 12，z 是 3
+// x 是 1，y 是 2，z 是 3
 
 const x, const y = @Vector(2, u32){ 1, 2 };
 // 编译期的值也会进行解构，x 是 1，y 是 2
