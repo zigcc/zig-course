@@ -105,8 +105,8 @@ PS:说实话，我认为这个设计并不太好。
 为什么是作用域顶层呢？实际上，zig 将一个源码文件看作是一个容器。
 :::
 
-## 解构赋值（Destructuring Assignment）
+## 解构赋值
 
-解构赋值是 `0.12` 新引入的语法，允许对可索引的聚合结构（如元组、向量和数组）进行解构。
+解构赋值（Destructuring Assignment）是于 `0.12` 新引入的语法，允许对可索引的聚合结构（如元组、向量和数组）进行解构。
 
 <<<@/code/release/define_variable.zig#deconstruct
