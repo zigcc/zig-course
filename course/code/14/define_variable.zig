@@ -133,3 +133,16 @@ const Block = struct {
         _ = x;
     }
 };
+
+const Deconstruct = struct {
+    fn main() void {
+        // #region deconstruct
+        var z: u32 = undefined;
+        // var z: u32 = undefined;
+        const x, var y, z = [3]u32{ 1, 2, 3 };
+        y += 10;
+        // x 是 1，y 是 2，z 是 3
+        // #endregion deconstruct
+        _ = x;
+    }
+};
