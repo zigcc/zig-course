@@ -107,11 +107,6 @@ PS:说实话，我认为这个设计并不太好。
 
 ## 解构赋值（Destructuring Assignment）
 
-解构赋值是 0.12 新引入的语法，允许对可索引的聚合结构（如元组、向量和数组）进行解构。
+解构赋值是 `0.12` 新引入的语法，允许对可索引的聚合结构（如元组、向量和数组）进行解构。
 
-```zig
-var z: u32 = undefined;
-const x, var y, z = [3]u32{ 1, 2, 3 };
-y += 10;
-// x 是 1，y 是 2，z 是 3
-```
+<<<@/code/release/define_variable.zig#deconstruct
