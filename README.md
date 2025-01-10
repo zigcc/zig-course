@@ -8,6 +8,8 @@
 
 欢迎各位志同道合的“道友”参与贡献本文档，并一起壮大 zig 中文社区！
 
+本仓库使用的文档工具是 vitepress，建议了解一下 [vitepress 的 markdown 扩展](https://vitepress.dev/zh/guide/markdown)。
+
 贡献方法：
 
 - fork 本文档仓库
