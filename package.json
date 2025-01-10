@@ -8,12 +8,12 @@
     "export-pdf": "press-export-pdf export course"
   },
   "devDependencies": {
-    "@types/node": "^20.17.6",
-    "prettier": "^3.3.3",
+    "@types/node": "^20.17.12",
+    "prettier": "^3.4.2",
     "vitepress": "^1.5.0",
     "vitepress-export-pdf": "^1.0.0"
   },
   "dependencies": {
-    "@giscus/vue": "^3.0.0"
+    "@giscus/vue": "^3.1.1"
   }
 }
