@@ -253,7 +253,7 @@ const Type = struct {
                     .name = "b",
                     .type = u32,
                     .is_comptime = false,
-                    .default_value = null,
+                    .default_value_ptr = null,
                 },
             },
             .decls = &.{},
