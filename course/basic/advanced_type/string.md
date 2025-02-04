@@ -30,7 +30,7 @@ Unicode 码点字面量类型是 `comptime_int`，所有的转义字符均可以
 
 > 对包含非 ASCII 字节的字符串进行索引会返回单个字节，无论是否为有效的 UTF-8。
 
-为了方便处理 UTF-8 和 Unicode ，zig的标准库 `std.unicode` 中实现了相关的函数来处理它们。
+为了方便处理 UTF-8 和 Unicode，zig 的标准库 `std.unicode` 中实现了相关的函数来处理它们。
 
 关于字符串有一个示例：
 

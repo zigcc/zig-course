@@ -14,11 +14,11 @@ outline: deep
 
 Socket（套接字）是计算机网络中用于实现不同计算机或同一台计算机上的不同进程之间的通信的一种技术。它提供了一种标准的 API，程序员可以使用这个 API 来编写网络应用程序。
 
-一个Socket由三个部分组成：**协议**、**本地地址**和**远程地址**，协议决定了Socket的类型和通信方式，例如TCP或UDP，本地地址是Socket绑定的网络接口和端口号，远程地址是Socket连接的目标网络接口和端口号。
+一个 Socket 由三个部分组成：**协议**、**本地地址**和**远程地址**，协议决定了 Socket 的类型和通信方式，例如 TCP 或 UDP，本地地址是 Socket 绑定的网络接口和端口号，远程地址是 Socket 连接的目标网络接口和端口号。
 
 除了常见的 **TCP** 和 **UDP** 外，还有一种叫做 **Unix Socket**，用于在同一台机器上的不同进程间进行通信，并不使用网络协议栈，而是直接在内核中传递数据，比 TCP 和 UDP 更加高效。
 
-### IO多路复用
+### IO 多路复用
 
 **I/O 多路复用**是一种允许一个进程同时监视多个 I/O 通道（例如，_socket_、*文件描述符*等），并知道哪个通道可以进行读写操作的技术。这样，一个进程就可以同时处理多个 I/O 操作，而无需为每个 I/O 操作启动一个新的线程或进程。
 
@@ -48,7 +48,7 @@ I/O 多路复用的常见实现包括 select、poll 和 epoll 等系统调用。
 
 ::: info 🅿️ 提示
 
-严格来说，**poll** 已经算是一门“过时”的技术，在 linux 平台它被 **epoll** 取代，BSD 系统（包括 mac ）则使用 **kqueue**，而 windows 使用 **IOCP（I/O Completion Ports）** 和 **Overlapped I/O**。
+严格来说，**poll** 已经算是一门“过时”的技术，在 linux 平台它被 **epoll** 取代，BSD 系统（包括 mac）则使用 **kqueue**，而 windows 使用 **IOCP（I/O Completion Ports）** 和 **Overlapped I/O**。
 
 WSAPoll For Windows: [WSAPoll function](https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsapoll)
 
@@ -64,7 +64,7 @@ Poll For Linux: [poll(2) — Linux manual page](https://man7.org/linux/man-pages
 
 为了同时兼容 linux 和 windows，我们需要利用一下 zig 的 `builtin` 包来判断构建目标来决定使用的函数（poll 在 windows 上的实现不完全标准）。
 
-完整的代码在 [Github](https://github.com/zigcc/zig-course/tree/main/course/code/release/echo_tcp_server.zig)，测试用的客户端可以使用 _telent_ （windows、linux、mac 均可用）。
+完整的代码在 [Github](https://github.com/zigcc/zig-course/tree/main/course/code/release/echo_tcp_server.zig)，测试用的客户端可以使用 _telent_（windows、linux、mac 均可用）。
 
 _server_ 监听端口的实现：
 

@@ -30,7 +30,7 @@ outline: deep
 
 ## 枚举方法
 
-没错，枚举也可以拥有方法，实际上枚举仅仅是一种命名空间（你可以看作是一类 struct ）。
+没错，枚举也可以拥有方法，实际上枚举仅仅是一种命名空间（你可以看作是一类 struct）。
 
 <<<@/code/release/enum.zig#enum_with_method
 

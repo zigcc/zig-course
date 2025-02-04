@@ -1,1 +1,1 @@
-- 浮点的optimized说明，和关于向量浮点reduce的情况
+- 浮点的 optimized 说明，和关于向量浮点 reduce 的情况

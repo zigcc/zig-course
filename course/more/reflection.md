@@ -10,7 +10,7 @@ outline: deep
 
 ## 观察已有类型
 
-zig 提供了不少函数来获取已有类型的信息,如：`@TypeOf`、`@typeName`、`@typeInfo`、`@hasDecl`、`@hasField`、`@field`、`@fieldParentPtr`、`@call`。
+zig 提供了不少函数来获取已有类型的信息，如：`@TypeOf`、`@typeName`、`@typeInfo`、`@hasDecl`、`@hasField`、`@field`、`@fieldParentPtr`、`@call`。
 
 ### `@TypeOf`
 
@@ -64,7 +64,7 @@ main.T.Y
 
 <<<@/code/release/reflection.zig#typeInfo
 
-需要注意的是，我们必须使用 `inline for` 才能编译通过，这是因为结构体的 **“字段类型”** [`std.builtin.Type.StructField`](https://ziglang.org/documentation/master/std/#std.builtin.Type.StructField)中的一个字段是 `comptime_int`类型，使得StructField没有运行时大小，从而不能在运行时遍历其数组，必须用 `inline for` 在编译期计算。
+需要注意的是，我们必须使用 `inline for` 才能编译通过，这是因为结构体的 **“字段类型”** [`std.builtin.Type.StructField`](https://ziglang.org/documentation/master/std/#std.builtin.Type.StructField)中的一个字段是 `comptime_int`类型，使得 StructField 没有运行时大小，从而不能在运行时遍历其数组，必须用 `inline for` 在编译期计算。
 
 ::: warning
 
@@ -72,11 +72,11 @@ main.T.Y
 
 :::
 
-在以下示例中，使用 `@typeInfo` 获得一个整数类型的长度，并返回和它的长度相同的`u8`数组类型。当位数不为8的整倍数时，产生一个编译错误。
+在以下示例中，使用 `@typeInfo` 获得一个整数类型的长度，并返回和它的长度相同的`u8`数组类型。当位数不为 8 的整倍数时，产生一个编译错误。
 
 <<<@/code/release/reflection.zig#TypeInfo2
 
-在以下示例中，使用 `@typeInfo` 获得一个结构体的信息，并使用 `@Type` 构造一个新的类型。构造的新结构体类型和原结构体的字段名和顺序相同，但结构体的内存布局被改为 extern，且每个字段的对齐被改为1。
+在以下示例中，使用 `@typeInfo` 获得一个结构体的信息，并使用 `@Type` 构造一个新的类型。构造的新结构体类型和原结构体的字段名和顺序相同，但结构体的内存布局被改为 extern，且每个字段的对齐被改为 1。
 
 <<<@/code/release/reflection.zig#TypeInfo3
 

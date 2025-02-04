@@ -36,7 +36,7 @@ Zig 使用 `build.zig` 文件来描述一个项目的构建步骤。
 `Step` 会在下一小节中会重点讲述，这里介绍一下上面这个构建文件的其他部分：
 
 - `b.standardTargetOptions`: 允许构建器读取来自命令行参数的**构建目标三元组**。
-- `b.standardOptimizeOption`： 允许构建器读取来自命令行参数的**构建优化模式**。
+- `b.standardOptimizeOption`：允许构建器读取来自命令行参数的**构建优化模式**。
 - `b.addExecutable`：创建一个 [`Build.Step.Compile`](https://ziglang.org/documentation/master/std/#std.Build.Step.Compile) 并返回对应的指针，其参数为 [`std.Build.ExecutableOptions`](https://ziglang.org/documentation/master/std/#std.Build.ExecutableOptions)。
 - `b.path`：该函数用于指定获取当前项目的源文件路径，请勿手动为 `root_source_file` 赋值！
 
@@ -172,7 +172,7 @@ zig 本身提供了一个实验性的文档生成器，它支持搜索查询，�
 
 每个文件可以使用 `zig test` 命令来执行测试，但实际开发中这样很不方便，zig 的构建系统提供了另外一种方式来处理当项目变得复杂时的测试。
 
-使用构建系统执行单元测试时，构建器和测试器会通过 stdin 和 stdout 进行通信，以便同时运行多个测试，并且可以有效地报告错误（不会将错误混到一起），但这导致了无法 [在单元测试中写入 stdin](https://github.com/ziglang/zig/issues/15091)，这会扰乱测试器的正常工作。另外， zig 将引入一个额外的机制，允许 [预测 `panic`](https://github.com/ziglang/zig/issues/1356)。
+使用构建系统执行单元测试时，构建器和测试器会通过 stdin 和 stdout 进行通信，以便同时运行多个测试，并且可以有效地报告错误（不会将错误混到一起），但这导致了无法 [在单元测试中写入 stdin](https://github.com/ziglang/zig/issues/15091)，这会扰乱测试器的正常工作。另外，zig 将引入一个额外的机制，允许 [预测 `panic`](https://github.com/ziglang/zig/issues/1356)。
 
 <<<@/code/release/build_system/test/build.zig
 
@@ -188,7 +188,7 @@ zig 本身提供了一个实验性的文档生成器，它支持搜索查询，�
 
 最常用的一个 target 设置可能是 `b.standardTargetOptions`，它会允许读取命令行输入来决定构建目标 target，它返回一个 [`ResolvedTarget`](https://ziglang.org/documentation/master/std/#std.Build.ResolvedTarget)。
 
-如果需要手动指定一个 target，可以手动构建一个 `std.Target.Query` 传递给构建（`addExecutable` 和 `addStaticLibrary` 等），如:
+如果需要手动指定一个 target，可以手动构建一个 `std.Target.Query` 传递给构建（`addExecutable` 和 `addStaticLibrary` 等），如：
 
 <<<@/code/release/build_system/build.zig#crossTarget
 
@@ -216,7 +216,7 @@ zig 本身提供了一个实验性的文档生成器，它支持搜索查询，�
 
 ### 执行外部命令
 
-zig 的构建系统还允许我们执行一些额外的命令，录入根据 json 生成某些特定的文件（例如 zig 源代码），构建其他的编程语言（不只是 C / C++），如Golang、Rust、前端项目构建等等！
+zig 的构建系统还允许我们执行一些额外的命令，录入根据 json 生成某些特定的文件（例如 zig 源代码），构建其他的编程语言（不只是 C / C++），如 Golang、Rust、前端项目构建等等！
 
 例如我们可以让 zig 在构建时调用系统的 sh 来输出 hello 并使用 `@embedFile` 传递给包：
 
@@ -230,7 +230,7 @@ zig 的构建系统还允许我们执行一些额外的命令，录入根据 jso
 
 ### 构建纯 C++ 项目
 
-由于 GTK 的 C++ 构建过于复杂（需要手动编译gtkmm），故我们这里选择构建一个 [tinytetris](https://github.com/taylorconor/tinytetris):
+由于 GTK 的 C++ 构建过于复杂（需要手动编译 gtkmm），故我们这里选择构建一个 [tinytetris](https://github.com/taylorconor/tinytetris):
 
 ::: warning
 
@@ -256,7 +256,7 @@ zig 的构建系统还允许我们执行一些额外的命令，录入根据 jso
 
 ::: warning 关于 `libc++` 的问题
 
-zig 的工具链使用的是 `libc++`（LLVM ABI），而GNU的则是 `libstdc++`，两者的标准库实现略有不同，这会导致混用可能出现问题！
+zig 的工具链使用的是 `libc++`（LLVM ABI），而 GNU 的则是 `libstdc++`，两者的标准库实现略有不同，这会导致混用可能出现问题！
 
 正确的做法是，手动编译依赖的源代码（一般是出现问题的），或者使用 `-nostdinc++ -nostdlib++` 指示不使用默认标准库，并链接 GNU 的标准库，具体可以参考该 [issue](https://github.com/ziglang/zig/issues/18300)。
 

@@ -65,11 +65,11 @@ C 语言共享类型通常是通过引入头文件实现，这点在 zig 中可�
 > [!IMPORTANT]
 > 该部分示例代码暂无 CI 测试，可能存在过期情况，请注意！
 
-既然可以引入头文件，那么毫无疑问同样可以引入由第三方写好的二进制lib库。
+既然可以引入头文件，那么毫无疑问同样可以引入由第三方写好的二进制 lib 库。
 
 以微软开发的跨平台开源 c/c++ 包管理器 _vcpkg_ 的库导入为例，具体安装以及设置环境变量的教程不在这里赘叙，只讲怎么 zig 使用已经编译好的 lib。
 
-假如你所处的开发环境系统为 "Windows"、处理器架构为 "x64"、vcpkg 安装目录为 "D:\vcpkg"、并且操作模式为 classic（Classic Mode）、要使用并且已安装的库为c运算库 `gsl`。
+假如你所处的开发环境系统为 "Windows"、处理器架构为 "x64"、vcpkg 安装目录为 "D:\vcpkg"、并且操作模式为 classic（Classic Mode）、要使用并且已安装的库为 c 运算库 `gsl`。
 
 那么在 `build.zig` 文件中，
 
@@ -79,13 +79,13 @@ C 语言共享类型通常是通过引入头文件实现，这点在 zig 中可�
 
 <<<@/code/release/import_vcpkg/src/main.zig#import_gsl
 
-然后使用 `gsl_fft_complex_radix2_forward` 函数计算从1到n的复数数组的离散傅里叶变换
+然后使用 `gsl_fft_complex_radix2_forward` 函数计算从 1 到 n 的复数数组的离散傅里叶变换
 
 <<<@/code/release/import_vcpkg/src/main.zig#use_gsl_fft
 
 ::: info 🅿️ 提示
 
-zig 使用 c++ 库的方式同c一样，需要保证该库 `extern "C"`，并且在需要使用动态库的时候也同样不能少。
+zig 使用 c++ 库的方式同 c 一样，需要保证该库 `extern "C"`，并且在需要使用动态库的时候也同样不能少。
 
 :::
 
@@ -215,7 +215,7 @@ zig 支持外部（`extern`）可变参数函数：
 
 实际上，zig 本身实现了一个 C 的编译器（目前仅限 linux，其他平台仍使用 llvm），当然不仅仅如此，zig 还提供了一个比较 **_magic_** 的东西—— [`glibc-abi-tool`](https://github.com/ziglang/glibc-abi-tool)，这是一个收集每个版本的 glibc 的 `.abilist` 文件的存储库，还包含一个将它们组合成一个数据集的工具。
 
-所以，zig 本身所谓的 “**_ships with libc_**” 并不准确，它的确分发 libc，但它只携带每个版本的符号库，仅依赖这个符号库，zig 就可以实现在没有 libc 的情况下仍然正确地进行动态链接！
+所以，zig 本身所谓的“**_ships with libc_**”并不准确，它的确分发 libc，但它只携带每个版本的符号库，仅依赖这个符号库，zig 就可以实现在没有 libc 的情况下仍然正确地进行动态链接！
 
 ::: info 🅿️ 提示
 
@@ -241,7 +241,7 @@ zig 支持静态链接 musl（针对 linux 的另一个 libc，目标为嵌入�
 CC='zig cc -target x86_64-linux-gnu' CXX='zig cc -target x86_64-linux-gnu' go build
 ```
 
-设置 zig 作为 C 编译器来供 go 使用，只要对 zig 和 go 设置正确的target，就可以在本机实现完善的交叉编译。
+设置 zig 作为 C 编译器来供 go 使用，只要对 zig 和 go 设置正确的 target，就可以在本机实现完善的交叉编译。
 
 再进一步，我们还可以构建出 linux 的使用 cgo 的静态链接的二进制可执行文件：
 

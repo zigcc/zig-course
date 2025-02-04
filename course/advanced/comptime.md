@@ -115,7 +115,7 @@ outline: deep
 
 :::info 🅿️ 提示
 
-注意：当前的自托管编译期设计存在某些缺陷（使用自己的堆栈进行comptime函数调用），当宿主机器并没有提供足够大的堆栈时，将导致堆栈溢出，具体问题可以见这个 [issue](https://github.com/ziglang/zig/issues/13724)。
+注意：当前的自托管编译期设计存在某些缺陷（使用自己的堆栈进行 comptime 函数调用），当宿主机器并没有提供足够大的堆栈时，将导致堆栈溢出，具体问题可以见这个 [issue](https://github.com/ziglang/zig/issues/13724)。
 
 :::
 
