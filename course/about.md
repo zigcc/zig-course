@@ -25,6 +25,6 @@ showVersion: false
 
 ::: info 🅿️ 提示
 
-本文档所使用的构建工具为 [bunjs](https://bun.sh/)，在提交时请勿将其他nodejs的包管理工具的额外配置文件添加到仓库中。
+本文档所使用的构建工具为 [bunjs](https://bun.sh/)，在提交时请勿将其他 nodejs 的包管理工具的额外配置文件添加到仓库中。
 
 :::

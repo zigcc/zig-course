@@ -12,7 +12,7 @@ zig 提供了三种类型转换，第一种是已知完全安全且不存在歧�
 
 出现时机：当需要一种类型时却提供了另一种类型，如果此时这种转换是安全，且不存在歧义，则会由 zig 自动完成。
 
-仅当完全明确如何从一种类型转换为另一种类型并且保证转换安全时才允许自动转换，但有一个例外，那就是 zig 的 [C指针](https://ziglang.org/documentation/master/#C-Pointers)。
+仅当完全明确如何从一种类型转换为另一种类型并且保证转换安全时才允许自动转换，但有一个例外，那就是 zig 的 [C 指针](https://ziglang.org/documentation/master/#C-Pointers)。
 
 大致的规则如下：
 
@@ -50,7 +50,7 @@ docgen_tmp/test_ambiguous_coercion.zig:3:25: error: ambiguous coercion of divisi
 
 1. 参照 `5` 的类型，将 `54.0` 转换为 `comptime_int` 就是 `54`，再相除，得到结果再转换为 `f32`，最终 `f` 为 `10`。
 
-2. 参照 `54.0` 的类型，将 `5` 转换为 `comptime_float` 就是 `5.0`， 再相除，得到结果再转换为 `f32`，最终 `f` 为 `10.8`。
+2. 参照 `54.0` 的类型，将 `5` 转换为 `comptime_float` 就是 `5.0`，再相除，得到结果再转换为 `f32`，最终 `f` 为 `10.8`。
 
 ### 切片、数组、指针
 
@@ -58,7 +58,7 @@ docgen_tmp/test_ambiguous_coercion.zig:3:25: error: ambiguous coercion of divisi
 
 <<<@/code/release/type-cast.zig#pointer_arr_slice_1
 
-2. 允许直接将数组的指针赋值给切片(会被自动转换)，这会使切片长度直接等于数组。
+2. 允许直接将数组的指针赋值给切片 (会被自动转换)，这会使切片长度直接等于数组。
 
 <<<@/code/release/type-cast.zig#pointer_arr_slice_2
 

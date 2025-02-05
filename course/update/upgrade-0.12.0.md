@@ -35,7 +35,7 @@ docgen_tmp/unnecessary_var.zig:3:9: note: consider using 'const'
 
 ::: info
 
-结果位置语义是Zig语言中的一个特性，它影响函数如何返回结果和错误。
+结果位置语义是 Zig 语言中的一个特性，它影响函数如何返回结果和错误。
 
 :::
 
@@ -86,11 +86,11 @@ const x, const y = .{ 42, runtime };
 
 ### 命名空间类型等价性
 
-在Zig中，结构体（`struct`）、枚举（`enum`）、联合体（`union`）和不透明类型（`opaque types`）是特殊的，它们不像元组和数组那样使用结构等价性，而是创建独特的类型。这些类型有命名空间，因此可能包含声明，它们可以统称为"命名空间类型"。
+在 Zig 中，结构体（`struct`）、枚举（`enum`）、联合体（`union`）和不透明类型（`opaque types`）是特殊的，它们不像元组和数组那样使用结构等价性，而是创建独特的类型。这些类型有命名空间，因此可能包含声明，它们可以统称为"命名空间类型"。
 
 在 `0.11.0` 版本中，每次这样的类型声明被语义分析时，都会创建一个新的类型。泛型类型的等价性是通过对编译时函数调用的记忆化（memoization）来处理的；也就是说，`std.ArrayList(u8) == std.ArrayList(u8)` 成立，因为 `ArrayList` 函数只被调用一次，其结果被记忆化。
 
-在0.12.0版本中，这一点发生了变化。现在，命名空间类型基于两个因素进行去重：它们的源位置和它们的捕获。
+在 0.12.0 版本中，这一点发生了变化。现在，命名空间类型基于两个因素进行去重：它们的源位置和它们的捕获。
 
 类型的"捕获"指的是它闭包覆盖的编译时已知类型和值的集合。换句话说，它是在类型内部引用但在类型外部声明的值的集合。例如，`std.ArrayList` 的编译时 `T: type` 参数被它返回的类型捕获。如果两个命名空间类型由同一段代码声明并且有相同的捕获，那么它们现在被认为是完全相同的类型。
 
@@ -173,7 +173,7 @@ docgen_tmp/comptime_var_ptr_runtime_arg.zig:3:14: note: comptime var pointers ar
 
 现在，这个测试也会发出一个编译错误。`load` 的调用发生在运行时，它的 `ptr` 参数没有标记为 `comptime`，所以在 `load` 的主体内，`ptr` 是运行时已知的。这意味着调用 `load` 使得指针 `&x` 在运行时已知，因此产生了编译错误。
 
-这个限制是为了修复一些反直觉的错误。当一个指向comptime var的指针变为运行时已知时，对它的修改变得无效，因为指向的数据变为常量，但类型系统没有反映这一点，导致在看似有效的代码中可能出现运行时段错误。此外，你在运行时从这样的指针读取的值将是它的"最终"编译时值，这是一种不直观的行为。因此，这些指针不能再是运行时已知的。
+这个限制是为了修复一些反直觉的错误。当一个指向 comptime var 的指针变为运行时已知时，对它的修改变得无效，因为指向的数据变为常量，但类型系统没有反映这一点，导致在看似有效的代码中可能出现运行时段错误。此外，你在运行时从这样的指针读取的值将是它的"最终"编译时值，这是一种不直观的行为。因此，这些指针不能再是运行时已知的。
 
 第二个新的限制是一个指向 `comptime var` 的指针永远不允许包含在全局声明的解析值中。例如：
 
@@ -220,7 +220,7 @@ referenced by:
     remaining reference traces hidden; use '-freference-trace' to see all reference traces
 ```
 
-这段代码引发的编译错误与前一个例子相同。这个限制主要是为了帮助在Zig编译器中实现增量编译，这依赖于全局声明的分析是顺序无关的，以及声明之间的依赖关系可以被轻易地建模。
+这段代码引发的编译错误与前一个例子相同。这个限制主要是为了帮助在 Zig 编译器中实现增量编译，这依赖于全局声明的分析是顺序无关的，以及声明之间的依赖关系可以被轻易地建模。
 
 这种情况最常见的表现形式是在现有代码中出现编译错误，如果一个函数在编译时构造一个切片，然后在运行时使用。例如，考虑以下代码：
 
@@ -247,7 +247,7 @@ referenced by:
     remaining reference traces hidden; use '-freference-trace' to see all reference traces
 ```
 
-调用getName返回一个切片，其ptr字段是一个指向comptime var的指针。这意味着这个值不能在运行时使用，也不能出现在全局声明的值中。这段代码可以通过在填充缓冲区后将计算的数据提升为const来修复：
+调用 getName 返回一个切片，其 ptr 字段是一个指向 comptime var 的指针。这意味着这个值不能在运行时使用，也不能出现在全局声明的值中。这段代码可以通过在填充缓冲区后将计算的数据提升为 const 来修复：
 
 ```zig
 fn getName() []const u8 {
@@ -262,7 +262,7 @@ test getName {
 }
 ```
 
-像在Zig的早期版本中一样，编译时已知的consts具有无限的生命周期，这里讨论的限制不适用于它们。因此，这段代码会正常运行。
+像在 Zig 的早期版本中一样，编译时已知的 consts 具有无限的生命周期，这里讨论的限制不适用于它们。因此，这段代码会正常运行。
 
 另一种可能的失败模式是在使用旧语义创建全局可变编译时状态的代码中。例如，以下片段试图创建一个全局的编译时计数器：
 
@@ -286,7 +286,7 @@ referenced by:
     remaining reference traces hidden; use '-freference-trace' to see all reference traces
 ```
 
-这段代码在 Zig `0.12.0` 中会发出一个编译错误。Zig不支持也不会支持这种用例：任何可变的编译时状态必须在本地表示。
+这段代码在 Zig `0.12.0` 中会发出一个编译错误。Zig 不支持也不会支持这种用例：任何可变的编译时状态必须在本地表示。
 
 ### `@fieldParentPtr`
 
@@ -380,7 +380,7 @@ test "@abs on int" {
 
 在 Windows 上，程序的命令行参数是一个单一的 WTF-16 编码字符串，由程序来将其分割成字符串数组。在 C/C++ 中，C 运行时的入口点负责分割命令行并将 argc/argv 传递给 main 函数。
 
-以前，`ArgIteratorWindows` 匹配 `CommandLineToArgvW` 的行为，但事实证明，CommandLineToArgvW 的行为并不匹配 2008 年后的 C 运行时。在 2008 年，C 运行时的 argv 分割[改变了它如何处理引用参数中的连续双引号](https://daviddeley.com/autohotkey/parameters/parameters.htm#WINCRULESDOC)（现在被认为是转义引号，例如 `"foo""bar"` 在2008年后会被解析成 `foo"bar`），并且 `argv[0]` 的规则也被改变了。
+以前，`ArgIteratorWindows` 匹配 `CommandLineToArgvW` 的行为，但事实证明，CommandLineToArgvW 的行为并不匹配 2008 年后的 C 运行时。在 2008 年，C 运行时的 argv 分割[改变了它如何处理引用参数中的连续双引号](https://daviddeley.com/autohotkey/parameters/parameters.htm#WINCRULESDOC)（现在被认为是转义引号，例如 `"foo""bar"` 在 2008 年后会被解析成 `foo"bar`），并且 `argv[0]` 的规则也被改变了。
 
 这个版本使 ArgIteratorWindows 匹配 2008 年后的 C 运行时的行为。这里的动机大致与 Rust 做出同样的改变时相同，即（改述）：
 
@@ -390,7 +390,7 @@ test "@abs on int" {
 
 此外，对 [BatBadBut](https://flatt.tech/research/posts/batbadbut-you-cant-securely-execute-commands-on-windows/) 的建议的缓解措施依赖于 2008 年后的 argv 分割行为，以便对给 cmd.exe 的参数进行往返处理。
 
-[BadBatBut 的缓解措施](https://github.com/ziglang/zig/pull/19698)没有在0.12.0版本的发布截止日期之前完成。
+[BadBatBut 的缓解措施](https://github.com/ziglang/zig/pull/19698)没有在 0.12.0 版本的发布截止日期之前完成。
 
 ### 不在允许覆盖 POSIX API
 
@@ -431,7 +431,7 @@ Zig 0.12.0 用基于 Ryu 的算法替换了先前的 errol 浮点数格式化算
 
 差异：
 
-- 指数不再用前导 0 填充到 2 位，如果是正数，不再打印符号:
+- 指数不再用前导 0 填充到 2 位，如果是正数，不再打印符号：
 
 ```sh
 errol: 2.0e+00
@@ -474,20 +474,20 @@ ryu:   2e0
 | ryu_exp: 1.981e-40
 ```
 
-性能：约提高2.3倍
+性能：约提高 2.3 倍
 
-代码大小：大约增加5KB（2倍）
+代码大小：大约增加 5KB（2 倍）
 
 以上源代码：[Github](https://github.com/ziglang/zig/pull/19229)
 
-### 重构HTTP
+### 重构 HTTP
 
 首先，一些非常直接的更改：
 
 - 不发出 Server HTTP 头。如果用户希望添加，让他们自己添加。这不是严格必要的，可以说是一个有害的默认设置。
 - 修正 `finish` 的错误集，不再包含 NotWriteable 和 MessageTooLong
   在 Server 中防止零长度的块
-- 在 FetchOptions 中添加缺失的重定向行为选项，并将其改为枚举，而不是2个字段
+- 在 FetchOptions 中添加缺失的重定向行为选项，并将其改为枚举，而不是 2 个字段
 - `error.CompressionNotSupported` 被重命名为 `error.CompressionUnsupported`，与同一集合中所有其他错误的命名约定相匹配。
 - 删除了与字段和类型名称重复的文档注释。
 - 暂时禁用服务器中的 zstd 解压缩；参见 [#18937](https://github.com/ziglang/zig/issues/18937)。
@@ -503,7 +503,7 @@ ryu:   2e0
 
 http_proxy 和 https_proxy 字段现在是指针，因为它们通常未被填充。
 
-将 `loadDefaultProxies` 改为 `initDefaultProxies` ，以表明它实际上并未从磁盘或网络加载任何东西。现在的函数是有泄漏的；API用户必须传递一个已经实例化的竞技场分配器。消除了反初始化代理的需要。
+将 `loadDefaultProxies` 改为 `initDefaultProxies` ，以表明它实际上并未从磁盘或网络加载任何东西。现在的函数是有泄漏的；API 用户必须传递一个已经实例化的竞技场分配器。消除了反初始化代理的需要。
 
 以前，代理存储了任意的头部集合。现在它们只存储授权值。
 
@@ -575,9 +575,9 @@ pub fn serve(
 
 ### deflate 的重实现
 
-> deflat e是一种无损数据压缩算法和相关的文件格式。它通常用于 gzip 和 zip 文件格式中，也是 HTTP 协议中的一种常见的内容编码方式。
+> deflat e 是一种无损数据压缩算法和相关的文件格式。它通常用于 gzip 和 zip 文件格式中，也是 HTTP 协议中的一种常见的内容编码方式。
 >
-> inflate 是一种数据解压缩算法，它是 deflate 压缩算法的反向操作。在网络传输或数据存储中，通常先使用 deflate 算法将数据压缩，然后在需要使用数据时，再使用inflate算法将数据解压缩回原始形式。
+> inflate 是一种数据解压缩算法，它是 deflate 压缩算法的反向操作。在网络传输或数据存储中，通常先使用 deflate 算法将数据压缩，然后在需要使用数据时，再使用 inflate 算法将数据解压缩回原始形式。
 
 在 `0.11.0` 中，deflate 实现是从 Go 标准库移植过来的，它有一些不受欢迎的特性，如不恰当地使用了全局变量，在 Zig 的代码库中关于 Go 的优化器的评论，以及需要动态内存分配。
 
@@ -587,7 +587,7 @@ pub fn serve(
 
 新的代码对所有结构使用静态分配，不需要分配器。这对于 deflate 很有意义，因为所有的结构、内部缓冲区获得了大小刚好的内存。对于 inflate 来说，相较过去的实现通过不预分配到理论最大尺寸数组（申请的数组通常不会被完全使用）来减少内存使用。
 
-对于 deflate ，新的实现分配了 395K，而之前的实现使用了 779K。对于 inflate，新的实现分配了 74.5K，而旧的实现大约 36K。
+对于 deflate，新的实现分配了 395K，而之前的实现使用了 779K。对于 inflate，新的实现分配了 74.5K，而旧的实现大约 36K。
 
 inflate 的差异是因为我们在这里使用 64K 的历史记录，而之前是 32K。
 
@@ -727,7 +727,7 @@ pub fn oldGzip(allocator: std.mem.Allocator) !void {
 - 整合 `std.c` 定义
 - 为所有整数添加类型安全性
 
-例如，以前这样在tty上设置即时模式：
+例如，以前这样在 tty 上设置即时模式：
 
 ```zig
 const in = std.io.getStdIn();
@@ -803,7 +803,7 @@ pub const tc_lflag_t = switch (native_arch) {
 };
 ```
 
-许多其他的 `std.posix` API也以类似的方式进行了调整。
+许多其他的 `std.posix` API 也以类似的方式进行了调整。
 
 ### `std.builtin` 枚举字段小写化
 
@@ -913,7 +913,7 @@ pub const Options = struct {
 
 ### 指针保护锁（Pointer Stability Locks）
 
-> "Pointer Stability Locks" 是一种用于保护数据结构中的指针不被非法修改的机制。在Zig中，你可以使用 `std.debug.SafetyLock` 来锁定指针，防止它们在不应该被修改的时候被修改。如果尝试在锁定后修改这些指针，程序会抛出一个panic，而不是触发未定义的行为。这可以帮助开发者更容易地发现和修复可能的错误。
+> "Pointer Stability Locks" 是一种用于保护数据结构中的指针不被非法修改的机制。在 Zig 中，你可以使用 `std.debug.SafetyLock` 来锁定指针，防止它们在不应该被修改的时候被修改。如果尝试在锁定后修改这些指针，程序会抛出一个 panic，而不是触发未定义的行为。这可以帮助开发者更容易地发现和修复可能的错误。
 
 添加了 `std.debug.SafetyLock` ，标准库的哈希表中新添加的 `lockPointers()` 和 `unlockPointers()` 用到了它。
 
@@ -1016,7 +1016,7 @@ fn calculate(m: anytype) i32 {
 
 ### 系统包模式
 
-通过引入系统集成选项，使zig构建系统对系统包维护者更加友好。
+通过引入系统集成选项，使 zig 构建系统对系统包维护者更加友好。
 
 让我们使用 [groovebasin](https://github.com/andrewrk/groovebasin/tree/old-client) 作为示例项目来检查这个特性：
 

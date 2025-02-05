@@ -90,7 +90,7 @@ outline: deep
 ) ?T
 ```
 
-弱原子的比较与交换操作，如果目标指针是给定值，那么赋值为参数的新值，并返回null，否则仅读取值返回。
+弱原子的比较与交换操作，如果目标指针是给定值，那么赋值为参数的新值，并返回 null，否则仅读取值返回。
 
 ### [`@cmpxchgStrong`](https://ziglang.org/documentation/master/#cmpxchgStrong)
 
@@ -107,7 +107,7 @@ outline: deep
 ) ?T
 ```
 
-强原子的比较与交换操作，如果目标指针是给定值，那么赋值为参数的新值，并返回null，否则仅读取值返回。
+强原子的比较与交换操作，如果目标指针是给定值，那么赋值为参数的新值，并返回 null，否则仅读取值返回。
 
 ### [`@fence`](https://ziglang.org/documentation/master/#fence)
 

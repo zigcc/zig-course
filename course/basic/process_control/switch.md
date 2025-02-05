@@ -4,7 +4,7 @@ outline: deep
 
 # Switch
 
-switch 语句可以进行匹配，并且switch匹配不能出现遗漏匹配的情况。
+switch 语句可以进行匹配，并且 switch 匹配不能出现遗漏匹配的情况。
 
 ## 基本使用
 
