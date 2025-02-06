@@ -10,7 +10,15 @@ outline: deep
 
 **取地址**：通过 `&` 符号来获取某个变量所对应的内存地址，如 `&integer` 就是获取变量 `integer` 的内存地址。
 
-zig 的指针和 C 的指针略有不同，包含两种指针，一种单项（single-item）指针，一种是多项（many-item）指针，它们的解引用的方式也略有不同。
+与 C 不同，Zig 中的指针类型有多种，主要是对指向的元素做了区分，便于更好地使用。下图展示了它们指向元素的不同：
+
+![pointer representation](/picture/basic/pointer-representation.svg)
+
+:::info 🅿️ 提示
+
+上图中包含了切片（slice）类型，严格来说它不是指针，但其是由指针构成的（一般称为胖指针），而且在代码中用的更为普遍，因此列在一起便于读者比较。
+
+:::
 
 :::warning 关于指针运算
 
