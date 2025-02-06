@@ -12,11 +12,11 @@ outline: deep
 
 与 C 不同，Zig 中的指针类型有多种，主要是对指向的元素做了区分，便于更好地使用。下图展示了它们指向元素的不同：
 
-![pointer representation](/picture/basic/zig-pointer.svg){data-zoomable}
+![pointer representation](/picture/basic/pointer-representation.svg)
 
 :::info 🅿️ 提示
 
-上图中包含了切片（slice）类型，严格来说它不是指针，但其是由指针构成的，而且在代码中用的更为普遍，因此列在一起便于读者比较。
+上图中包含了切片（slice）类型，严格来说它不是指针，但其是由指针构成的（一般称为胖指针），而且在代码中用的更为普遍，因此列在一起便于读者比较。
 
 :::
 
