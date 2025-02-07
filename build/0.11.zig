@@ -33,17 +33,17 @@ pub fn build(b: *Build) void {
     while (iterate.next()) |val| {
         if (val) |entry| {
             // get the entry name, entry can be file or directory
-            const name = entry.name;
+            const output_name = std.mem.trimRight(u8, entry.name, ".zig");
             if (entry.kind == .file) {
                 // connect path
-                const path = std.fs.path.join(b.allocator, &[_][]const u8{ relative_path, name }) catch |err| {
+                const path = std.fs.path.join(b.allocator, &[_][]const u8{ relative_path, entry.name }) catch |err| {
                     log.err("fmt path for examples failed, err is {}", .{err});
                     std.os.exit(1);
                 };
 
                 // build exe
                 const exe = b.addExecutable(.{
-                    .name = name,
+                    .name = output_name,
                     .root_source_file = .{ .path = path },
                     .target = target,
                     .optimize = optimize,
@@ -68,7 +68,7 @@ pub fn build(b: *Build) void {
                 var child = ChildProcess.init(&args, b.allocator);
 
                 // build cwd
-                const cwd = std.fs.path.join(b.allocator, &[_][]const u8{ full_path, name }) catch |err| {
+                const cwd = std.fs.path.join(b.allocator, &[_][]const u8{ full_path, entry.name }) catch |err| {
                     log.err("fmt path for examples failed, err is {}", .{err});
                     std.os.exit(1);
                 };
