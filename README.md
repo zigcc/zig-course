@@ -19,12 +19,17 @@
 - 合并到上游仓库，并由 github action 自动构建
 
 ```sh
+bun i // 安装依赖
 bun dev // 启动热更开发服务
-bun format // 运行 prettier 格式化程序
+bun format // 运行 prettier, zig fmt 和 autocorrect 格式化程序
 bun run build // 构建产物
 bun run preview // 运行预览
 ```
 
-注意：本文档所使用的构建工具为 [bunjs](https://bun.sh/)，在提交时请勿将其他 nodejs 的包管理工具的额外配置文件添加到仓库中。
+> [!NOTE]
+> 请自行安装 `bun` （建议也安装 `autocorrect`，并且在提交前运行 `bun format`）
+
+> [!NOTE]
+> 本文档所使用的构建工具为 [bunjs](https://bun.sh/)，在提交时请勿将其他 nodejs 的包管理工具的额外配置文件添加到仓库中。
 
 > 如需要更新依赖，请参照此处 [Lockfile](https://bun.sh/docs/install/lockfile) 先设置 git 使用 bun 来 diff 文件！
