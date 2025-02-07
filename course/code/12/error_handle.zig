@@ -173,6 +173,8 @@ const NotHandleError = struct {
         } else |_| {
             // 你也可以在这里做点额外的事情
         }
+        // 或者你也可以这样：
+        parseU64(str, 10) catch {};
     }
     // #endregion NotHandleError
 };

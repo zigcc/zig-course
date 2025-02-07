@@ -32,9 +32,15 @@ outline: deep
 
 在以上的示例中，我们使用了 [for](/basic/process_control/loop) 循环，来进行矩阵的打印，关于循环我们放在后面再聊。
 
-## 哨兵数组
+## 哨兵数组（标记终止数组）
 
 > 很抱歉，这里的名字是根据官方的文档直接翻译过来的，原文档应该是 ([Sentinel-Terminated Arrays](https://ziglang.org/documentation/master/#toc-Sentinel-Terminated-Arrays)) 。
+
+:::info
+
+本质上来说，这是为了兼容 C 中的规定的字符串结尾字符`\0`
+
+:::
 
 我们使用语法 `[N:x]T` 来描述一个元素为类型 `T`，长度为 `N` 的数组，在它对应 `N` 的索引处的值应该是 `x`。前面的说法可能比较复杂，换种说法，就是这个语法表示数组的长度索引处的元素应该是 `x`，具体可以看下面的示例：
 
@@ -47,6 +53,12 @@ outline: deep
 :::
 
 ## 操作
+
+:::info
+
+以下操作都是编译期 (comptime) 的，如果你需要运行时地处理数组操作，请使用 `std.mem`。
+
+:::
 
 ### 乘法
 

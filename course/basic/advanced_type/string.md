@@ -53,6 +53,13 @@ Unicode 码点字面量类型是 `comptime_int`，所有的转义字符均可以
 
 如果要使用多行字符串，可以使用 `\\`，多行字符串没有转义，最后一行行尾的换行符号不会包含在字符串中。示例如下：
 
+:::info
+
+从 `0.14.0` 开始，字符串中不能出现`<Tab>`（在 Zig 中任何`<Tab>`都是不被允许的），但是可以用`\t`或者`@embedFile`实现平行功能。
+参考：[enum-backed address spaces](https://github.com/ziglang/zig-spec/issues/38)
+
+:::
+
 <<<@/code/release/string.zig#multiline_string
 
 ### 常见错误
