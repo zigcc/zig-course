@@ -16,6 +16,18 @@ outline: deep
 
 ![vscode-zig](/picture/basic/vscode-zig.png){data-zoomable}
 
+## Zed
+
+官网地址：[`https://zed.dev/`](https://zed.dev/)
+
+> ZED 是新一代的代码编辑器，使用 AI 增强人的开发速度。
+
+这是近年来比较热门的编辑器，使用 rust 编写，并支持插件系统，颜值还很不错，同时其提出了一种 zed AI 的体系，用于接入各种 AI 模型，提供高效的使用体验。
+
+Zig 扩展安装方式：在主界面按下 `Ctrl + Shift + p`，在呼出的命令栏中输入 extension，选择 `zed: extensions`，进入后搜索 zig，点击右侧的 `Install` 即可！
+
+![zed-zig](/picture/basic/zed-zig.png){data-zoomable}
+
 ## Vim / Neovim
 
 Vim：[https://github.com/vim/vim](https://github.com/vim/vim)
@@ -42,10 +54,8 @@ vim.g.zig_fmt_autosave = false
 
 如果使用`coc.nvim`作为 _language server_，则推荐使用 [**coc-zls**](https://github.com/xiyaowong/coc-zls)，会自动下载最新的 zls 并配置好，如果使用 **neovim** 的内置 LSP 功能，则推荐使用 [**mason.nvim**](https://github.com/williamboman/mason.nvim) 和 [**mason-lspconfig.nvim**](https://github.com/williamboman/mason-lspconfig.nvim)。
 
-::: tip 🅿️ 提示
+::: details 🅿️ 提示
 mason 所安装的 zls 为稳定版本，如果需要 `nightly` 版本，有两种方案可以选择，安装 Zig.nvim 插件，或者手动编译。
-
-- Zig.nvim 插件的仓库地址为：[jinzhongjia/Zig.nvim](https://github.com/jinzhongjia/Zig.nvim)
 
 - 手动编译安装的方法如下：
 
