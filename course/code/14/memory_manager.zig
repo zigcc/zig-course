@@ -4,9 +4,6 @@ pub fn main() !void {
     try FixedBufferAllocator.main();
     try ThreadSafeFixedBufferAllocator.main();
     try ArenaAllocator.main();
-    if (builtin.os.tag == .windows) {
-        try HeapAllocator.main();
-    }
     try c_allocaotr.main();
     try page_allocator.main();
     try StackFallbackAllocator.main();
@@ -117,28 +114,6 @@ const ArenaAllocator = struct {
         _ = try arena_allocator.alloc(u8, 100);
     }
     // #endregion ArenaAllocator
-};
-
-const HeapAllocator = struct {
-    // #region HeapAllocator
-    const std = @import("std");
-
-    pub fn main() !void {
-        // 获取分配器模型
-        var heap = std.heap.HeapAllocator.init();
-        // 善后工作，但有一点需要注意
-        // 这个善后工作只有在你手动指定 heapallocaotr 的 heap_handle 字段时，才有效
-        defer heap.deinit();
-
-        // 获取分配器
-        const allocator = heap.allocator();
-
-        // 分配内存
-        const num = try allocator.alloc(u8, 1);
-        // free 内存
-        defer allocator.free(num);
-    }
-    // #endregion HeapAllocator
 };
 
 const c_allocaotr = struct {
