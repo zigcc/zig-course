@@ -36,9 +36,9 @@ Neovim：[https://github.com/neovim/neovim](https://github.com/neovim/neovim)
 
 古老的编辑器之一，被誉为“编辑器之神”！
 
-推荐安装插件 [zig.vim](https://github.com/ziglang/zig.vim)，由官方维护。
+推荐安装插件 [zig.vim](https://github.com/ziglang/zig.vim)，由官方维护，提供了基本的语法解析
 
-::: details 小细节
+::: details zig.vim 配置小细节
 
 推荐关闭 vim / neovim 的保存自动格式化功能（默认开启）：
 
@@ -52,25 +52,9 @@ vim.g.zig_fmt_autosave = false
 
 :::
 
-如果使用`coc.nvim`作为 _language server_，则推荐使用 [**coc-zls**](https://github.com/xiyaowong/coc-zls)，会自动下载最新的 zls 并配置好，如果使用 **neovim** 的内置 LSP 功能，则推荐使用 [**mason.nvim**](https://github.com/williamboman/mason.nvim) 和 [**mason-lspconfig.nvim**](https://github.com/williamboman/mason-lspconfig.nvim)。
+Neovim 使用内置的 lsp（大多数用户选择）支持的话，推荐使用插件 [zig-lamp](https://github.com/jinzhongjia/zig-lamp)，该插件支持自动安装和配置 zls，并且支持可视化管理 `build.zig.zon` 文件！
 
-::: details 🅿️ 提示
-mason 所安装的 zls 为稳定版本，如果需要 `nightly` 版本，有两种方案可以选择，安装 Zig.nvim 插件，或者手动编译。
-
-- 手动编译安装的方法如下：
-
-```sh
-# 单独创建一个 source 目录
-mkdir source
-cd source
-git clone https://github.com/zigtools/zls.git
-cd zls
-zig build -Doptimize=ReleaseSafe
-# 此处将编译后的 zls 直接覆盖 mason 的 zls
-cp zig-out/bin/zls  ~/.local/share/nvim/mason/packages/zls/bin/zls
-```
-
-:::
+Neovim 使用 `coc.nvim` 作为 _language server_，则推荐使用 [**coc-zls**](https://github.com/xiyaowong/coc-zls)，会自动下载最新的 zls 并配置好。
 
 ![nvim-zig](/picture/basic/nvim-zig.png)
 
