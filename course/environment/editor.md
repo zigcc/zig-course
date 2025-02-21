@@ -54,7 +54,7 @@ vim.g.zig_fmt_autosave = false
 
 Neovim 使用内置的 lsp（大多数用户选择）支持的话，推荐使用插件 [zig-lamp](https://github.com/jinzhongjia/zig-lamp)，该插件支持自动安装和配置 zls，并且支持可视化管理 `build.zig.zon` 文件！
 
-Neovim 使用 `coc.nvim` 作为 _language server_，则推荐使用 [**coc-zls**](https://github.com/xiyaowong/coc-zls)，会自动下载最新的 zls 并配置好。
+Neovim 使用 `coc.nvim` 作为 _language server_，则推荐使用 [**coc-zig**](https://github.com/UltiRequiem/coc-zig)，会自动下载最新的 zls 并配置好。
 
 ![nvim-zig](/picture/basic/nvim-zig.png)
 
