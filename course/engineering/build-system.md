@@ -180,6 +180,24 @@ zig 本身提供了一个实验性的文档生成器，它支持搜索查询，�
 
 ## 高级功能
 
+### 引用依赖中的 `build.zig`
+
+该特性自 `0.11` 引入，允许包引用依赖的 `build.zig` 中提供的一些函数，示例如下：
+
+`pkg1` 的源代码部分：
+
+::: code-group
+<<<@/code/release/import_dependency_build/pkg1/build.zig
+<<<@/code/release/import_dependency_build/pkg1/build.zig.zon{zig}
+:::
+
+`pkg2` 的源代码部分：
+
+::: code-group
+<<<@/code/release/import_dependency_build/pkg2/build.zig
+<<<@/code/release/import_dependency_build/pkg2/build.zig.zon{zig}
+:::
+
 ### 交叉编译
 
 得益于 LLVM 的存在，zig 支持交叉编译到任何 LLVM 的目标代码，zig 可以很方便的处理交叉编译，只需要指定好恰当的 target 即可。
