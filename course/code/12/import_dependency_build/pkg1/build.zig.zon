@@ -1,0 +1,14 @@
+.{
+    .name = "pkg1",
+    .version = "0.0.0",
+    .dependencies = .{
+        .pkg2 = .{
+            // path 为本地包的路径
+            .path = "../pkg2",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+    },
+}
