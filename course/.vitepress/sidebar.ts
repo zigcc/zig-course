@@ -187,7 +187,7 @@ export default [
     items: [
       {
         text: "包管理",
-        link: "/advanced/package_management",
+        link: "/engineering/package_management",
       },
       {
         text: "构建系统",

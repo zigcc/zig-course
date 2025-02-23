@@ -55,7 +55,7 @@ outline: deep
 
 平常使用过程中会面临另外的一个情况，就是匿名结构体要如何实现自引用呢？
 
-答案是使用 [`@This`](https://ziglang.org/documentation/master/#This)，这是 zig 专门为匿名结构体和文件类的类型声明（此处可以看 [命名空间](../../more/miscellaneous.md#容器)）提供的处理方案。
+答案是使用 [`@This`](https://ziglang.org/documentation/master/#This)，这是 zig 专门为匿名结构体和文件类的类型声明（此处可以看 [命名空间](../../basic/define-variable.md#容器)）提供的处理方案。
 
 此函数会返回一个当前包裹它的容器的类型！
 
