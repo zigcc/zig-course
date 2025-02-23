@@ -100,6 +100,10 @@ export default [
         link: "/basic/union",
       },
       {
+        text: "零位类型",
+        link: "/basic/zero-type",
+      },
+      {
         text: "流程控制",
         collapsed: true,
         items: [
@@ -147,31 +151,44 @@ export default [
         text: "内存管理",
         link: "/advanced/memory_manage",
       },
-      {
-        text: "异步",
-        link: "/advanced/async",
-      },
+
       {
         text: "编译期",
         link: "/advanced/comptime",
       },
       {
-        text: "包管理",
-        link: "/advanced/package_management",
+        text: "反射",
+        link: "/advanced/reflection",
+      },
+      {
+        text: "异步",
+        link: "/advanced/async",
       },
       {
         text: "汇编",
         link: "/advanced/assembly",
       },
       {
+        text: "原子操作",
+        link: "/advanced/atomic",
+      },
+      {
         text: "与 C 交互",
         link: "/advanced/interact-with-c",
+      },
+      {
+        text: "未定义行为",
+        link: "/advanced/undefined_behavior",
       },
     ],
   },
   {
     text: "工程化",
     items: [
+      {
+        text: "包管理",
+        link: "/advanced/package_management",
+      },
       {
         text: "构建系统",
         link: "/engineering/build-system",
@@ -180,34 +197,9 @@ export default [
         text: "单元测试",
         link: "/engineering/unit-test",
       },
-    ],
-  },
-  {
-    text: "更多",
-    items: [
-      {
-        text: "反射",
-        link: "/more/reflection",
-      },
-      {
-        text: "零位类型",
-        link: "/more/zero-type",
-      },
-      {
-        text: "原子操作",
-        link: "/more/atomic",
-      },
-      {
-        text: "未定义行为",
-        link: "/more/undefined_behavior",
-      },
       {
         text: "风格指南",
-        link: "/more/style_guide",
-      },
-      {
-        text: "杂项",
-        link: "/more/miscellaneous",
+        link: "/engineering/style_guide",
       },
     ],
   },

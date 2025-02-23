@@ -63,6 +63,12 @@ zig 使用 `const` 作为关键字来声明常量，它无法再被更改，只�
 在 `Debug` 模式下，Zig 将 `0xaa` 字节写入未定义的内存。这是为了尽早发现错误，并帮助检测调试器中未定义内存的使用。但是，此行为只是一种实现功能，而不是语言语义，因此不能保证代码可以观察到它。
 :::
 
+## 解构赋值
+
+解构赋值（Destructuring Assignment）是于 `0.12` 新引入的语法，允许对可索引的聚合结构（如元组、向量和数组）进行解构。
+
+<<<@/code/release/define_variable.zig#deconstruct
+
 ## 块
 
 块（block）用于限制变量声明的范围，例如以下代码是非法的：
@@ -80,6 +86,17 @@ x += 1;
 <<<@/code/release/define_variable.zig#block
 
 上方的 `blk` 是标签名字，它可以是你设置的任何名字。
+
+## 容器
+
+在 Zig 中，**容器** 是充当保存变量和函数声明的命名空间的任何语法结构。容器也是可以实例化的类型定义。结构体、枚举、联合、不透明，甚至 Zig 源文件本身都是容器，但容器并不能包含语句（语句是描述程序运行操作的一个单位）。
+
+当然，你也可以这样理解，容器是一个只包含变量或常量定义以及函数定义的命名空间。
+
+注意：容器和块（block）不同！
+
+> [!IMPORTANT]
+> 初次阅读此处困惑是正常的，后面的概念学习完成后此处自通。
 
 ## 注释
 
@@ -105,8 +122,34 @@ PS:说实话，我认为这个设计并不太好。
 为什么是作用域顶层呢？实际上，zig 将一个源码文件看作是一个容器。
 :::
 
-## 解构赋值
+## `usingnamespace`
 
-解构赋值（Destructuring Assignment）是于 `0.12` 新引入的语法，允许对可索引的聚合结构（如元组、向量和数组）进行解构。
+关键字 `usingnamespace` 可以将一个容器中的所有 `pub` 声明混入到当前的容器中。
 
-<<<@/code/release/define_variable.zig#deconstruct
+例如，可以使用将 `usingnamespace` 将 std 标准库混入到 `main.zig` 这个容器中：
+
+```zig
+const T = struct {
+    usingnamespace @import("std");
+};
+pub fn main() !void {
+    T.debug.print("Hello, World!\n", .{});
+}
+```
+
+注意：无法在结构体 `T` 内部直接使用混入的声明，需要使用 `T.debug` 这种方式才可以！
+
+`usingnamespace` 还可以使用 `pub` 关键字进行修饰，用于转发声明，这常用于组织 API 文件和 C import。
+
+```zig
+pub usingnamespace @cImport({
+    @cInclude("epoxy/gl.h");
+    @cInclude("GLFW/glfw3.h");
+    @cDefine("STBI_ONLY_PNG", "");
+    @cDefine("STBI_NO_STDIO", "");
+    @cInclude("stb_image.h");
+});
+```
+
+> [!IMPORTANT]
+> 初次阅读此处困惑是正常的，后面的概念学习完成后此处自通。
