@@ -153,3 +153,9 @@ pub usingnamespace @cImport({
 
 > [!IMPORTANT]
 > 初次阅读此处困惑是正常的，后面的概念学习完成后此处自通。
+
+## `threadlocal`
+
+变量可以使用 `threadlocal` 修饰，来使得该变量在不同线程中是不同的示例：
+
+<<<@/code/release/define_variable.zig#threadlocal
