@@ -112,16 +112,6 @@ outline: deep
 
 强原子的比较与交换操作，如果目标指针是给定值，那么赋值为参数的新值，并返回 null，否则仅读取值返回。
 
-### [`@fence`](https://ziglang.org/documentation/master/#fence)
-
-函数原型：
-
-```zig
-@fence(order: AtomicOrder) void
-```
-
-用于创建一个内存屏障，防止某些类型的内存重新排序，具体细节可以查看内存屏障的相关信息。
-
 ## `std.atomic` 包
 
 ### 原子数据结构
