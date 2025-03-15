@@ -861,3 +861,561 @@ pub const SourceLocation = struct {
 
 - mem：在 `byteSwapAllFields` 中处理 `Float` 和 `Bool` 情况
 - fmt：从二进制中移除占位符
+
+### DebugAllocator
+
+`GeneralPurposeAllocator` 依赖于编译时已知的页面大小，因此必须重写。
+
+现在它被重写以减少活动映射，以获得更好的性能，并重命名为 `DebugAllocator`。
+
+性能数据展示，这是在重写前后使用调试版 Zig 编译器运行 ast-check 的结果：
+
+**Benchmark 1 (3 runs)**: `master/bin/zig ast-check ../lib/compiler_rt/udivmodti4_test.zig`
+
+| Measurement      | Mean ± σ        | Min … Max       | Outliers | Delta |
+| ---------------- | --------------- | --------------- | -------- | ----- |
+| Wall Time        | 22.8s ± 184ms   | 22.6s … 22.9s   | 0 (0%)   | 0%    |
+| Peak RSS         | 58.6MB ± 77.5KB | 58.5MB … 58.6MB | 0 (0%)   | 0%    |
+| CPU Cycles       | 38.1G ± 84.7M   | 38.0G … 38.2G   | 0 (0%)   | 0%    |
+| Instructions     | 27.7G ± 16.6K   | 27.7G … 27.7G   | 0 (0%)   | 0%    |
+| Cache References | 1.08G ± 4.40M   | 1.07G … 1.08G   | 0 (0%)   | 0%    |
+| Cache Misses     | 7.54M ± 1.39M   | 6.51M … 9.12M   | 0 (0%)   | 0%    |
+| Branch Misses    | 165M ± 454K     | 165M … 166M     | 0 (0%)   | 0%    |
+
+**Benchmark 2 (3 runs)**: `branch/bin/zig ast-check ../lib/compiler_rt/udivmodti4_test.zig`
+
+| Measurement      | Mean ± σ       | Min … Max       | Outliers | Delta             |
+| ---------------- | -------------- | --------------- | -------- | ----------------- |
+| Wall Time        | 20.5s ± 95.8ms | 20.4s … 20.6s   | 0 (0%)   | ⚡- 10.1% ± 1.5%  |
+| Peak RSS         | 54.9MB ± 303KB | 54.6MB … 55.1MB | 0 (0%)   | ⚡- 6.2% ± 0.9%   |
+| CPU Cycles       | 34.8G ± 85.2M  | 34.7G … 34.9G   | 0 (0%)   | ⚡- 8.6% ± 0.5%   |
+| Instructions     | 25.2G ± 2.21M  | 25.2G … 25.2G   | 0 (0%)   | ⚡- 8.8% ± 0.0%   |
+| Cache References | 1.02G ± 195M   | 902M … 1.24G    | 0 (0%)   | - 5.8% ± 29.0%    |
+| Cache Misses     | 4.57M ± 934K   | 3.93M … 5.64M   | 0 (0%)   | ⚡- 39.4% ± 35.6% |
+| Branch Misses    | 142M ± 183K    | 142M … 142M     | 0 (0%)   | ⚡- 14.1% ± 0.5%  |
+
+### SmpAllocator
+
+一个为 `ReleaseFast` 优化模式设计的分配器，启用了多线程。
+
+这个分配器是一个单例；它使用全局状态，并且整个进程中只应实例化一个。
+
+这是一个“sweet spot”——实现大约 200 行代码，但性能与 glibc 相媲美。例如，以下是使用 `glibc malloc` 与 `SmpAllocator` 构建 Zig 自身的比较：
+
+**Benchmark 1 (3 runs)**: `glibc/bin/zig build -Dno-lib -p trash`
+
+| Measurement        | Mean ± σ         | Min … Max         | Outliers | Delta |
+|--------------------|------------------|-------------------|----------|-------|
+| Wall Time          | 12.2s ± 99.4ms   | 12.1s … 12.3s     | 0 (0%)   | 0%    |
+| Peak RSS           | 975MB ± 21.7MB   | 951MB … 993MB     | 0 (0%)   | 0%    |
+| CPU Cycles         | 88.7G ± 68.3M    | 88.7G … 88.8G     | 0 (0%)   | 0%    |
+| Instructions       | 188G ± 1.40M     | 188G … 188G       | 0 (0%)   | 0%    |
+| Cache References   | 5.88G ± 33.2M    | 5.84G … 5.90G     | 0 (0%)   | 0%    |
+| Cache Misses       | 383M ± 2.26M     | 381M … 385M       | 0 (0%)   | 0%    |
+| Branch Misses      | 368M ± 1.77M     | 366M … 369M       | 0 (0%)   | 0%    |
+
+**Benchmark 2 (3 runs)**: `SmpAllocator/fast/bin/zig build -Dno-lib -p trash`
+
+| Measurement        | Mean ± σ         | Min … Max         | Outliers | Delta                |
+|--------------------|------------------|-------------------|----------|----------------------|
+| Wall Time          | 12.2s ± 49.0ms   | 12.2s … 12.3s     | 0 (0%)   | + 0.0% ± 1.5%        |
+| Peak RSS           | 953MB ± 3.47MB   | 950MB … 957MB     | 0 (0%)   | - 2.2% ± 3.6%        |
+| CPU Cycles         | 88.4G ± 165M     | 88.2G … 88.6G     | 0 (0%)   | - 0.4% ± 0.3%        |
+| Instructions       | 181G ± 6.31M     | 181G … 181G       | 0 (0%)   | ⚡- 3.9% ± 0.0%       |
+| Cache References   | 5.48G ± 17.5M    | 5.46G … 5.50G     | 0 (0%)   | ⚡- 6.9% ± 1.0%       |
+| Cache Misses       | 386M ± 1.85M     | 384M … 388M       | 0 (0%)   | + 0.6% ± 1.2%        |
+| Branch Misses      | 377M ± 899K      | 377M … 378M       | 0 (0%)   | 💩+ 2.6% ± 0.9%      |
+
+设计思路：
+
+每个线程都有一个单独的空闲列表，但是，当线程退出时，数据必须是可恢复的。我们不会直接知道线程何时退出，因此有时一个线程必须尝试回收另一个线程的资源。
+
+超过一定大小的分配直接进行内存映射，不存储分配元数据。这是可行的，因为这个分配器实现拒绝 resize（将从小的 buffer 移动到大的 buffer或反过来的行为）。
+
+每个分配器操作从线程局部变量检查线程标识符，以确定访问全局状态中的哪个元数据，并尝试获取其锁。这通常会在没有争用的情况下成功，除非另一个线程被分配了相同的 ID。在这种争用的情况下，线程会移动到下一个线程元数据槽，并重复尝试获取锁的过程。
+
+通过将线程局部元数据数组限制为与 CPU 数量相同，确保随着线程的创建和销毁，它们循环通过整个空闲列表集。
+
+要使用这个新的 `allocator`，在你的主函数中放置类似以下内容的代码：
+
+```zig
+var debug_allocator: std.heap.DebugAllocator(.{}) = .init;
+
+pub fn main() !void {
+    const gpa, const is_debug = gpa: {
+        if (native_os == .wasi) break :gpa .{ std.heap.wasm_allocator, false };
+        break :gpa switch (builtin.mode) {
+            .Debug, .ReleaseSafe => .{ debug_allocator.allocator(), true },
+            .ReleaseFast, .ReleaseSmall => .{ std.heap.smp_allocator, false },
+        };
+    };
+    defer if (is_debug) {
+        _ = debug_allocator.deinit();
+    };
+}
+```
+
+更多的信息可以看开发日志 [No-Libc Zig Now Outperforms Glibc Zig](https://ziglang.org/devlog/2025/#2025-02-07)。
+
+### Allocator API 变动 (remap) 
+
+此版本在 `std.mem.Allocator.VTable` 中引入了一个新函数 `remap`。
+
+以下为文档注释中的关键部分：
+
+> 尝试扩展或缩小内存，允许重新定位。
+>
+> 非空返回值表示调整大小成功。
+>
+> 分配可能具有相同的地址，或者可能已重新定位。
+>
+> 在任何一种情况下，分配现在的大小都是 new_len。
+>
+> 空返回值表示调整大小相当于分配新内存，从旧内存复制字节，然后释放旧内存。
+>
+> 在这种情况下，调用者执行复制操作更为高效。
+
+函数原型：
+
+`remap: *const fn (*anyopaque, memory: []u8, alignment: Alignment, new_len: usize, return_address: usize) ?[*]u8,`
+
+所有 `Allocator.VTable` 函数现在接受 `std.mem.Alignment` 类型而不是 `u8`。具体数值相同，但现在有类型安全和附加到类型的便捷方法。
+
+`resize` 和 `remap` 各有其用途。例如，`resize` 对于 `std.heap.ArenaAllocator` 是必要的，因为它不能重新定位其分配。同时，当容量增加时，`remap` 适用于 `std.ArrayList`。
+
+关于 `remap` 需要注意，除非可以在不执行分配器内部 `memcpy` 的情况下实现 `remap`，否则 `Allocator` 实现 `remap` 通常应与 `resize` 行为相同。
+
+例如，此版本在支持的情况下引入了对调用 `mremap` 的支持，在这种情况下，操作系统重新映射页面，避免了用户空间中昂贵的 `memcpy`。Zig 程序员现在可以期望在使用 `std.heap.page_allocator` 以及将其用作例如 `std.heap.ArenaAllocator` 或 `std.heap.GeneralPurposeAllocator` 的后备分配器时发生这种情况。
+
+另外：
+
+- `std.heap.page_allocator` 现在支持大于页面大小的对齐，这在重写 `DebugAllocator` 时是需要的。
+- 删除 `std.heap.WasmPageAllocator`，改用 `std.heap.WasmAllocator`。
+- 删除 `std.heap.LoggingAllocator`，它不属于 `std`。
+- 删除 `std.heap.HeapAllocator` - 这是仅限 Windows 的，并且依赖于 `kernel32`。
+
+### Zon 解析和序列化
+
+`std.zon.parse` 提供了在运行时将 **ZON** 解析为 **Zig** 结构体的功能：
+
+- `std.zon.parse.fromSlice`
+- `std.zon.parse.fromZoir`
+- `std.zon.parse.fromZoirNode`
+- `std.zon.parse.free`
+
+典型用例将使用 `std.zon.parse.fromSlice`，如果类型需要分配，则需要使用 `std.zon.parse.free`。
+
+对于具有与 Zig 结构体不完全对应的模式的 ZON 值，可以使用 `std.zig.ZonGen` 生成一个可以根据需要解释的树结构（`std.Zoir`）。
+
+有关在编译时导入 ZON，请参见 `Import ZON`。
+
+`std.zon.stringify` 提供了在运行时序列化 ZON 的功能：
+
+- `std.zon.stringify.serialize`
+- `std.zon.stringify.serializeMaxDepth`
+- `std.zon.stringify.serializeArbitraryDepth`
+- `std.zon.stringify.serializer`
+
+示例将使用 `serialize` 和其他函数。
+
+`std.zon.stringify.serializer` 返回一个更细粒度的接口。它可以用于逐块序列化值，例如对值的不同部分应用不同的配置，或者以与内存中布局不同的形式序列化值。
+
+### 运行时页面大小
+
+编译时已知的 `std.mem.page_size` 被移除，因为页面大小实际上是在运行时已知的（对此表示抱歉），并用 `std.heap.page_size_min` 和 `std.heap.page_size_max` 替代，以用于可能页面大小的编译时已知边界。在指针对齐属性中使用页面大小的地方，例如在 `mmap` 中，已迁移到 `std.heap.page_size_min`。
+
+在必须使用页面大小的地方，`std.heap.pageSize()` 提供解决方案。如果可能，它将返回一个编译时已知的值，否则将在运行时查询操作系统，并记忆化结果（原子地）。它还具有 `std.options` 集成，因此应用程序维护者可以覆盖此行为。
+
+值得注意的是，这修复了对运行在苹果新硬件上的 **Linux** 的支持，例如 Asahi Linux。
+
+### Panic 接口
+
+具体改动可以参考该 PR [#22594](https://github.com/ziglang/zig/pull/22594)。
+
+### 传输层安全（std.crypto.tls）
+
+具体信息可以见 PR [#21872](https://github.com/ziglang/zig/pull/21872)。
+
+### `process.Child.collectOutput` API 变动
+
+升级指南：
+
+```zig
+var stdout = std.ArrayList(u8).init(allocator);
+defer stdout.deinit();
+var stderr = std.ArrayList(u8).init(allocator);
+defer stderr.deinit();
+
+try child.collectOutput(&stdout, &stderr, max_output_bytes);
+```
+
+⬇️
+
+```zig
+var stdout: std.ArrayListUnmanaged(u8) = .empty;
+defer stdout.deinit(allocator);
+var stderr: std.ArrayListUnmanaged(u8) = .empty;
+defer stderr.deinit(allocator);
+
+try child.collectOutput(allocator, &stdout, &stderr, max_output_bytes);
+```
+
+在此之前，`collectOutput` 包含一个检查，以确保 `stdout.allocator` 与 `stderr.allocator` 相同，这是由于其内部实现的必要性。然而，比较 `Allocator` 接口的 `ptr` 字段可能会导致非法行为，因为在分配器的实现没有任何关联状态的情况下（如 `page_allocator`、`c_allocator` 等），`Allocator.ptr` 被设置为未定义。
+
+通过此更改，`collectOutput` 中的不安全的 `Allocator.ptr` 比较已被清除（这是 Zig 代码库中唯一出现的此类比较）。此外，`Allocator` 和 `Random` 接口的 `ptr` 字段的文档已更新，标注了对这些字段的任何比较都可能导致非法行为。未来，这种比较将被检测为非法行为。
+
+### LLVM 构建器 API
+
+Zig 是为数不多的直接生成 LLVM 位代码的编译器之一，而不是依赖于具有不稳定 API 且非常庞大的 libLLVM。这是我们努力完全消除 Zig 中 LLVM 依赖的一部分（[#16270](https://github.com/ziglang/zig/issues/16270)）。Roc 项目最近[决定](https://gist.github.com/rtfeldman/77fb430ee57b42f5f2ca973a3992532f)用 Zig 重写他们的编译器，部分原因是能够重用 Zig 的 LLVM 位代码构建器。为了使这一过程更加容易，我们决定将构建器 API 移动到 `std.zig.llvm` 以供第三方项目使用。请注意，与 `std.zig` 命名空间中的内容一样，这是 Zig 编译器的实现细节，不一定遵循与标准库其他部分相同的 API 稳定性和弃用规范。
+
+### 拥抱 “Unmanaged” 风格的容器
+
+`std.ArrayHashMap` 现在已被弃用，并别名到了 `std.ArrayHashMapWithAllocator`。
+
+要迁移代码，请切换到 `ArrayHashMapUnmanaged`，这将需要更新函数调用以向需要分配器的方法传递一个分配器。在 Zig `0.14.0` 发布后，`std.ArrayHashMapWithAllocator` 将被移除，`std.ArrayHashMapUnmanaged` 将成为 `ArrayHashMap` 的弃用别名。在 Zig `0.15.0` 发布后，弃用的别名 `ArrayHashMapUnmanaged` 将被移除。
+
+这一举措来自于资深 Zig 用户的一致意见，他们已经趋向于使用 “Unmanaged” 容器。它们作为更好的构建块，避免了冗余存储相同的数据，并且分配器参数的存在 / 不存在与保留容量 / 保留插入模式很好地契合。
+
+其他 “Unmanaged” 容器的派生也被弃用，例如 `std.ArrayList`。
+
+```zig
+var list = std.ArrayList(i32).init(gpa);
+defer list.deinit();
+try list.append(1234);
+try list.ensureUnusedCapacity(1);
+list.appendAssumeCapacity(5678);
+```
+
+⬇️
+
+```zig
+const ArrayList = std.ArrayListUnmanaged;
+var list: std.ArrayList(i32) = .empty;
+defer list.deinit(gpa);
+try list.append(gpa, 1234);
+try list.ensureUnusedCapacity(gpa, 1);
+list.appendAssumeCapacity(5678);
+```
+
+### 弃用列表
+
+以下弃用的别名现在会导致编译错误：
+
+- `std.fs.MAX_PATH_BYTES`（重命名为 `std.fs.max_path_bytes`）
+- `std.mem.tokenize`（拆分为 `tokenizeAny`、`tokenizeSequence`、`tokenizeScalar`）
+- `std.mem.split`（拆分为 `splitSequence`、`splitAny`、`splitScalar`）
+- `std.mem.splitBackwards`（拆分为 `splitBackwardsSequence`、`splitBackwardsAny`、`splitBackwardsScalar`）
+- `std.unicode`
+- `utf16leToUtf8Alloc`、`utf16leToUtf8AllocZ`、`utf16leToUtf8`、`fmtUtf16le`（全部重命名为首字母大写的 `Le`）
+- `utf8ToUtf16LeWithNull`（重命名为 `utf8ToUtf16LeAllocZ`）
+- `std.zig.CrossTarget`（移动到 `std.Target.Query`）
+- `std.fs.Dir: Rename OpenDirOptions to OpenOptions`
+- `std.crypto.tls.max_cipertext_inner_record_len` 重命名为 `std.crypto.tls.max_ciphertext_inner_record_len`
+
+被删除的顶级 `std` 命名空间：
+
+- `std.rand`（重命名为 `std.Random`）
+- `std.TailQueue`（重命名为 `std.DoublyLinkedList`）
+- `std.ChildProcess`（重命名/移动到 `std.process.Child`）
+
+更多弃用：
+
+- `std.posix.iovec`: 使用 `.base` 和 `.len` 代替 `.iov_base` 和 `.iov_len`
+- `LockViolation` 被添加到 `std.posix.ReadError`。如果 `std.os.windows.ReadFile` 遇到 `ERROR_LOCK_VIOLATION`，将发生此错误。
+- 在所有容器类型中，`popOrNull` 重命名为 `pop`
+
+### `std.c` 重组
+
+现在它由以下主要部分组成：
+
+1. 所有操作系统共享的声明。
+2. 具有相同名称但根据操作系统具有不同类型签名的声明。然而，多个操作系统通常共享相同的类型签名。
+3. 特定于单个操作系统的声明。
+   - 这些声明每行导入一个，以便可以看到它们的来源，并在操作系统特定文件内通过 `comptime` 块保护，以防止访问错误的声明。
+4. 底部有一个名为 `private` 的命名空间，它是一个声明包，用于上面的逻辑选择和使用。
+
+通过将不存在的符号的约定从 `@compileError` 更改为使类型为 `void` 和函数为 `{}` 来解决 [#19352](https://github.com/ziglang/zig/issues/19352) 问题，从而可以更新 `@hasDecl` 以使用 `@TypeOf(f) != void` 或 `T != void`。令人高兴的是，这最终删除了一些重复的逻辑并更新了一些过时的功能检测检查。
+
+一些类型已被修改以获得命名空间、类型安全并符合字段命名约定。这是 break change。
+
+通过此更改，标准库中最后一个 `usingnamespace` 的使用被消除。
+
+### 二分查找
+
+具体见此 PR [#20927](https://github.com/ziglang/zig/pull/20927)。
+
+### `std.hash_map` 增加 `rehash` 方法
+
+无序哈希表目前有一个严重缺陷：[删除操作会导致 `HashMaps` 变慢](https://github.com/ziglang/zig/issues/17851)。
+
+未来，哈希表将进行调整以消除这一缺陷，届时该方法将被直接删除。
+
+请注意，array hash maps 没有这个缺陷。
+
+## 构建系统
+
+未分类的更改：
+
+- 报告缺少 `addConfigHeader` 值的错误
+- 修复 `WriteFile` 和 `addCSourceFiles` 未添加 `LazyPath` 依赖项的问题
+- [破坏性更改] `Compile.installHeader` 现在接受 `LazyPath`。
+- [破坏性更改] `Compile.installConfigHeader` 的第二个参数已被移除，现在使用 `include_path` 的值作为其子路径，以与 `Module.addConfigHeader` 保持一致。如果想将子路径设置为不同的值，请使用 `artifact.installHeader(config_h.getOutput(), "foo.h")`。
+- [破坏性更改] `Compile.installHeadersDirectory/installHeadersDirectoryOptions` 已合并为 `Compile.installHeadersDirectory`，它接受 `LazyPath` 并允许排除/包含过滤器，就像 `InstallDir` 一样。
+- [破坏性更改] `b.addInstallHeaderFile` 现在接受 `LazyPath`。
+- [破坏性更改] [#9698](https://github.com/ziglang/zig/issues/9698) 的解决方法，即使用户为 `h_dir` 指定了覆盖，生成的 `-femit-h` 头文件现在也不会被发出。如果您绝对需要发出的头文件，现在需要执行 `install_artifact.emitted_h = artifact.getEmittedH()` 直到 `-femit-h` 被修复。
+- 添加了 `WriteFile.addCopyDirectory`，其功能与 `InstallDir` 非常相似。
+- `InstallArtifact` 已更新，以便将捆绑的头文件与工件一起安装。捆绑的头文件安装到 `h_dir` 指定的目录（默认为 `zig-out/include`）。
+- `std.Build`: 检测带有 "lib" 前缀的 `pkg-config` 名称
+- `fetch`: 添加对 SHA-256 Git 仓库的支持
+- `fetch`: 添加对 Mach-O 文件头的可执行文件检测
+- 允许在 `comptime` 之外添加 `ConfigHeader` 值
+
+### 文件系统监控
+
+- `--watch` 持续监控源文件修改并重新构建
+- `--debounce <ms>` 检测到文件更改后重新构建前的延迟
+
+使用构建系统对所有文件系统输入的完美控制，在完成后保持构建运行器活跃，监控最少数量的目录，以便仅重新运行图中脏的步骤。
+
+默认的去抖动时间是 50ms，但它可配置。这有助于防止在源文件快速连续更改时浪费重建，例如在使用 vim 保存时，它不会进行原子重命名，而是实际上删除目标文件然后再次写入，导致短暂的无效状态，如果没有去抖动会导致构建失败（随后会成功构建，但无论如何体验到临时构建失败是令人恼火的）。
+
+此功能的目的是减少开发周期中编辑和调试之间的延迟。在大型项目中，即使是缓存命中，缓存系统也必须调用 `fstat` 来处理大量文件。文件系统监控允许更高效地检测过时的管道步骤。
+
+主要动机是增量编译即将到来，以便我们可以保持编译器运行并尽快响应源代码更改。在这种情况下，保持其余构建管道的最新状态也是基本要求。
+
+### 新的包哈希格式
+
+旧的哈希格式如下所示：`1220115ff095a3c970cc90fce115294ba67d6fbc4927472dc856abc51e2a1a9364d7`
+
+新的哈希格式如下所示：`mime-3.0.0-zwmL-6wgAADuFwn7gr-_DAQDGJdIim94aDIPa6qO-6GT`
+
+除了 200 位的 SHA-256，新哈希还包含以下附加数据：
+
+- 名称
+- 版本
+- 指纹的 ID 组件
+- 磁盘上的总解压大小
+
+这在编译错误或文件路径中显示包哈希时提供了更好的用户体验，并提供了实现依赖树管理工具所需的数据。例如，仅通过了解整个依赖树的包哈希，现在可以知道在完成所有获取后磁盘上所需的总文件大小，以及执行版本选择，而无需进行任何获取。
+
+文件大小还可以作为默认情况下是否获取懒加载包的启发式方法。
+
+这些好处需要一些新的规则来管理 `build.zig.zon` 文件：
+
+- 名称和版本限制为 32 字节。
+- 名称必须是有效的裸 Zig 标识符。将来，这一限制可能会被取消；目前选择了保守的规则。
+
+指纹是一个重要的概念：
+
+- 与名称一起，这代表了一个全局唯一的包标识符。该字段在包首次创建时由工具链自动初始化，然后永远不会更改。尽管生态系统是去中心化的，但这允许 Zig 明确检测一个包是否是另一个包的更新版本。
+- 当分叉一个 Zig 项目时，如果上游项目仍在维护，则应重新生成此指纹。否则，分叉是敌对的，试图控制原始项目的身份。可以通过删除该字段并运行 `zig build` 来重新生成指纹。
+- 这个 64 位整数是 32 位 ID 组件和 32 位校验和的组合。
+
+指纹中的 ID 组件有以下限制：
+
+- `0x00000000` 保留用于旧包。
+- `0xffffffff` 保留用于表示“裸”包。
+
+校验和是从名称计算的，用于保护 Zig 用户免受意外的 ID 冲突。
+
+版本选择和利用指纹的相关工具尚未实现。
+
+尽管仍支持旧的哈希格式，但此更改会破坏任何不遵循上述新包命名规则的包。还有一个已知的错误：不必要地获取旧包。
+
+### `WriteFile` Step
+
+如果您使用 `WriteFile` 来更新源文件，该功能已被提取到一个单独的步骤，称为 `UpdateSourceFiles`。其他一切都保持不变，因此迁移如下所示：
+
+```diff
+-    const copy_zig_h = b.addWriteFiles();
++    const copy_zig_h = b.addUpdateSourceFiles();
+```
+
+### `RemoveDir` Step
+
+`RemoveDir` Step 现在接受 `LazyPath` 而不是 `[]const u8`。迁移如下所示：
+
+```diff
+-        const cleanup = b.addRemoveDirTree(tmp_path);
++        const cleanup = b.addRemoveDirTree(.{ .cwd_relative = tmp_path });
+```
+
+但是，请考虑不要在配置时选择临时路径，同时运行构建管道有点脆弱。
+
+### `Fmt` Step
+
+这个 Step 用于打印格式检查失败的文件名。
+
+### 从现有模块创建工件
+
+Zig `0.14.0` 修改了创建 `Compile` Step 的构建系统 API，允许从现有的 `std.Build.Module` 对象创建它们。这使得模块图的定义更加清晰，并且这些图的组件可以更容易地重用；例如，作为另一个模块依赖项存在的模块可以轻松创建相应的测试步骤。可以通过修改对 `addExecutable`、`addTest` 等的调用来使用新的 API。不要直接将 `root_source_file`、`target` 和 `optimize` 等选项传递给这些函数，而是应该传递使用这些参数创建的 `*std.Build.Module` 的 `root_module` 字段。Zig `0.14.0` 仍然允许这些函数的旧的、已弃用的用法，但下一版本将移除它们。
+
+旧 API 的用户可以通过将 `addExecutable`（等）调用的模块特定部分移动到 `createModule` 调用中，以最小的努力进行升级。例如，以下是一个简单构建脚本的更新版本：
+
+```zig
+pub fn build(b: *std.Build) void {
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+
+    const exe = b.addExecutable(.{
+        .name = "hello",
+        .root_source_file = b.path("src/main.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    b.installArtifact(exe);
+}
+const std = @import("std");
+```
+
+⬇️
+
+```zig
+pub fn build(b: *std.Build) void {
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+
+    const exe = b.addExecutable(.{
+        .name = "hello",
+        .root_module = b.createModule(.{ // this line was added
+            .root_source_file = b.path("src/main.zig"),
+            .target = target,
+            .optimize = optimize,
+        }), // this line was added
+    });
+    b.installArtifact(exe);
+}
+const std = @import("std");
+```
+
+而且，为了展示新 API 的优势，这里有一个示例构建脚本，它优雅地构建了一个包含多个模块的复杂构建图：
+
+```zig
+pub fn build(b: *std.Build) void {
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+
+    // First, we create our 3 modules.
+
+    const foo = b.createModule(.{
+        .root_source_file = b.path("src/foo.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    const bar = b.createModule(.{
+        .root_source_file = b.path("src/bar.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    const qux = b.createModule(.{
+        .root_source_file = b.path("src/qux.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    // Next, we set up all of their dependencies.
+
+    foo.addImport("bar", bar);
+    foo.addImport("qux", qux);
+    bar.addImport("qux", qux);
+    qux.addImport("bar", bar); // mutual recursion!
+
+    // Finally, we will create all of our `Compile` steps.
+    // `foo` will be the root of an executable, but all 3 modules also have unit tests we want to run.
+
+    const foo_exe = b.addExecutable(.{
+        .name = "foo",
+        .root_module = foo,
+    });
+
+    b.installArtifact(foo_exe);
+
+    const foo_test = b.addTest(.{
+        .name = "foo",
+        .root_module = foo,
+    });
+    const bar_test = b.addTest(.{
+        .name = "bar",
+        .root_module = bar,
+    });
+    const qux_test = b.addTest(.{
+        .name = "qux",
+        .root_module = qux,
+    });
+
+    const test_step = b.step("test", "Run all unit tests");
+    test_step.dependOn(&b.addRunArtifact(foo_test).step);
+    test_step.dependOn(&b.addRunArtifact(bar_test).step);
+    test_step.dependOn(&b.addRunArtifact(qux_test).step);
+}
+const std = @import("std");
+```
+
+### 允许包通过名称暴露任意 LazyPaths
+
+在之前的 Zig 版本中，包可以暴露 artifact、`module` 和命名的 WriteFile Step。这些可以分别通过 `installArtifact`、`addModule` 和 `addNamedWriteFiles` 暴露，并可以通过 `std.Build.Dependency` 上的方法访问它们。
+
+除了这些，Zig `0.14.0` 引入了包暴露任意 `LazyPaths` 的能力。依赖项通过 `std.Build.addNamedLazyPath` 暴露它们，依赖包使用 `std.Build.Dependency.namedLazyPath` 访问它们。
+
+此功能的一个用例是让依赖项向其依赖包暴露一个生成的文件。例如，在以下示例中，依赖包 bar 暴露了一个生成的 Zig 文件，主包将其用作可执行文件的模块导入：
+
+***build.zig***
+
+```zig
+pub fn build(b: *std.Build) void {
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+    const bar = b.dependency("bar", .{});
+    const exe = b.addExecutable(.{
+        .name = "main",
+        .root_source_file = b.path("main.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    exe.root_module.addImport("generated", bar.namedLazyPath("generated"));
+    b.installArtifact(exe);
+}
+```
+
+***bar/build.zig***
+
+```zig
+pub fn build(b: *std.Build) {
+    const generator = b.addExecutable(.{
+        .name = "generator",
+        .root_source_file = b.path("generator.zig"),
+        .target = b.graph.host,
+        .optimize = .ReleaseSafe,
+    });
+    const run_gen = b.addRunArtifact(generator);
+    const generated_file = run_gen.addOutputFileArg("generated.zig");
+    b.addNamedLazyPath("generated", generated_file);
+}
+```
+
+### `addLibrary` 函数
+
+作为 `addSharedLibrary` 和 `addStaticLibrary` 的替代，但可以更轻松地在 `build.zig` 中更改链接模式，例如：
+
+对于库来说：
+
+```zig
+const lib = b.addLibrary(.{
+    .linkage = linkage,
+    .name = "foo_bar",
+    .root_module = mod,
+});
+```
+
+对于调用库的包来说：
+
+```zig
+const dep_foo_bar = b.dependency("foo_bar", .{
+    .target = target,
+    .optimize = optimize,
+    .linkage = .dynamic // or leave for default static
+});
+
+mod.linkLibrary(dep_foor_bar.artifact("foo_bar"));
+```
+
