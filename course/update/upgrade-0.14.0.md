@@ -123,10 +123,10 @@ pub const BufferB = extern struct {
     len: usize,
     pub const empty: BufferB = .{ .ptr = null, .len = 0 };
 };
-// 以一种更简单的方式创建一个新的空buffer
+// 以一种更简单的方式创建一个新的空 buffer
 var empty_buf_b: BufferB = .empty;
-// 不会再出现莫名其妙的字段覆盖!
-// 如果我们要指定值，那么就需要都指定值，这会使错误更容易暴露出来:
+// 不会再出现莫名其妙的字段覆盖！
+// 如果我们要指定值，那么就需要都指定值，这会使错误更容易暴露出来：
 var bad_buf_b: BufferB = .{ .ptr = null, .len = 10 };
 ```
 
@@ -394,18 +394,18 @@ fn foo(comptime x: u8) void {
 
 例如：
 
-| thread-1                | thread-2                |
-|-------------------------|-------------------------|
-| store X         // A    | store Y         // C    |
-| fence(seq_cst)  // F1   | fence(seq_cst)  // F2   |
-| load  Y         // B    | load  X         // D    |
+| thread-1             | thread-2             |
+| -------------------- | -------------------- |
+| store X // A         | store Y // C         |
+| fence(seq_cst) // F1 | fence(seq_cst) // F2 |
+| load Y // B          | load X // D          |
 
 目标是确保要么 `load X (D)` 看到 `store X (A)`，要么 `load Y (B)` 看到 `store Y (C)`。这一对顺序一致的栅栏通过两个不变[1](https://en.cppreference.com/w/cpp/atomic/memory_order#Strongly_happens-before:~:text=for%20every%20pair%20of%20atomic%20operations%20A%20and%20B%20on%20an%20object%20M%2C%20where%20A%20is%20coherence%2Dordered%2Dbefore%20B%3A)[2](https://en.cppreference.com/w/cpp/atomic/memory_order#Strongly_happens-before:~:text=if%20a%20memory_order_seq_cst%20fence%20X%20happens%2Dbefore%20A%2C%20and%20B%20happens%2Dbefore%20a%20memory_order_seq_cst%20fence%20Y%2C%20then%20X%20precedes%20Y%20in%20S.)来保证这一点。
 
 现在 `@fence` 已被删除，还有其他方法可以实现这种关系：
 
 - 将所有相关的存储和加载（A、B、C 和 D）设为 `SeqCst`，将它们全部包含在总顺序中。
-- 将存储操作（A/C）设为 `Acquire`，并将其匹配的加载操作（D/B）设为 `Release`。从语义上讲，这意味着将它们升级为读-修改-写操作，这可以实现这样的排序。加载操作可以替换为非变异的 RMW 操作，即 `fetchAdd(0)` 或 `fetchOr(0)`。
+- 将存储操作（A/C）设为 `Acquire`，并将其匹配的加载操作（D/B）设为 `Release`。从语义上讲，这意味着将它们升级为读 - 修改 - 写操作，这可以实现这样的排序。加载操作可以替换为非变异的 RMW 操作，即 `fetchAdd(0)` 或 `fetchOr(0)`。
 
 像 LLVM 这样的优化器可能会在内部将其简化为 `@fence(.seq_cst)` + `load`。
 
@@ -453,17 +453,17 @@ if (counter.rc.fetchSub(1, .release) == 1) {
 
 理想情况下，隐式函数应该对用户可访问，他们可以简单地在源代码中增加排序。但如果这不可能，最后的手段是引入一个原子变量来模拟栅栏的屏障。例如：
 
-| thread-1                    | thread-2                    |
-|-----------------------------|-----------------------------|
-| queue.push()                | e = signal.listen()         |
-| fence(.seq_cst)             | fence(.seq_cst)             |
-| signal.notify()             | if queue.empty(): e.wait()  |
+| thread-1        | thread-2                   |
+| --------------- | -------------------------- |
+| queue.push()    | e = signal.listen()        |
+| fence(.seq_cst) | fence(.seq_cst)            |
+| signal.notify() | if queue.empty(): e.wait() |
 
-| thread-1                    | thread-2                    |
-|-----------------------------|-----------------------------|
-| queue.push()                | e = signal.listen()         |
-| fetchAdd(0, .seq_cst)       | fetchAdd(0, .seq_cst)       |
-| signal.notify()             | if queue.empty(): e.wait()  |
+| thread-1              | thread-2                   |
+| --------------------- | -------------------------- |
+| queue.push()          | e = signal.listen()        |
+| fetchAdd(0, .seq_cst) | fetchAdd(0, .seq_cst)      |
+| signal.notify()       | if queue.empty(): e.wait() |
 
 ### `packed` 结构体相等性
 
@@ -507,7 +507,7 @@ test "packed struct atomics" {
 
 ### `@ptrCast` 可以改变切片长度
 
-具体讨论和实现可以见PR[#22706](https://github.com/ziglang/zig/pull/22706)
+具体讨论和实现可以见 PR[#22706](https://github.com/ziglang/zig/pull/22706)
 
 ### 移除匿名结构类型，统一元组
 
@@ -841,7 +841,7 @@ pub const SourceLocation = struct {
 - 为编译时 `@memcpy` 实现别名检查；如果参数别名，现在将发出编译错误。
 - 通过一次加载和存储整个数组来实现更高效的编译时 `@memcpy`，类似于 `@memset` 的实现方式。
 
-这是一个break change，因为虽然旧的强制转换行为在运行时触发了“未实现”的编译错误，但它确实在编译时起作用。
+这是一个 break change，因为虽然旧的强制转换行为在运行时触发了“未实现”的编译错误，但它确实在编译时起作用。
 
 ### 不允许不安全的内存强制转换
 
@@ -854,3 +854,10 @@ pub const SourceLocation = struct {
 ### 函数调用的分支配额规则已调整
 
 具体见 PR [#22414](https://github.com/ziglang/zig/pull/22414)。
+
+## 标准库
+
+未分类的更改：
+
+- mem：在 `byteSwapAllFields` 中处理 `Float` 和 `Bool` 情况
+- fmt：从二进制中移除占位符
