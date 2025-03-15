@@ -22,9 +22,9 @@ pub fn build(b: *Build) void {
     // open dir
     var dir =
         std.fs.openIterableDirAbsolute(full_path, .{}) catch |err| {
-        log.err("open 11 path failed, err is {}", .{err});
-        std.os.exit(1);
-    };
+            log.err("open 11 path failed, err is {}", .{err});
+            std.os.exit(1);
+        };
     defer dir.close();
 
     // make a iterate for path

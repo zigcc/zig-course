@@ -1,17 +1,16 @@
 // #region package_management
 .{
     // 包名字
-    .name = "importer",
+    .name = .importer,
     // 包版本
     .version = "0.0.0",
+    .fingerprint = 0x64e883e88dde22e2,
     // 包依赖
     .dependencies = .{
         // 包依赖项的名字
         .@"tarball-exporter" = .{
-            // url 为包的下载地址
-            .url = "https://github.com/zigcc/zig-msgpack/archive/refs/tags/0.0.5.tar.gz",
-            // hash 为包的哈希值，但不是对整个包的哈希值，而是对包中的所有文件的哈希值
-            .hash = "12207ec1296852c17c0424b5e650003bd9a3c4f35e9d0ab586d39ea0ab812c2d9f2c",
+            .url = "https://github.com/zigcc/zig-msgpack/archive/refs/tags/0.0.7.tar.gz",
+            .hash = "zig_msgpack-0.0.7-evvueE3MAADy-2EAgCGUYIf1tHC9-z4n2sDIldvTZcY8",
         },
         .@"path-exporter" = .{
             // path 为本地包的路径
