@@ -432,7 +432,7 @@ fn dec(counter: *RefCounter) void {
 
 如果没有 `@fence` ，这里有两种方法：
 
-- 无条件地通过 fence 的排序来加强所需的原子操作。
+- 无条件地通过栅栏的排序来加强所需的原子操作。
 
 ```zig
 if (counter.rc.fetchSub(1, .acq_rel) == 1) {
