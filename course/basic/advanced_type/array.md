@@ -24,6 +24,12 @@ outline: deep
 
 关于[越界问题](https://ziglang.org/documentation/master/#Index-out-of-Bounds)，zig 在编译期和运行时均有完整的越界保护和完善的堆栈错误跟踪。
 
+### 解构数组
+
+我们在变量声明的章节提到了，数组可以结构，再来回忆一下：
+
+<<<@/code/release/array.zig#deconstruct
+
 ### 多维数组
 
 多维数组（矩阵）实际上就是嵌套数组，我们很容易就可以创建一个多维数组出来：

@@ -21,6 +21,28 @@ const CreateArray = struct {
     // #endregion create_array
 };
 
+const Deconstruct = struct {
+    // #region deconstruct
+    const print = @import("std").debug.print;
+
+    fn swizzleRgbaToBgra(rgba: [4]u8) [4]u8 {
+        // 解构
+        const r, const g, const b, const a = rgba;
+        return .{ b, g, r, a };
+    }
+
+    pub fn main() void {
+        const pos = [_]i32{ 1, 2 };
+        // 解构
+        const x, const y = pos;
+        print("x = {}, y = {}\n", .{ x, y });
+
+        const orange: [4]u8 = .{ 255, 165, 0, 255 };
+        print("{any}\n", .{swizzleRgbaToBgra(orange)});
+    }
+    // #endregion deconstruct
+};
+
 const Matrix = struct {
     // #region matrix
     const print = @import("std").debug.print;

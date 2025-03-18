@@ -69,6 +69,12 @@ zig 使用 `const` 作为关键字来声明常量，它无法再被更改，只�
 
 <<<@/code/release/define_variable.zig#deconstruct
 
+解构表达式只能出现在块内（不在容器范围内），赋值的左侧必须由逗号分隔的列表组成，其中每个元素可以是左值（例如`var`）或变量声明：
+
+<<<@/code/release/define_variable.zig#deconstruct_2
+
+解构可以以 `comptime` 关键字作为前缀，在这种情况下，整个解构表达式在 `comptime` 处求值。所有声明的 `var` 都将是 `comptime var`，并且所有表达式（左值和右值）都在 `comptime` 处求值。
+
 ## 块
 
 块（block）用于限制变量声明的范围，例如以下代码是非法的：

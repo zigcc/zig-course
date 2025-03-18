@@ -6,6 +6,8 @@ outline: deep
 
 > 向量（Vector）为我们提供了并行操纵一组同类型（布尔、整型、浮点、指针）的值的方法，它尽可能使用 `SIMD` 指令。
 
+向量类型使用内置函数 [@Vector](https://ziglang.org/documentation/master/#Vector) 创建
+
 ## 基本使用
 
 向量支持与底层基本类型相同的内置运算符。这些操作是按元素执行，并返回与输入向量长度相同的向量，包括：
@@ -29,6 +31,12 @@ outline: deep
 Zig 支持任何已知的最大 2^32-1 向量长度。请注意，过长的向量长度（例如 2^20）可能会导致当前版本的 Zig 上的编译器崩溃。
 
 :::
+
+## 解构向量
+
+和数组一样，向量也可以被解构：
+
+<<<@/code/release/vector.zig#deconstruct
 
 ## `@splat`
 
