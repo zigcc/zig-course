@@ -137,13 +137,53 @@ const Block = struct {
 const Deconstruct = struct {
     fn main() void {
         // #region deconstruct
+        const print = @import("std").debug.print;
+        var x: u32 = undefined;
+        var y: u32 = undefined;
         var z: u32 = undefined;
-        // var z: u32 = undefined;
-        const x, var y, z = [3]u32{ 1, 2, 3 };
-        y += 10;
-        // x 是 1，y 是 2，z 是 3
+        // 元组
+        const tuple = .{ 1, 2, 3 };
+        // 解构元组
+        x, y, z = tuple;
+
+        print("tuple: x = {}, y = {}, z = {}\n", .{ x, y, z });
+        // 数组
+        const array = [_]u32{ 4, 5, 6 };
+        // 解构数组
+        x, y, z = array;
+
+        print("array: x = {}, y = {}, z = {}\n", .{ x, y, z });
+        // 向量定义
+        const vector: @Vector(3, u32) = .{ 7, 8, 9 };
+        // 解构向量
+        x, y, z = vector;
+
+        print("vector: x = {}, y = {}, z = {}\n", .{ x, y, z });
         // #endregion deconstruct
-        _ = x;
+
+    }
+};
+
+const Deconstruct_2 = struct {
+    pub fn main() !void {
+        // #region deconstruct_2
+        const print = @import("std").debug.print;
+        var x: u32 = undefined;
+
+        const tuple = .{ 1, 2, 3 };
+
+        x, var y: u32, const z = tuple;
+
+        print("x = {}, y = {}, z = {}\n", .{ x, y, z });
+
+        // y 可变
+        y = 100;
+
+        // 可以用 _ 丢弃不想要的值
+        _, x, _ = tuple;
+
+        print("x = {}", .{x});
+        // #endregion deconstruct_2
     }
 };
 
