@@ -9,6 +9,8 @@ pub fn main() !void {
     try AlignCast.main();
     try ZeroPointer.main();
     ComptimePointer.main();
+    ptr2int.main();
+    try compPointer.main();
 }
 
 const SinglePointer = struct {
@@ -24,6 +26,34 @@ const SinglePointer = struct {
     }
     // #endregion single_pointer
 };
+
+const fnPointer = struct {
+    // #region fn_pointer
+    const Call2Op = *const fn (a: i8, b: i8) i8;
+    // Call20p 是一个函数指针类型，指向一个接受两个 i8 类型参数并返回 i8 类型的函数
+    // #endregion fn_pointer
+};
+
+const ptr2int = struct {
+    pub fn main() void {
+        // #region ptr2int
+        const std = @import("std");
+
+        // ptrFromInt 将整数转换为指针
+        const ptr: *i32 = @ptrFromInt(0xdeadbee0);
+        // intFromPtr 将指针转换为整数
+        const addr = @intFromPtr(ptr);
+
+        if (@TypeOf(addr) == usize) {
+            std.debug.print("success\n", .{});
+        }
+        if (addr == 0xdeadbee0) {
+            std.debug.print("success\n", .{});
+        }
+        // #endregion ptr2int
+    }
+};
+
 const MultiPointer = struct {
     // #region multi_pointer
     const print = @import("std").debug.print;
@@ -191,4 +221,46 @@ const ComptimePointer = struct {
         }
     }
     // #endregion comptime_pointer
+};
+
+const compPointer = struct {
+    pub fn main() !void {
+        // #region comp_pointer
+        comptime {
+            const expect = @import("std").testing.expect;
+            // 只要指针不被解引用，那么就可以这么做
+            const ptr: *i32 = @ptrFromInt(0xdeadbee0);
+            const addr = @intFromPtr(ptr);
+            try expect(@TypeOf(addr) == usize);
+            try expect(addr == 0xdeadbee0);
+        }
+        // #endregion comp_pointer
+    }
+};
+
+const ptrCast = struct {
+    const std = @import("std");
+    pub fn main() !void {
+        // #region ptr_cast
+        const bytes align(@alignOf(u32)) = [_]u8{ 0x12, 0x12, 0x12, 0x12 };
+        // 将 u8数组指针 转换为 u32 类型的指针
+        const u32_ptr: *const u32 = @ptrCast(&bytes);
+
+        if (u32_ptr.* == 0x12121212) {
+            std.debug.print("success\n", .{});
+        }
+
+        // 通过标准库转为 u32
+        const u32_value = std.mem.bytesAsSlice(u32, bytes[0..])[0];
+
+        if (u32_value == 0x12121212) {
+            std.debug.print("success\n", .{});
+        }
+
+        // 通过内置函数转换
+        if (@as(u32, @bitCast(bytes)) == 0x12121212) {
+            std.debug.print("success\n", .{});
+        }
+        // #endregion ptr_cast
+    }
 };
