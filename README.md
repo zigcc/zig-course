@@ -4,6 +4,8 @@
 >
 > Zig 是一种通用的编程语言和工具链，用于维护健壮、最优和可重用的软件
 
+![Cover Image](./course/public/cover_image.png "Cover Image")
+
 ## 参与贡献
 
 欢迎各位志同道合的“道友”参与贡献本文档，并一起壮大 zig 中文社区！
