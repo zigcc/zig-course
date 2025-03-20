@@ -85,9 +85,11 @@ outline: deep
 
 ## 自动推断
 
-zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig 编译器推断出类型即可，例如：
+zig 在使用结构体的时候还支持省略结构体类型，此时 zig 将会使用结果位置语义来对类型进行推导，例如：
 
 <<<@/code/release/struct.zig#auto_reference
+
+_这种基于结果位置语义的推导还支持结构体本身的方法和其内部中定义的其他类型（此处指的并不是结构体字段）！_
 
 ## 泛型实现
 
@@ -110,6 +112,12 @@ zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig
 结构体允许使用默认值，只需要在定义结构体的时候声明默认值即可：
 
 <<<@/code/release/struct.zig#default_field
+
+但仅仅这样还不够，因为在使用时很容易遇到只初始化部分字段，而其他字段使用默认值的情况，此时如果我们对结构体的字段值并无默认不变性的要求，那么这种默认值方案已经足够我们使用。
+
+但如果要求结构体的字段值具有默认不变性（要么都是默认值，要么全部由使用者手动赋值），那么可以采用以下方案：
+
+<<<@/code/release/struct.zig#all_default
 
 ## 空结构体
 
@@ -136,7 +144,7 @@ zig 在使用结构体的时候还支持省略结构体类型，只要能让 zig
 
 <<<@/code/release/struct.zig#base_ptr
 
-这里使用了内建函数 [`@fieldParentPtr`](https://ziglang.org/documentation/master/#toc-fieldParentPtr) ，它会根据给定字段指针，返回对应的结构体基指针。
+这里使用了内建函数 [`@fieldParentPtr`](https://ziglang.org/documentation/master/#fieldParentPtr) ，它会根据给定字段指针，返回对应的结构体基指针。
 
 ## 元组
 

@@ -12,6 +12,29 @@ pub fn main() !void {
     try PackedCast.main();
 }
 
+const StructAllDefault = struct {
+    // #region all_default
+    const Threshold = struct {
+        minimum: f32,
+        maximum: f32,
+
+        // 选择声明一个默认值
+        const default: Threshold = .{
+            .minimum = 0.25,
+            .maximum = 0.75,
+        };
+    };
+
+    pub fn main() !void {
+        const std = @import("std");
+        // 初始化时直接使用默认值
+        const threshold: Threshold = .default;
+        std.debug.print("minimum is %d, maximum is %d", .{ threshold.minimum, threshold.maximum });
+    }
+
+    // #endregion all_default
+};
+
 const Struct = struct {
     // #region more_struct
     const std = @import("std");
