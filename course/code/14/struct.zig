@@ -10,6 +10,7 @@ pub fn main() !void {
     NamePrinciple.main();
     try PackedBitOffset.main();
     try PackedCast.main();
+    DestructTuple.main();
 }
 
 const StructAllDefault = struct {
@@ -114,6 +115,24 @@ const SelfReference2 = struct {
         std.debug.print("list len is {}\n", .{list.length()});
     }
     // #endregion more_self_reference2
+};
+
+const DestructTuple = struct {
+    pub fn main() void {
+        // #region destruct_tuple
+        const print = @import("std").debug.print;
+
+        var x: u32 = undefined;
+        var y: u32 = undefined;
+        var z: u32 = undefined;
+
+        const tuple = .{ 1, 2, 3 };
+
+        x, y, z = tuple;
+
+        print("tuple: x = {}, y = {}, z = {}\n", .{ x, y, z });
+        // #endregion destruct_tuple
+    }
 };
 
 const SelfReference3 = struct {
