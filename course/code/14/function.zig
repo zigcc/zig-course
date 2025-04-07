@@ -61,3 +61,20 @@ inline fn shiftLeftOne(a: u32) u32 {
     return a << 1;
 }
 // #endregion shiftLeftOne
+
+// #region closure
+fn bar(comptime x: i32) fn (i32) i32 {
+    return struct {
+        pub fn foo(y: i32) i32 {
+            var counter = 0;
+            for (x..y) |i| {
+                if ((i % 2) == 0) {
+                    counter += i * i;
+                }
+            }
+            return counter;
+        }
+    }.foo;
+}
+
+// #endregion closure
