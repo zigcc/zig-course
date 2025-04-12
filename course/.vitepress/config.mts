@@ -33,4 +33,9 @@ export default defineConfig({
     ],
     ["meta", { name: "theme-color", content: "#ffffff" }],
   ],
+  markdown: {
+    image: {
+      lazyLoading: true,
+    }
+  }
 });
