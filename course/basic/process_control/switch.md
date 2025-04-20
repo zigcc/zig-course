@@ -65,3 +65,25 @@ switch 的分支可以标记为 `inline` 来要求编译器生成该分支对应
 当使用 `inline else` 捕获 tag union 时，可以额外捕获 tag 和对应的 value：
 
 <<<@/code/release/switch.zig#catch_tag_union_value
+
+### labeled switch
+
+这是 `0.14.0` 引入的新特性，当 `switch` 语句带有标签时，它可以被 `break` 或 `continue` 语句引用。`break` 将从 `switch` 语句返回一个值。
+
+针对 `switch` 的 `continue` 语句必须带有一个操作数。当执行时，它会跳转到匹配的分支，就像用 `continue` 的操作数替换了初始 `switch` 值后重新执行 `switch` 一样。
+
+例如以下两段代码的写法是一样的：
+
+<<<@/code/release/switch.zig#labeled_switch_1
+
+<<<@/code/release/switch.zig#labeled_switch_2
+
+这可以提高（例如）状态机的清晰度，其中 `continue :sw .next_state` 这样的语法是明确的、清楚的，并且可以立即理解。
+
+不过，这个设计的目的是处理对数组中每个元素进行 `switch` 判断的情况，在这种情况下，使用单个 `switch` 语句可以提高代码的清晰度和性能：
+
+<<<@/code/release/switch.zig#vm
+
+如果 `continue` 的操作数在编译时就已知，那么它可以被简化为一个无条件分支指令，直接跳转到相关的 `case`。这种分支是完全可预测的，因此通常执行速度很快。
+
+如果操作数在运行时才能确定，每个 `continue` 可以内联嵌入一个条件分支（理想情况下通过跳转表实现），这使得 CPU 可以独立于其他分支来预测其目标。相比之下，基于循环的简化实现会迫使所有分支都通过同一个分发点，这会妨碍分支预测。
