@@ -10,7 +10,7 @@ outline: deep
 
 事实上，zig 本身的标准库为我们提供了多种内存分配模型：
 
-1. [`DebugAllocato`](https://ziglang.org/documentation/master/std/#std.heap.debug_allocator.DebugAllocator)
+1. [`DebugAllocator`](https://ziglang.org/documentation/master/std/#std.heap.debug_allocator.DebugAllocator)
 2. [`SmpAllocator`](https://ziglang.org/documentation/master/std/#std.heap.SmpAllocator)
 3. [`FixedBufferAllocator`](https://ziglang.org/documentation/master/std/#std.heap.FixedBufferAllocator)
 4. [`ArenaAllocator`](https://ziglang.org/documentation/master/std/#std.heap.arena_allocator.ArenaAllocator)
