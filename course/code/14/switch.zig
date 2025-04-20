@@ -4,6 +4,8 @@ pub fn main() !void {
     Expression.main();
     Catch_tagUnion.main();
     AutoRefer.main();
+    try LabeledSwitch1.main();
+    try LabeledSwitch2.main();
 }
 
 const Basic = struct {
@@ -191,3 +193,91 @@ fn getNum(u: U) u32 {
     }
 }
 // #endregion catch_tag_union_value
+
+const LabeledSwitch1 = struct {
+    pub fn main() !void {
+        // #region labeled_switch_1
+        sw: switch (@as(i32, 5)) {
+            5 => continue :sw 4,
+
+            // `continue` can occur multiple times within a single switch prong.
+            2...4 => |v| {
+                if (v > 3) {
+                    continue :sw 2;
+                } else if (v == 3) {
+
+                    // `break` can target labeled loops.
+                    break :sw;
+                }
+
+                continue :sw 1;
+            },
+
+            1 => return,
+
+            else => unreachable,
+        }
+        // #endregion labeled_switch_1
+    }
+};
+
+const LabeledSwitch2 = struct {
+    pub fn main() !void {
+        // #region labeled_switch_2
+        var sw: i32 = 5;
+        while (true) {
+            switch (sw) {
+                5 => {
+                    sw = 4;
+                    continue;
+                },
+                2...4 => |v| {
+                    if (v > 3) {
+                        sw = 2;
+                        continue;
+                    } else if (v == 3) {
+                        break;
+                    }
+
+                    sw = 1;
+                    continue;
+                },
+                1 => return,
+                else => unreachable,
+            }
+        }
+        // #endregion labeled_switch_2
+    }
+};
+
+// #region vm
+const Instruction = enum {
+    add,
+    mul,
+    end,
+};
+
+fn evaluate(initial_stack: []const i32, code: []const Instruction) !i32 {
+    const std = @import("std");
+    var stack = try std.BoundedArray(i32, 8).fromSlice(initial_stack);
+    var ip: usize = 0;
+
+    return vm: switch (code[ip]) {
+        // Because all code after `continue` is unreachable, this branch does
+        // not provide a result.
+        .add => {
+            try stack.append(stack.pop().? + stack.pop().?);
+
+            ip += 1;
+            continue :vm code[ip];
+        },
+        .mul => {
+            try stack.append(stack.pop().? * stack.pop().?);
+
+            ip += 1;
+            continue :vm code[ip];
+        },
+        .end => stack.pop().?,
+    };
+}
+// #endregion vm
