@@ -157,6 +157,17 @@ pub usingnamespace @cImport({
 });
 ```
 
+相关的使用方法可以是这样的：
+
+```zig
+pub usingnamespace @cImport({
+    @cInclude("xcb/xcb.h");
+    @cInclude("xcb/xproto.h");
+});
+```
+
+针对以上的引入的头文件，我们可以这样使用 `@This().xcb_generic_event_t`
+
 > [!IMPORTANT]
 > 初次阅读此处困惑是正常的，后面的概念学习完成后此处自通。
 

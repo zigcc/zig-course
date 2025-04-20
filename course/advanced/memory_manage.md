@@ -10,10 +10,10 @@ outline: deep
 
 事实上，zig 本身的标准库为我们提供了多种内存分配模型：
 
-1. [`GeneralPurposeAllocator`](https://ziglang.org/documentation/master/std/#std.heap.general_purpose_allocator.GeneralPurposeAllocator)
-2. [`FixedBufferAllocator`](https://ziglang.org/documentation/master/std/#std.heap.FixedBufferAllocator)
-3. [`ArenaAllocator`](https://ziglang.org/documentation/master/std/#std.heap.arena_allocator.ArenaAllocator)
-4. [`HeapAllocator`](https://ziglang.org/documentation/master/std/#std.heap.HeapAllocator)
+1. [`DebugAllocato`](https://ziglang.org/documentation/master/std/#std.heap.debug_allocator.DebugAllocator)
+2. [`SmpAllocator`](https://ziglang.org/documentation/master/std/#std.heap.SmpAllocator)
+3. [`FixedBufferAllocator`](https://ziglang.org/documentation/master/std/#std.heap.FixedBufferAllocator)
+4. [`ArenaAllocator`](https://ziglang.org/documentation/master/std/#std.heap.arena_allocator.ArenaAllocator)
 5. [`c_allocator`](https://ziglang.org/documentation/master/std/#std.heap.c_allocator)
 6. [`page_allocator`](https://ziglang.org/documentation/master/std/#std.heap.page_allocator)
 7. [`StackFallbackAllocator`](https://ziglang.org/documentation/master/std/#std.heap.StackFallbackAllocator)
@@ -28,10 +28,7 @@ outline: deep
 
 - `std.testing.FailingAllocator`
 - `std.testing.allocator`
-- `std.heap.LoggingAllocator`
-- `std.heap.LogToWriterAllocator`
 - `std.heap.SbrkAllocator`
-- `std.heap.ScopedLoggingAllocator`
 
 :::
 
@@ -41,13 +38,31 @@ outline: deep
 
 :::
 
-## `GeneralPurposeAllocator`
+## `DebugAllocator`
 
-这是一个通用的分配器，当你需要动态内存时，并且还不知道自己应该用什么分配器模型，用这个准没错！
+这是一个用于调试的分配器，现阶段适用于在调试模式下使用该分配器，它的性能并不高！
 
 这个分配器的目的不是为了性能，而是为了安全，它支持线程安全，安全检查，检查是否存在泄露等特性，这些特性均可手动配置是否开启。
 
-<<<@/code/release/memory_manager.zig#GeneralPurposeAllocator
+<<<@/code/release/memory_manager.zig#DebugAllocator
+
+## `SmpAllocator`
+
+专为 `ReleaseFast` 优化设计的分配器，启用多线程。
+
+这个分配器是一个单例；它使用全局状态，并且整个过程只应实例化一个。
+
+设计思路：
+
+1. 每个线程都有独立的空闲列表（freelist），但是当线程退出时，这些数据必须是可回收的。由于我们无法直接得知线程何时退出，所以偶尔需要一个线程尝试回收其他线程的资源。
+
+2. 超过特定大小的内存分配会直接通过内存映射（memory mapped）实现，且不存储分配元数据。这种机制之所以可行，是因为实现中禁止了将分配从小类别转移到大类别（反之亦然）的大小调整。
+
+3. 每个分配器操作都会通过线程局部变量检查线程标识符，以确定要访问全局状态中的哪个元数据，并尝试获取其锁。通常情况下，这个操作会在没有竞争的情况下成功，除非另一个线程被分配了相同的ID。如果发生这种竞争情况，线程会移动到下一个线程元数据槽位并重复尝试获取锁的过程。
+
+4. 通过将线程局部元数据数组限制为与CPU数量相同的大小，确保了随着线程的创建和销毁，它们会循环使用整个空闲列表集合。
+
+<<<@/code/release/memory_manager.zig#SmpAllocator
 
 ## `FixedBufferAllocator`
 
@@ -67,14 +82,6 @@ outline: deep
 
 <<<@/code/release/memory_manager.zig#ArenaAllocator
 
-## `HeapAllocator`
-
-这是一个依赖 windows 特性的分配器模型，故仅可在 windows 下可用。
-
-关于这个模型的更多信息，可以参考这里[https://learn.microsoft.com/en-us/windows/win32/api/heapapi/](https://learn.microsoft.com/en-us/windows/win32/api/heapapi/)
-
-<<<@/code/release/memory_manager.zig#HeapAllocator
-
 ## `c_allocator`
 
 这是纯粹的 C 的 `malloc`，它会直接尝试调用 C 库的内存分配，使用它需要在 `build.zig` 中添加上 `linkLibC` 功能：
@@ -85,7 +92,7 @@ outline: deep
 
 它还有一个变体：[`raw_c_allocator`](https://ziglang.org/documentation/master/std/#std.heap.raw_c_allocator)。
 
-这两者的区别仅仅是 `c_allocator` 可能会调用 `alloc_aligned `而不是 `malloc` ，会优先使用 `malloc_usable_size` 来进行一些检查。
+这两者的区别仅仅是 `c_allocator` 可能会调用 `alloc_aligned`而不是 `malloc` ，会优先使用 `malloc_usable_size` 来进行一些检查。
 
 而 `raw_c_allocator` 则是完全只使用 `malloc`。
 
@@ -128,4 +135,4 @@ outline: deep
 
 待添加，当前你可以通过实现 `Allocator` 接口来实现自己的分配器。为了做到这一点，必须仔细阅读 [`std/mem.zig`](https://github.com/ziglang/zig/blob/master/lib/std/mem.zig) 中的文档注释，然后提供 `allocFn` 和 `resizeFn`。
 
-有许多分配器示例可供查看以获取灵感。查看 [`std/heap.zig`](https://github.com/ziglang/zig/blob/master/lib/std/heap.zig) 和 [`std.heap.GeneralPurposeAllocator`](https://github.com/ziglang/zig/blob/master/lib/std/heap/general_purpose_allocator.zig)
+有许多分配器示例可供查看以获取灵感。查看 [`std/heap.zig`](https://github.com/ziglang/zig/blob/master/lib/std/heap.zig) 和 [`std.heap.DebugAllocator`](https://github.com/ziglang/zig/blob/master/lib/std/heap/debug_allocator.zig)
