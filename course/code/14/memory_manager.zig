@@ -1,6 +1,7 @@
-const builtin = @import("builtin");
 pub fn main() !void {
-    try GPA.main();
+    try DebugAllocator.main();
+    try SmpAllocator.main();
+    try BestAllocator.main();
     try FixedBufferAllocator.main();
     try ThreadSafeFixedBufferAllocator.main();
     try ArenaAllocator.main();
@@ -10,17 +11,17 @@ pub fn main() !void {
     try MemoryPool.main();
 }
 
-const GPA = struct {
-    // #region GeneralPurposeAllocator
+const DebugAllocator = struct {
+    // #region DebugAllocator
     const std = @import("std");
 
     pub fn main() !void {
         // 使用模型，一定要是变量，不能是常量
-        var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+        var gpa = std.heap.DebugAllocator(std.heap.DebugAllocatorConfig{}){};
         // 拿到一个allocator
         const allocator = gpa.allocator();
 
-        // defer 用于执行general_purpose_allocator善后工作
+        // defer 用于执行debug_allocator善后工作
         defer {
             // 尝试进行 deinit 操作
             const deinit_status = gpa.deinit();
@@ -34,7 +35,23 @@ const GPA = struct {
         // 延后释放内存
         defer allocator.free(bytes);
     }
-    // #endregion GeneralPurposeAllocator
+    // #endregion DebugAllocator
+};
+
+const SmpAllocator = struct {
+    // #region SmpAllocator
+    const std = @import("std");
+
+    pub fn main() !void {
+        // 无需任何初始化，拿来就可以使用
+        const allocator = std.heap.smp_allocator;
+
+        //申请内存
+        const bytes = try allocator.alloc(u8, 100);
+        // 延后释放内存
+        defer allocator.free(bytes);
+    }
+    // #endregion SmpAllocator
 };
 
 const FixedBufferAllocator = struct {
@@ -81,6 +98,29 @@ const ThreadSafeFixedBufferAllocator = struct {
         defer thread_safe_allocator.free(memory);
     }
     // #endregion ThreadSafeFixedBufferAllocator
+};
+
+const BestAllocator = struct {
+    const std = @import("std");
+    const builtin = @import("builtin");
+    var debug_allocator: std.heap.DebugAllocator(.{}) = .init;
+
+    pub fn main() !void {
+        const allocator, const is_debug = allocator: {
+            if (builtin.os.tag == .wasi) break :allocator .{ std.heap.wasm_allocator, false };
+            break :allocator switch (builtin.mode) {
+                .Debug, .ReleaseSafe => .{ debug_allocator.allocator(), true },
+                .ReleaseFast, .ReleaseSmall => .{ std.heap.smp_allocator, false },
+            };
+        };
+        defer if (is_debug) {
+            _ = debug_allocator.deinit();
+        };
+        //申请内存
+        const bytes = try allocator.alloc(u8, 100);
+        // 延后释放内存
+        defer allocator.free(bytes);
+    }
 };
 
 const ArenaAllocator = struct {
