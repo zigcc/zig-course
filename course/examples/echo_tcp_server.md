@@ -64,7 +64,7 @@ Poll For Linux: [poll(2) — Linux manual page](https://man7.org/linux/man-pages
 
 为了同时兼容 linux 和 windows，我们需要利用一下 zig 的 `builtin` 包来判断构建目标来决定使用的函数（poll 在 windows 上的实现不完全标准）。
 
-完整的代码在 [Github](https://github.com/zigcc/zig-course/tree/main/course/code/release/echo_tcp_server.zig)，测试用的客户端可以使用 _telent_（windows、linux、mac 均可用）。
+完整的代码在 [Github](https://github.com/zigcc/zig-course/tree/main/course/code/release/echo_tcp_server.zig)，测试用的客户端可以使用 _telnet_（windows、linux、mac 均可用）。
 
 _server_ 监听端口的实现：
 
