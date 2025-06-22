@@ -24,14 +24,14 @@ outline: deep
 
 ## `zig init`
 
-这个命令用于初始化项目，在当前路径下创建 `src/main.zig`、`src/root.zig` 、`build.zig` 和 `build.zig.zon`  四个文件。
+这个命令用于初始化项目，在当前路径下创建 `src/main.zig`、`src/root.zig` 、`build.zig` 和 `build.zig.zon` 四个文件。
 
 关于 `build.zig` 这个文件的内容涉及到了 zig 的构建系统，我们将会单独讲述。
 
 ```sh
 .                               # 项目根目录
 ├── build.zig                   # Zig 构建脚本：定义如何编译、测试和打包项目
-├── build.zig.zon               # 项目清单文件 (zon是Zig Object Notation)：声明项目元数据和依赖项
+├── build.zig.zon               # 项目清单文件 (zon 是 Zig Object Notation)：声明项目元数据和依赖项
 └── src                         # 源代码目录
     ├── main.zig                # 程序主入口文件
     └── root.zig                # 核心逻辑模块：存放应用或库的主要代码和功能
