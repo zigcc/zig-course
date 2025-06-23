@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.3",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.0",
     "vitepress": "^1.6.3",
     "vitepress-export-pdf": "^1.0.0"
   },
