@@ -4,7 +4,7 @@ outline: deep
 
 # 向量
 
-> 向量（Vector）为我们提供了并行操纵一组同类型（布尔、整型、浮点、指针）的值的方法，它尽可能使用 `SIMD` 指令。
+> 向量（Vector）提供了并行操作一组同类型（布尔、整型、浮点、指针）值的方法，它尽可能使用 `SIMD` 指令。
 
 向量类型使用内置函数 [@Vector](https://ziglang.org/documentation/master/#Vector) 创建
 
