@@ -198,8 +198,8 @@ Zig 本身具有良好的错误返回跟踪（Error Return Trace）机制，能�
 
 错误返回跟踪生效的几种方式：
 
--   从 `main` 函数返回一个错误。
--   错误抵达 `catch unreachable`（并且没有覆盖默认的 `panic` 处理函数）。
--   使用 `@errorReturnTrace` 函数显式访问。构建时如果没有启用错误返回跟踪功能，则该函数会返回 `null`。
+- 从 `main` 函数返回一个错误。
+- 错误抵达 `catch unreachable`（并且没有覆盖默认的 `panic` 处理函数）。
+- 使用 `@errorReturnTrace` 函数显式访问。构建时如果没有启用错误返回跟踪功能，则该函数会返回 `null`。
 
 具体的堆栈跟踪实现细节可以看 _[这里](https://ziglang.org/documentation/master/#Implementation-Details)_。
