@@ -697,7 +697,7 @@ pub fn oldGzip(allocator: std.mem.Allocator) !void {
     // Remove allocator
     var cmp = try gzip.compress(allocator, buf.writer(), .{});
     _ = try cmp.write(data);
-    try cmp.close(); // Rename to finisho
+    try cmp.close(); // Rename to finish
     cmp.deinit(); // Remove
 
     var fbs = std.io.fixedBufferStream(buf.items);

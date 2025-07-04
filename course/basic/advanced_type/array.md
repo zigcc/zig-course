@@ -76,7 +76,7 @@ outline: deep
 
 可以使用 `++` 在编译期对数组进行串联。只要两个数组的元素类型相同，它们就可以被连接起来。
 
-<<<@/code-release/array.zig#connect
+<<<@/code/release/array.zig#connect
 
 ## 奇技淫巧
 

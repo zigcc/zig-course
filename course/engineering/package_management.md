@@ -20,7 +20,7 @@ zig 当前并没有一个中心化存储库，包可以来自任何来源，无�
 
 - `name`：当前你所开发的包的名字
 - `version`：包的版本，使用 [Semantic Version](https://semver.org/)。
-- `fingerprint`: 该值为效验和，它与包的名字有关，使用 `zig build` 时会告诉你应该填什么。
+- `fingerprint`: 该值为校验和，它与包的名字有关，使用 `zig build` 时会告诉你应该填什么。
 - `dependencies`：依赖项，内部是一连串的匿名结构体，字段
   `dep_name` 是依赖包的名字，
   `url` 是源代码地址，
@@ -43,7 +43,7 @@ zig 当前并没有一个中心化存储库，包可以来自任何来源，无�
 
 而若是想要离线使用本地包时则是先下载源码包并直接使用绝对或相对路径导入，例如在下载完包之后放在项目的 deps 目录下，那么使用本地包的格式为：
 
-`./deps/tunk.tar.gz`
+`./deps/trunk.tar.gz`
 
 :::
 
