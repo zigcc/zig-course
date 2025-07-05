@@ -1416,5 +1416,5 @@ const dep_foo_bar = b.dependency("foo_bar", .{
     .linkage = .dynamic // or leave for default static
 });
 
-mod.linkLibrary(dep_foor_bar.artifact("foo_bar"));
+mod.linkLibrary(dep_foo_bar.artifact("foo_bar"));
 ```

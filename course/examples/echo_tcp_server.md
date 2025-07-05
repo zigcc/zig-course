@@ -4,7 +4,7 @@ outline: deep
 
 # Echo TCP Server
 
-我们来进行编写一个小小的示例———— Echo TCP Server(TCP 回显 server)，帮助我们理解更多的内容。
+我们来编写一个小小的示例———— Echo TCP Server(TCP 回显 server)，帮助我们理解更多的内容。
 
 > 代码一共也就一百行左右，简洁但不简单！
 

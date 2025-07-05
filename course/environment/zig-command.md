@@ -4,70 +4,71 @@ outline: deep
 
 # `zig` 命令
 
-现在，我们已经安装了 zig，也安装了对应的编辑器，接下来就了解一下基本的 `zig` 命令。
+安装好 Zig 和编辑器后，我们来了解一下 `zig` 命令行的基本用法。
 
-这单单一个命令可神了，它囊括了项目建立、构建、测试、运行，甚至你可以用它来部署你的项目，也可以用来给 C/C++ 作为编译或者依赖管理工具，非常的全面，这一切都是得益于 zig 本身的编译器。
+这个命令非常强大，它不仅涵盖了项目的创建、构建、测试和运行，甚至还能用于部署，或作为 C/C++ 的编译器及依赖管理工具。这一切都得益于 Zig 强大的自举编译器。
 
-以下仅列出常用的命令！
+以下列出一些常用命令：
 
 ## `zig build`
 
-构建项目，会自动搜索当前目录及父目录的 `build.zig` 进行构建。
+构建项目。该命令会自动在当前及父目录中查找 `build.zig` 文件并执行构建流程。
 
 ## `zig build-obj`
 
-编译一个 Zig 源文件为一个对象文件（`.o` 文件）。
+将指定的 Zig 源文件编译成对象文件（`.o` 文件）。
 
-## `zig build-test`
+## `zig build test`
 
-编译并执行 Zig 文件中的所有测试用例。
+编译并执行 `build.zig` 中定义的 "test" 步骤。通常用于运行整个项目的测试。
 
-## `zig init`
+## `zig init-exe`
 
-这个命令用于初始化项目，在当前路径下创建 `src/main.zig`、`src/root.zig` 、`build.zig` 和 `build.zig.zon` 四个文件。
-
-关于 `build.zig` 这个文件的内容涉及到了 zig 的构建系统，我们将会单独讲述。
+此命令用于初始化一个新的可执行文件（application）项目，会在当前目录下创建 `build.zig`、`build.zig.zon` 和 `src` 目录（包含 `main.zig`）。
 
 ```sh
 .                               # 项目根目录
 ├── build.zig                   # Zig 构建脚本：定义如何编译、测试和打包项目
 ├── build.zig.zon               # 项目清单文件 (zon 是 Zig Object Notation)：声明项目元数据和依赖项
 └── src                         # 源代码目录
-    ├── main.zig                # 程序主入口文件
-    └── root.zig                # 核心逻辑模块：存放应用或库的主要代码和功能
+    └── main.zig                # 程序主入口文件
 ```
+
+## `zig init-lib`
+
+与 `zig init-exe` 类似，但用于初始化一个库项目。它会创建一个结构相似的模板，但 `build.zig` 中的配置是面向库的。
 
 ## `zig ast-check`
 
-对指定文件进行 AST 语法检查，支持指定文件和标准输入。
+对指定的源文件或从标准输入读取的代码进行 AST (抽象语法树) 级别的语法检查。
 
 ## `zig fmt`
 
-用于格式化代码源文件，支持`stdin`和指定路径。
+格式化 Zig 源代码文件。支持指定文件路径，也支持从标准输入（`stdin`）读取内容。
 
 ## `zig test`
 
-对指定的源文件运行 test，适用于单元测试。
+编译并运行指定源文件中的测试用例。非常适用于单元测试。
 
 ## `zig run`
 
-编译并立即运行一个 Zig 程序。这对于快速测试片段代码非常有用。
+编译并立即运行一个 Zig 程序。该命令对于快速测试代码片段非常有用。
 
 ## `zig cc`
 
-使用 Zig 的内置 C 编译器来编译 C 代码。
+使用 Zig 的内置 C 编译器来编译 C 代码。可以看作是 `gcc` 或 `clang` 的直接替代品。
 
 ## `zig c++`
 
-使用 Zig 的内置 C++ 编译器来编译 C++ 代码。
+使用 Zig 的内置 C++ 编译器来编译 C++ 代码。可以看作是 `g++` 或 `clang++` 的直接替代品。
 
 ## `zig translate-c`
 
-将 C 代码转换为 Zig 代码。这是 Zig 提供的一个强大功能，可以帮助你将现有的 C 代码库迁移到 Zig。
+将 C 代码自动转换为 Zig 代码。这是一个强大的功能，可以极大地帮助开发者将现有的 C 代码库迁移到 Zig。
 
 ## `zig targets`
 
-显示 Zig 编译器支持的所有目标架构、操作系统和 ABI。
+列出 Zig 编译器支持的所有目标架构、操作系统和 ABI (应用程序二进制接口)。
 
 ## `zig version`
 
@@ -79,21 +80,21 @@ outline: deep
 
 ## `zig fetch`
 
-该命令用于获取包的 hash 或者添加包到 `build.zig.zon` 中！
+此命令用于获取包的哈希值，或直接将包添加为项目的依赖项并记录在 `build.zig.zon` 文件中。
 
 ```sh
+# 仅获取包的哈希值
 $ zig fetch https://github.com/webui-dev/zig-webui/archive/main.tar.gz
 12202809180bab2c7ae3382781b2fc65395e74b49d99ff2595f3fea9f7cf66cfa963
 ```
 
-当然如果你想将包直接添加到 `zon` 中，你可以附加 `--save` 参数来实现效果：
+如果你希望将包直接添加为依赖项，可以附加 `--save` 参数：
 
-```zig
+```sh
+# 获取哈希值，并将其作为依赖项保存到 build.zig.zon
 zig fetch --save https://github.com/webui-dev/zig-webui/archive/main.tar.gz
-// 当包提供 name 时，会自动使用包的 name
-// 当然，你也可以指定包的 name，使用 --save=webuizig
 ```
 
-除了上述命令之外，还有一些其他的命令和选项可以在 Zig 的官方文档中找到。随着 Zig 语言的不断发展，可能会有新的命令和功能加入，所以建议定期查看官方文档来获取最新信息。
+当包在其 `build.zig.zon` 中定义了 `name` 字段时，`zig fetch` 会自动使用该名称。你也可以使用 `--save=<custom-name>` 来指定一个自定义的依赖名称，例如 `--save=webuizig`。
 
-希望这些补充能够帮助完善你的文档。如果你需要更详细的信息，可以参考 Zig 的官方文档。
+除了以上介绍的命令，`zig` 还提供了许多其他命令和选项。随着 Zig 语言的不断发展，新的功能和命令也会持续加入，建议您定期查阅 [Zig 官方文档](https://ziglang.org/documentation/master/) 以获取最新信息。
