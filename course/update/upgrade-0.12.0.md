@@ -129,7 +129,7 @@ const B = MakeOpaque(1);
 
 对编译器的编译时内存（comptime memory）的内部表示，特别是编译时可变内存（即 `comptime var`）进行了全面改革。这次改革带来了一些面向用户的变化，以新的限制的形式出现，限制了你可以对 `comptime var` 做什么。
 
-第一个也是最重要的新规则是，永远不允许指向 a comptime var 的指针成为运行时已知的。例如：
+第一个也是最重要的新规则是，永远不允许指向 `comptime var` 的指针成为运行时已知的。例如：
 
 ```zig
 test "runtime-known comptime var pointer" {
@@ -392,7 +392,7 @@ test "@abs on int" {
 
 [BadBatBut 的缓解措施](https://github.com/ziglang/zig/pull/19698)没有在 0.12.0 版本的发布截止日期之前完成。
 
-### 不在允许覆盖 POSIX API
+### 不再允许覆盖 POSIX API
 
 Zig 的历史版本允许应用程序覆盖标准库的 POSIX API 层。该版本故意移除了这个能力，没有提供迁移方案。
 
@@ -575,7 +575,7 @@ pub fn serve(
 
 ### deflate 的重实现
 
-> deflat e 是一种无损数据压缩算法和相关的文件格式。它通常用于 gzip 和 zip 文件格式中，也是 HTTP 协议中的一种常见的内容编码方式。
+> deflate 是一种无损数据压缩算法和相关的文件格式。它通常用于 gzip 和 zip 文件格式中，也是 HTTP 协议中的一种常见的内容编码方式。
 >
 > inflate 是一种数据解压缩算法，它是 deflate 压缩算法的反向操作。在网络传输或数据存储中，通常先使用 deflate 算法将数据压缩，然后在需要使用数据时，再使用 inflate 算法将数据解压缩回原始形式。
 
@@ -1299,7 +1299,7 @@ error: the following build command crashed:
 
 ### Header 安装
 
-`Compile.installHeader `和其它相关函数的目的一直是将头文件与产物一起打包，让它们与产物一起安装，并自动添加到与产物链接的模块的包含搜索路径中。
+`Compile.installHeader`和其它相关函数的目的一直是将头文件与产物一起打包，让它们与产物一起安装，并自动添加到与产物链接的模块的包含搜索路径中。
 
 然而，在 `0.11.0` 中，这些函数修改了构建器的默认 `install` 顶级步骤，导致了一些意想不到的结果，比如根据调用的顶级构建步骤的不同，可能会安装或不安装头文件。
 
