@@ -10,7 +10,9 @@ export default defineComponent({
 
     const currentVersion: Ref<string> = ref(version);
 
-    const fontColor: ComputedRef<string> = computed(() => (isDark.value ? "#fff" : "#000"));
+    const fontColor: ComputedRef<string> = computed(() =>
+      isDark.value ? "#fff" : "#000",
+    );
 
     const backgroundColor: ComputedRef<string> = computed(() =>
       isDark.value ? "#14120F" : "#ebedf0",
