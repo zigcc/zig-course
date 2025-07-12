@@ -22,21 +22,20 @@ outline: deep
 
 编译并执行 `build.zig` 中定义的 "test" 步骤。通常用于运行整个项目的测试。
 
-## `zig init-exe`
+## `zig init`
 
-此命令用于初始化一个新的可执行文件（application）项目，会在当前目录下创建 `build.zig`、`build.zig.zon` 和 `src` 目录（包含 `main.zig`）。
+初始化一个新的 Zig 项目。此命令会在当前目录下创建 `build.zig`、`build.zig.zon` 和 `src` 目录（包含 `main.zig` 和 `root.zig`）。
+
+> **注意**：在 Zig 0.12+ 版本中，原来的 `zig init-exe` 和 `zig init-lib` 命令已合并为统一的 `zig init` 命令。新的模板同时包含可执行文件和静态库的配置，用户可以根据需要删除不需要的部分。
 
 ```sh
 .                               # 项目根目录
 ├── build.zig                   # Zig 构建脚本：定义如何编译、测试和打包项目
 ├── build.zig.zon               # 项目清单文件 (zon 是 Zig Object Notation)：声明项目元数据和依赖项
 └── src                         # 源代码目录
-    └── main.zig                # 程序主入口文件
+    ├── main.zig                # 程序主入口文件（可执行文件）
+    └── root.zig                # 库的根文件（静态库）
 ```
-
-## `zig init-lib`
-
-与 `zig init-exe` 类似，但用于初始化一个库项目。它会创建一个结构相似的模板，但 `build.zig` 中的配置是面向库的。
 
 ## `zig ast-check`
 
