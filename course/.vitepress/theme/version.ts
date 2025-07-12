@@ -1,17 +1,18 @@
 import { defineComponent, h, ref, computed } from "vue";
+import type { Ref, ComputedRef } from "vue";
 
 import { useData } from "vitepress";
-import { version } from "./config";
+import { version } from "./config.js";
 
 export default defineComponent({
   setup() {
     const { isDark, frontmatter } = useData();
 
-    const currentVersion = ref(version);
+    const currentVersion: Ref<string> = ref(version);
 
-    const fontColor = computed(() => (isDark.value ? "#fff" : "#000"));
+    const fontColor: ComputedRef<string> = computed(() => (isDark.value ? "#fff" : "#000"));
 
-    const backgroundColor = computed(() =>
+    const backgroundColor: ComputedRef<string> = computed(() =>
       isDark.value ? "#14120F" : "#ebedf0",
     );
 

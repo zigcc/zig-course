@@ -3,17 +3,14 @@ import { defineComponent, h } from "vue";
 import { useData, useRoute } from "vitepress";
 import Giscus from "@giscus/vue";
 
-const is_dev = process.env.NODE_ENV === "development";
+const is_dev: boolean = process.env.NODE_ENV === "development";
 
 export default defineComponent({
   setup() {
     const { isDark, title, frontmatter } = useData();
 
     return () =>
-      is_dev ||
-      !(typeof frontmatter.value.comments == "undefined"
-        ? true
-        : frontmatter.value.comments)
+      is_dev || !(frontmatter.value.comments ?? true)
         ? h("div")
         : h(
             "div",

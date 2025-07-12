@@ -1,14 +1,15 @@
-// .vitepress/theme/index.js
+// .vitepress/theme/index.ts
+import type { Theme } from "vitepress";
 import DefaultTheme from "vitepress/theme";
 
-import giscus from "./giscus";
-import version from "./version";
+import giscus from "./giscus.js";
+import version from "./version.js";
 import "./style/print.css";
 
 import { h } from "vue";
 
 export default {
-  ...DefaultTheme,
+  extends: DefaultTheme,
   enhanceApp(ctx: any) {
     DefaultTheme.enhanceApp(ctx);
     if (typeof window != "undefined") {
@@ -33,4 +34,4 @@ export default {
       "doc-before": () => h(version),
     });
   },
-};
+} satisfies Theme;

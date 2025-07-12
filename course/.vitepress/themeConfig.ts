@@ -1,7 +1,7 @@
-import { DefaultTheme } from "vitepress";
-import sidebar from "./sidebar";
-import nav from "./nav";
-import socialLinks from "./socialLinks";
+import type { DefaultTheme } from "vitepress";
+import sidebar from "./sidebar.js";
+import nav from "./nav.js";
+import socialLinks from "./socialLinks.js";
 
 const config: DefaultTheme.Config = {
   editLink: {

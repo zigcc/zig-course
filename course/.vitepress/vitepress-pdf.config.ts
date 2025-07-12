@@ -2,11 +2,11 @@
 import type { DefaultTheme } from "vitepress";
 import { defineUserConfig } from "vitepress-export-pdf";
 
-import sidebar from "./sidebar";
+import sidebar from "./sidebar.js";
 
-let links: string[] = [];
+const links: string[] = [];
 
-function ExtractLinks(item: DefaultTheme.SidebarItem) {
+function ExtractLinks(item: DefaultTheme.SidebarItem): void {
   if (item.link) {
     if (item.link === "/") {
       // 此处额外打了一个补丁，因为首页的链接是 /index
@@ -16,10 +16,11 @@ function ExtractLinks(item: DefaultTheme.SidebarItem) {
     }
   }
 
-  if (item.items)
+  if (item.items) {
     for (const key in item.items) {
       ExtractLinks(item.items[key]);
     }
+  }
 }
 
 for (const key in sidebar) {

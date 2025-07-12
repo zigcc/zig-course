@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "scripts": {
     "format": "prettier --write . && zig fmt . --exclude zig-out && autocorrect --fix",
     "dev": "vitepress dev course",
