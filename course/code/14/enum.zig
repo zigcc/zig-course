@@ -149,7 +149,7 @@ const EnumLiteral_ = struct {
         // #region enum_literal
         // 使用内建函数 @Type 构造出一个 EnumLiteral 类型
         // 这是目前官方文档中的使用方案
-        const EnumLiteral: type = @Type(.EnumLiteral);
+        const EnumLiteral: type = @Type(.enum_literal);
 
         // 定义一个常量 enum_literal，它的类型为 EnumLiteral，并赋值为 “.kkk”
         const enum_literal: EnumLiteral = .kkk;
