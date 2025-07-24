@@ -6,7 +6,7 @@ outline: deep
 
 与学习其他编程语言一样，我们也将从经典的 `Hello, World!` 程序开始，以此向 Zig 的世界打一声招呼。
 
-首先，使用 `zig init-exe` 命令初始化一个可执行项目，然后将以下内容覆盖写入到 `src/main.zig` 文件中。
+首先，使用 `zig init` 命令初始化一个可执行项目，然后将以下内容覆盖写入到 `src/main.zig` 文件中。
 
 <!-- 引入代码片段 -->
 <!-- 具体说明见：https://vitepress.dev/zh/guide/markdown#import-code-snippets -->
