@@ -44,9 +44,11 @@ pub fn build(b: *Build) void {
                 // build exe
                 const exe = b.addExecutable(.{
                     .name = output_name,
-                    .root_source_file = b.path(path),
-                    .target = target,
-                    .optimize = optimize,
+                    .root_module = b.addModule(output_name, .{
+                        .root_source_file = b.path(path),
+                        .target = target,
+                        .optimize = optimize,
+                    }),
                 });
                 exe.linkLibC();
 
@@ -54,10 +56,16 @@ pub fn build(b: *Build) void {
                 b.installArtifact(exe);
 
                 // build test
+                const test_name = std.fmt.allocPrint(b.allocator, "{s}_test", .{output_name}) catch |err| {
+                    log.err("fmt test name failed, err is {}", .{err});
+                    std.process.exit(1);
+                };
                 const unit_tests = b.addTest(.{
-                    .root_source_file = b.path(path),
-                    .target = target,
-                    .optimize = optimize,
+                    .root_module = b.addModule(test_name, .{
+                        .root_source_file = b.path(path),
+                        .target = target,
+                        .optimize = optimize,
+                    }),
                 });
 
                 // add to default install

@@ -1,0 +1,10 @@
+.{
+    .name = .pkg2,
+    .version = "0.0.0",
+    .fingerprint = 0xec92f7a1a7362798,
+    .dependencies = .{},
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+    },
+}
