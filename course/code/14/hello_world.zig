@@ -1,5 +1,5 @@
 pub fn main() !void {
-    One.main();
+    try One.main();
     try Two.main();
     try Three.main();
 }
