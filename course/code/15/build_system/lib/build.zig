@@ -12,11 +12,13 @@ pub fn build(b: *std.Build) void {
         // 库的名字
         .name = "example",
         // 源文件地址
-        .root_source_file = b.path("src/root.zig"),
-        // 构建目标
-        .target = target,
-        // 构建模式
-        .optimize = optimize,
+        .root_module = b.addModule("example", .{
+            .root_source_file = b.path("src/root.zig"),
+            // 构建目标
+            .target = target,
+            // 构建模式
+            .optimize = optimize,
+        }),
     });
 
     // 这代替原本的 lib.install，在构建时自动构建 lib
@@ -26,11 +28,12 @@ pub fn build(b: *std.Build) void {
     // 添加一个二进制可执行程序构建
     const exe = b.addExecutable(.{
         .name = "zig",
-        .root_source_file = b.path("src/main.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.addModule("zig", .{
+            .root_source_file = b.path("src/main.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
-
     // 链接 lib
     exe.linkLibrary(lib);
 

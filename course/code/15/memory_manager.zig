@@ -5,7 +5,7 @@ pub fn main() !void {
     try FixedBufferAllocator.main();
     try ThreadSafeFixedBufferAllocator.main();
     try ArenaAllocator.main();
-    try c_allocaotr.main();
+    try c_allocator.main();
     try page_allocator.main();
     try StackFallbackAllocator.main();
     try MemoryPool.main();
@@ -17,7 +17,7 @@ const DebugAllocator = struct {
 
     pub fn main() !void {
         // 使用模型，一定要是变量，不能是常量
-        var gpa = std.heap.DebugAllocator(std.heap.DebugAllocatorConfig{}){};
+        var gpa = std.heap.DebugAllocator(.{}){};
         // 拿到一个allocator
         const allocator = gpa.allocator();
 
@@ -103,7 +103,7 @@ const ThreadSafeFixedBufferAllocator = struct {
 const BestAllocator = struct {
     const std = @import("std");
     const builtin = @import("builtin");
-    var debug_allocator: std.heap.DebugAllocator(.{}) = .init;
+    var debug_allocator: std.heap.DebugAllocator(.{}) = .{};
 
     pub fn main() !void {
         const allocator, const is_debug = allocator: {
@@ -156,15 +156,15 @@ const ArenaAllocator = struct {
     // #endregion ArenaAllocator
 };
 
-const c_allocaotr = struct {
+const c_allocator = struct {
     // #region c_allocator
     const std = @import("std");
 
     pub fn main() !void {
         // 用起来和 C 一样纯粹
-        const c_allocator = std.heap.c_allocator;
-        const num = try c_allocator.alloc(u8, 1);
-        defer c_allocator.free(num);
+        const allocator = std.heap.c_allocator;
+        const num = try allocator.alloc(u8, 1);
+        defer allocator.free(num);
     }
     // #endregion c_allocator
 };

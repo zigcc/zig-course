@@ -8,11 +8,12 @@ const Build = struct {
 
         const exe = b.addExecutable(.{
             .name = "c_lib_import_gsl_windows-x64",
-            .root_source_file = b.path("c_lib_import_gsl_fft.zig"),
-            .target = target,
-            .optimize = optimize,
+            .root_module = b.addModule("c_lib_import_gsl_windows-x64", .{
+                .root_source_file = b.path("src/main.zig"),
+                .target = target,
+                .optimize = optimize,
+            }),
         });
-
         // #region c_import
         // 增加 include 搜索目录
         exe.addIncludePath(.{ .cwd_relative = "D:\\vcpkg\\installed\\windows-x64\\include" });
