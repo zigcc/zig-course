@@ -15,9 +15,11 @@ pub fn build(b: *std.Build) void {
     // 注意：我们在这里并没有使用 root_source_file 字段
     // 该字段是为 zig 源文件准备的
     const exe = b.addExecutable(.{
-        .name = "zig",
-        .target = target,
-        .optimize = optimize,
+        .name = "tinytetris",
+        .root_module = b.createModule(.{
+            .target = target,
+            .optimize = optimize,
+        }),
     });
 
     // 添加 C 源代码文件，两个参数：

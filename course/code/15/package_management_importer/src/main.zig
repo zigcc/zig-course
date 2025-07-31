@@ -3,7 +3,9 @@ const pe = @import("path_exporter");
 const te = @import("tarball_exporter");
 
 pub fn main() !void {
-    const stdout = std.io.getStdOut().writer();
+    var stdout_buffer: [1024]u8 = undefined;
+    var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+    const stdout = &stdout_writer.interface;
 
     const str2: te.Str = .{ .str = "2" };
 
@@ -15,4 +17,5 @@ pub fn main() !void {
         pe.add(1, 1),
         str2.value(),
     });
+    try stdout.flush();
 }
