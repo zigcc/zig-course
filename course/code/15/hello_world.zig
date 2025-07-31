@@ -37,8 +37,8 @@ const Three = struct {
     // #region three
     pub fn main() !void {
         // 定义两个缓冲区
-        var stdout_buffer: [1024]u8 = undefined;// [!code focus]
-        var stderr_buffer: [1024]u8 = undefined;// [!code focus]
+        var stdout_buffer: [1024]u8 = undefined; // [!code focus]
+        var stderr_buffer: [1024]u8 = undefined; // [!code focus]
 
         // 获取writer句柄// [!code focus]
         var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
@@ -49,8 +49,8 @@ const Three = struct {
         const stderr = &stderr_writer.interface;
 
         // 通过句柄写入buffer// [!code focus]
-        try stdout.print("Hello {s}!\n", .{"out"});// [!code focus]
-        try stderr.print("Hello {s}!\n", .{"err"});// [!code focus]
+        try stdout.print("Hello {s}!\n", .{"out"}); // [!code focus]
+        try stderr.print("Hello {s}!\n", .{"err"}); // [!code focus]
 
         try stdout.flush();
         try stderr.flush();
@@ -61,4 +61,3 @@ const Three = struct {
     }
     // #endregion three
 };
-
