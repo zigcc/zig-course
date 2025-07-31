@@ -20,6 +20,6 @@ pub fn main() !void {
     // 快速离散傅里叶变换
     _ = gsl.gsl_fft_complex_radix2_forward(data.ptr, 1, n);
     // 输出结果
-    try std.io.getStdOut().writer().print("\n{any}\n", .{data});
+    try std.io.stdout.writer().print("\n{any}\n", .{data});
     // #endregion use_gsl_fft
 }

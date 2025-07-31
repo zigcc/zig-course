@@ -10,9 +10,11 @@ pub fn build(b: *std.Build) void {
     // 添加一个二进制可执行程序构建
     const exe = b.addExecutable(.{
         .name = "zig",
-        .root_source_file = b.path("src/main.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/main.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
 
     // 通过标准库获取时间戳

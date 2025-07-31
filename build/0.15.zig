@@ -52,6 +52,10 @@ pub fn build(b: *Build) void {
                 });
                 exe.linkLibC();
 
+                if (exe.root_module.resolved_target.?.result.os.tag == .windows and std.mem.eql(u8, "echo_tcp_server.zig", entry.name)) {
+                    std.log.info("link ws2_32 for {s}", .{entry.name});
+                    exe.linkSystemLibrary("ws2_32");
+                }
                 // add to default install
                 b.installArtifact(exe);
 

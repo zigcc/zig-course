@@ -8,35 +8,24 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
 
     // 尝试添加一个静态库
-    const lib = b.addStaticLibrary(.{
-        // 库的名字
-        .name = "example",
-        // 源文件地址
-        .root_module = b.addModule("example", .{
-            .root_source_file = b.path("src/root.zig"),
-            // 构建目标
-            .target = target,
-            // 构建模式
-            .optimize = optimize,
-        }),
-    });
+    const lib = b.addLibrary(.{ .name = "example", .root_module = b.createModule(.{
+        .root_source_file = b.path("src/root.zig"),
+        .target = target,
+        .optimize = optimize,
+    }) });
 
-    // 这代替原本的 lib.install，在构建时自动构建 lib
-    // 但其实这是不必要的，因为如果有可执行二进制程序构建使用了 lib，那么它会自动被构建
     b.installArtifact(lib);
 
-    // 添加一个二进制可执行程序构建
     const exe = b.addExecutable(.{
         .name = "zig",
-        .root_module = b.addModule("zig", .{
+        .root_module = b.createModule(.{
             .root_source_file = b.path("src/main.zig"),
             .target = target,
             .optimize = optimize,
         }),
     });
-    // 链接 lib
+
     exe.linkLibrary(lib);
 
-    // 添加到顶级 install step 中作为依赖，构建 exe
     b.installArtifact(exe);
 }
