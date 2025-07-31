@@ -1,5 +1,5 @@
 pub fn main() !void {
-    One.main();
+    try One.main();
     try Two.main();
     try Three.main();
 }
@@ -19,19 +19,12 @@ const Two = struct {
     const std = @import("std");
 
     pub fn main() !void {
-        var stdout_buffer: [1024]u8 = undefined;
-        var stderr_buffer: [1024]u8 = undefined;
-        var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
-        const stdout = &stdout_writer.interface;
-        var stderr_writer = std.fs.File.stderr().writer(&stderr_buffer);
-        const stderr = &stderr_writer.interface;
+        const stdout = std.io.getStdOut().writer();
+        const stderr = std.io.getStdErr().writer();
 
         try stdout.print("Hello {s}!\n", .{"out"});
         try stderr.print("Hello {s}!\n", .{"err"});
-        try stdout.flush();
-        try stderr.flush();
-    }
-    // #endregion two
+    } // #endregion two
 };
 
 const Three = struct {
@@ -39,18 +32,16 @@ const Three = struct {
     const std = @import("std");
 
     pub fn main() !void {
-        var stdout_buffer: [1024]u8 = undefined;
-        var stderr_buffer: [1024]u8 = undefined;
-        const out = std.fs.File.stdout().writer(&stdout_buffer); // [!code focus]
-        const err = std.fs.File.stderr().writer(&stderr_buffer); // [!code focus]
+        const out = std.io.getStdOut().writer(); // [!code focus]
+        const err = std.io.getStdErr().writer(); // [!code focus]
 
         // 获取buffer// [!code focus]
         var out_buffer = std.io.bufferedWriter(out); // [!code focus]
         var err_buffer = std.io.bufferedWriter(err); // [!code focus]
 
         // 获取writer句柄// [!code focus]
-        var out_writer = out_buffer.writer(); // [!code focus]
-        var err_writer = err_buffer.writer(); // [!code focus]
+        const out_writer = out_buffer.writer(); // [!code focus]
+        const err_writer = err_buffer.writer(); // [!code focus]
 
         // 通过句柄写入buffer// [!code focus]
         try out_writer.print("Hello {s}!\n", .{"out"}); // [!code focus]

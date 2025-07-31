@@ -1,5 +1,6 @@
 pub fn main() !void {
     CreateArray.main();
+    Deconstruct.main();
     Matrix.main();
     TerminatedArray.main();
     Multiply.main();
@@ -7,7 +8,6 @@ pub fn main() !void {
     FuncInitArray.main();
     ComptimeInitArray.main();
 }
-
 const CreateArray = struct {
     // #region create_array
     const print = @import("std").debug.print;

@@ -9,11 +9,12 @@ pub fn build(b: *std.Build) void {
     // 构建一个 object，用于生成文档
     const object = b.addObject(.{
         .name = "object",
-        .root_source_file = b.path("src/root.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.addModule("object", .{
+            .root_source_file = b.path("src/root.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
-
     // 创建一个 step
     const docs_step = b.step("docs", "Generate docs");
 

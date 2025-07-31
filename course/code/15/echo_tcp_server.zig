@@ -46,7 +46,7 @@ pub fn main() !void {
     const port = 8080;
     const address = try net.Address.parseIp4("127.0.0.1", port);
     // 初始化一个server，这里就包含了 socket() 和 bind() 两个过程
-    var server = try address.listen(.{ .reuse_port = true });
+    var server = try address.listen(.{});
     defer server.deinit();
     // #endregion listen
 
