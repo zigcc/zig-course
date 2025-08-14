@@ -41,7 +41,7 @@ const inline_assembly = struct {
             : [ret] "={rax}" (-> usize),
             : [number] "{rax}" (number),
               [arg1] "{rdi}" (arg1),
-            : .{ .rcx = true, .r11 = true }
+            : "rcx", "r11"
         );
     }
 
@@ -52,7 +52,7 @@ const inline_assembly = struct {
               [arg1] "{rdi}" (arg1),
               [arg2] "{rsi}" (arg2),
               [arg3] "{rdx}" (arg3),
-            : .{ .rcx = true, .r11 = true }
+            : "rcx", "r11"
         );
     }
     // #endregion inline_assembly
