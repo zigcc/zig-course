@@ -151,7 +151,7 @@ Zig 语言不允许在函数内部声明函数，也不允许直接创建匿名�
 
 ### `export`
 
-`export` 关键字确保函数在生成的对象文件中可见，并遵循 C ABI。
+`export` 关键字确保函数在生成的目标文件(object file)中可见，并遵循 C ABI。
 
 <<<@/code/release/function.zig#sub
 
