@@ -11,6 +11,7 @@ pub fn build(b: *Build) void {
         13 => @import("build/0.13.zig").build(b),
         14 => @import("build/0.14.zig").build(b),
         15 => @import("build/0.15.zig").build(b),
+        16 => @import("build/0.16.zig").build(b),
         else => @compileError("unknown zig version"),
     }
 }
