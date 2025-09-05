@@ -4,14 +4,13 @@ showVersion: false
 ---
 
 本篇文档将介绍如何从 `0.14.0` 版本升级到 `0.15.1`。
-
-> 本次发布包含了 162 位贡献者在 5 个月内完成的 647 次提交。在默认选择 Zig 的 x86 后端后，调试编译速度提高了 5 倍；正在开发的 aarch64 后端也紧随其后。同时，Writergate 事件以及一系列语言变更和标准库的调整，带来了大量的 API 破坏性更改。
+本次发布凝聚了 162 位贡献者 在 5 个月内 647 次提交的成果。在将 Zig 的 **x86 后端** 设为 **调试模式** 的默认选项后，其编译速度提升了 5 倍；同时，正在积极开发的 **aarch64 后端** 也取得了显著进展。此外，**Writergate** 以及一系列语言变更和标准库调整，带来了大量的 **API 破坏性更改**。
 
 ## 语言变更
 
 ### 移除 `usingnamespace`
 
-`usingnamespace` 关键字已被移除。以下是一些常见用例的替代方案：
+`usingnamespace` 关键字已被移除。以下是常见用例的替代方案：
 
 #### 用例：条件包含
 
@@ -50,10 +49,10 @@ pub const write = os_impl.write;
 // 旧代码
 const MyStruct = struct {
     data: u32,
-    
-    usingnamespace if (builtin.mode == .Debug) 
+
+    usingnamespace if (builtin.mode == .Debug)
         @import("debug_impl.zig")
-    else 
+    else
         @import("release_impl.zig");
 };
 ```
@@ -62,18 +61,18 @@ const MyStruct = struct {
 
 ```zig
 // 新代码
-const Impl = if (builtin.mode == .Debug) 
+const Impl = if (builtin.mode == .Debug)
     @import("debug_impl.zig")
-else 
+else
     @import("release_impl.zig");
 
 const MyStruct = struct {
     data: u32,
-    
+
     pub fn doSomething(self: *MyStruct) void {
         return Impl.doSomething(self);
     }
-    
+
     // 显式实现所有需要的方法
 };
 ```
@@ -110,9 +109,9 @@ fn LoggingMixin(comptime T: type) type {
 
 const MyStruct = struct {
     data: u32,
-    
+
     const Mixin = LoggingMixin(@This());
-    
+
     pub fn log(self: *MyStruct, message: []const u8) void {
         Mixin.log(self, message);
     }
@@ -165,7 +164,7 @@ fn handleEnum(value: MyEnum) void {
 test "boolean vector operations" {
     const vec_a: @Vector(4, bool) = .{ true, false, true, false };
     const vec_b: @Vector(4, bool) = .{ false, true, true, false };
-    
+
     const and_result = vec_a & vec_b;
     const or_result = vec_a | vec_b;
     const xor_result = vec_a ^ vec_b;
@@ -205,10 +204,10 @@ asm volatile ("mov %[src], %[dst]"
 test "ptrCast to slice" {
     var value: u32 = 42;
     const ptr: *u32 = &value;
-    
+
     // 新功能：将单项指针转换为切片
     const slice: []u32 = @ptrCast(ptr);
-    
+
     std.testing.expect(slice[0] == 42);
 }
 ```
@@ -221,11 +220,11 @@ test "ptrCast to slice" {
 test "undefined arithmetic" {
     const a: i32 = undefined;
     const b: i32 = 10;
-    
+
     // 任何与 undefined 的运算都返回 undefined
     const result = a + b; // result 是 undefined
     _ = result;
-    
+
     // 更安全的做法
     const safe_a: i32 = 0; // 显式初始化
     const safe_result = safe_a + b;
@@ -240,13 +239,13 @@ test "undefined arithmetic" {
 ```zig
 test "lossy integer to float conversion" {
     const large_int: u64 = 0x1FFFFFFFFFFFFF; // 53 位
-    
+
     // 这将产生编译错误，因为 f64 只有 52 位尾数
     // const float_val: f64 = @floatFromInt(large_int); // 错误！
-    
+
     // 需要显式使用有损转换
     const float_val: f64 = @floatFromInt(@as(u53, @truncate(large_int)));
-    
+
     std.debug.print("Float: {}\n", .{float_val});
 }
 ```
@@ -260,6 +259,7 @@ test "lossy integer to float conversion" {
 #### 动机
 
 旧的 I/O 系统存在以下问题：
+
 - 泛型接口导致编译时间过长
 - 缓冲区管理不一致
 - 性能不佳，存在不必要的内存拷贝
@@ -306,26 +306,26 @@ try processData(
 );
 ```
 
-#### 新的 `std.Io.Writer` 和 `std.Io.Reader` API
+### 新的 `std.Io.Writer` 和 `std.Io.Reader` API
 
-新的 API 采用非泛型设计：
+新的 API 采用**非泛型设计**：
 
 ```zig
 // std.Io.Writer 的定义
 pub const Writer = struct {
     ptr: *anyopaque,
     vtable: *const VTable,
-    
+
     pub const VTable = struct {
         write: *const fn (*anyopaque, []const u8) anyerror!usize,
         writeAll: *const fn (*anyopaque, []const u8) anyerror!void,
         writeByte: *const fn (*anyopaque, u8) anyerror!void,
     };
-    
+
     pub fn write(self: Writer, bytes: []const u8) !usize {
         return self.vtable.write(self.ptr, bytes);
     }
-    
+
     pub fn writeAll(self: Writer, bytes: []const u8) !void {
         return self.vtable.writeAll(self.ptr, bytes);
     }
@@ -453,7 +453,7 @@ var buffered_writer = std.io.BufferedWriter(4096, @TypeOf(base_writer)).init(bas
 const Point = struct {
     x: f32,
     y: f32,
-    
+
     pub fn format(self: Point, writer: anytype) !void {
         try writer.print("Point({d}, {d})", .{ self.x, self.y });
     }
@@ -473,7 +473,7 @@ std.debug.print("{f}\n", .{point}); // 注意使用 {f}
 const Point = struct {
     x: f32,
     y: f32,
-    
+
     pub fn format(
         self: Point,
         comptime fmt: []const u8, // 被移除
@@ -494,7 +494,7 @@ const Point = struct {
 const Point = struct {
     x: f32,
     y: f32,
-    
+
     pub fn format(
         self: Point,
         writer: anytype, // 只保留 writer 参数
@@ -538,14 +538,14 @@ std.debug.print("{b}\n", .{value});     // 二进制：11111111
 // 浮点数格式化
 const pi: f64 = 3.14159;
 std.debug.print("{d:.2}\n", .{pi});     // 保留两位小数：3.14
-std.debug.print("{e}\n", .{pi});       // 科学计数法：3.14159e+00
+std.debug.print("{e}\n", .{pi});        // 科学计数法：3.14159e+00
 
 // 指针和切片
 const ptr: *u32 = &value;
 const slice: []const u8 = "hello";
-std.debug.print("{*}\n", .{ptr});      // 指针地址
-std.debug.print("{s}\n", .{slice});    // 字符串
-std.debug.print("{any}\n", .{slice});  // 通用格式化
+std.debug.print("{*}\n", .{ptr});       // 指针地址
+std.debug.print("{s}\n", .{slice});     // 字符串
+std.debug.print("{any}\n", .{slice});   // 通用格式化
 ```
 
 ### 去泛型化链表
@@ -593,26 +593,26 @@ pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
-    
+
     var client = std.http.Client{ .allocator = allocator };
     defer client.deinit();
-    
+
     const uri = std.Uri.parse("https://httpbin.org/get") catch unreachable;
-    
+
     var headers = std.http.Headers{ .allocator = allocator };
     defer headers.deinit();
-    
+
     try headers.append("User-Agent", "Zig HTTP Client");
-    
+
     var request = try client.open(.GET, uri, headers, .{});
     defer request.deinit();
-    
+
     try request.send(.{});
     try request.wait();
-    
+
     const body = try request.reader().readAllAlloc(allocator, 8192);
     defer allocator.free(body);
-    
+
     std.debug.print("Response: {s}\n", .{body});
 }
 ```
@@ -629,20 +629,20 @@ pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
-    
+
     const address = try std.net.Address.parseIp("93.184.216.34", 443); // example.com
     const stream = try std.net.tcpConnectToAddress(address);
     defer stream.close();
-    
+
     var tls_client = try std.crypto.tls.Client.init(stream, .{
         .host = "example.com",
         .allocator = allocator,
     });
     defer tls_client.deinit();
-    
+
     const request = "GET / HTTP/1.1\r\nHost: example.com\r\n\r\n";
     try tls_client.writeAll(request);
-    
+
     var buffer: [4096]u8 = undefined;
     const bytes_read = try tls_client.read(&buffer);
     std.debug.print("Response: {s}\n", .{buffer[0..bytes_read]});
@@ -651,7 +651,7 @@ pub fn main() !void {
 
 ### `ArrayList`：将非托管模式设为默认
 
-这是一个重大的破坏性更改。`std.ArrayList` 现在默认采用非托管 (unmanaged) 方式：
+这是一个重大的破坏性更改。`std.ArrayList` 现在默认采用 **非托管(unmanaged)** 模式：
 
 ```zig
 // 旧代码
@@ -660,10 +660,10 @@ const std = @import("std");
 fn oldArrayListExample(allocator: std.mem.Allocator) !void {
     var list = std.ArrayList(i32).init(allocator);
     defer list.deinit();
-    
+
     try list.append(42);
     try list.appendSlice(&[_]i32{ 1, 2, 3 });
-    
+
     for (list.items) |item| {
         std.debug.print("{d} ", .{item});
     }
@@ -680,10 +680,10 @@ fn newArrayListExample(allocator: std.mem.Allocator) !void {
     // 方式 1：使用新的 ArrayListUnmanaged
     var list: std.ArrayListUnmanaged(i32) = .empty;
     defer list.deinit(allocator);
-    
+
     try list.append(allocator, 42);
     try list.appendSlice(allocator, &[_]i32{ 1, 2, 3 });
-    
+
     for (list.items) |item| {
         std.debug.print("{d} ", .{item});
     }
@@ -695,7 +695,7 @@ fn compatibilityExample(allocator: std.mem.Allocator) !void {
     const ArrayList = std.ArrayListUnmanaged;
     var list: ArrayList(i32) = .empty;
     defer list.deinit(allocator);
-    
+
     try list.append(allocator, 42);
 }
 
@@ -703,11 +703,11 @@ fn compatibilityExample(allocator: std.mem.Allocator) !void {
 fn newInitExample(allocator: std.mem.Allocator) !void {
     var list = std.ArrayList(i32).init(allocator); // 仍然可用，但已弃用
     defer list.deinit();
-    
+
     // 或者使用新的方式
     var new_list: std.ArrayList(i32) = .{};
     defer new_list.deinit(allocator);
-    
+
     try new_list.append(allocator, 42);
 }
 ```
@@ -839,15 +839,15 @@ zig build --watch
 zig build --watch --debounce 100
 ```
 
-### Web 界面和时间报告
+### Web 界面和即时报告
 
-构建系统现在支持 Web 界面和详细的时间报告功能。
+构建系统现在支持 Web 界面和详细的即时报告功能。
 
 ## 编译器
 
 ### x86 后端
 
-在默认选择 Zig 的 x86 后端的情况下，调试编译速度提高了 5 倍。这是本次更新最显著的性能改进：
+在 **调试编译** 默认为 **x86 后端** 的情况下，其速度提高了 5 倍。这也是本次更新最显著的性能改进：
 
 ```bash
 # 使用新的 x86 后端（默认）
@@ -859,7 +859,7 @@ zig build -Doptimize=Debug -fLLVM
 
 ### aarch64 后端
 
-aarch64 后端的开发也在稳步推进，为 ARM 平台提供更好的支持。
+**aarch64 后端** 的开发也在稳步推进，为 ARM 平台提供更好的支持。
 
 ### 增量编译
 
@@ -968,10 +968,10 @@ zig build test --fuzz --timeout 60
 // 模糊测试例子
 test "fuzz string parsing" {
     const input_bytes = std.testing.fuzzInput(.{});
-    
+
     // 测试字符串解析函数
     const result = parseString(input_bytes);
-    
+
     // 确保不会崩溃
     _ = result catch |err| {
         // 预期的错误可以忽略
@@ -991,7 +991,7 @@ fn parseString(input: []const u8) ![]const u8 {
 
 本次发布修复了大量错误。
 
-### 本次发布包含的错误
+## 本次发布包含的错误
 
 Zig 目前仍存在一些已知的 bugs，包括一些编译错误。
 
@@ -1000,6 +1000,7 @@ Zig 目前仍存在一些已知的 bugs，包括一些编译错误。
 ### LLVM 20
 
 本次更新升级到 LLVM 20，带来了以下改进：
+
 - 更好的优化支持
 - 新的目标架构支持
 - 改进的调试信息生成
@@ -1110,16 +1111,16 @@ I/O 系统将继续作为接口进行发展和完善。
    - 最后处理 ArrayList 等容器的变更
 
 3. **使用编译器检查**：
+
    ```bash
    # 检查编译错误
    zig build-exe src/main.zig
-   
+
    # 使用新的 x86 后端加速编译
    zig build -fno-LLVM
    ```
 
 4. **测试全面性**：确保所有功能在新版本下正常运行
-
 5. **利用新特性**：
    - 使用新的 x86 后端提高编译速度
    - 使用文件系统监视功能
