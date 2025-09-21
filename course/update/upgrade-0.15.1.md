@@ -651,7 +651,7 @@ pub fn main() !void {
 
 ### `ArrayList`：将非托管模式设为默认
 
-这是一个重大的破坏性更改。`std.ArrayList` 现在默认采用 **非托管(unmanaged)** 模式：
+这是一个重大的破坏性更改。`std.ArrayList` 现在默认采用 **非托管 (unmanaged)** 模式：
 
 ```zig
 // 旧代码
