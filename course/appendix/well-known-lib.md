@@ -11,6 +11,7 @@ showVersion: false
 - **[bun](https://github.com/oven-sh/bun)**: 使用 zig 编写的 js 运行时，原生支持 ts 和包管理
 - **[mach](https://machengine.org/)**：zig 的游戏引擎和图形套件
 - **[capy](https://github.com/capy-ui/capy)**：依托于 GTK4 的强大的 GUI 库
+- **[dvui](https://github.com/david-vanderson/dvui)**: 适用于应用程序和游戏的 Immediate Zig GUI
 - **[zld](https://github.com/kubkon/zld)**: zig 实现的 LD 的替代品
 - **[zls](https://github.com/zigtools/zls)**: zig 的 language server 实现
 - **[dt](https://github.com/so-dang-cool/dt)**: 用于 unix 的 pipe
