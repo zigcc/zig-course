@@ -217,6 +217,14 @@ export default [
     collapsed: true,
     items: [
       {
+        text: "0.15.1 升级指南",
+        link: "/update/upgrade-0.15.1",
+      },
+      {
+        text: "0.15.1 版本说明",
+        link: "/update/0.15.1-description",
+      },
+      {
         text: "0.14.0 升级指南",
         link: "/update/upgrade-0.14.0",
       },

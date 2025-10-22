@@ -20,7 +20,7 @@ showVersion: false
 > 允许函数处理各种数据，以及一小组新的编译器指令，以允许使用反射访问有关这些类型的信息。
 > Zig 还旨在提高代码的安全性，它不提供垃圾回收（GC），但是使用可选类型代替 `null` ，这避免了空指针的出现。
 
-![Cover Image](./public/cover_image.png "Cover Image")
+![Cover Image](/cover_image.png "Cover Image")
 
 ## 为何使用 Zig
 
