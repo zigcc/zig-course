@@ -81,9 +81,13 @@ Zig 本身没有内置的 `@print()` 函数，输出功能通常由标准库的 
 
 ## 更进一步：线程安全
 
-以上代码在单线程环境下工作良好，但在多线程环境中，多个线程同时调用 `print` 可能会导致输出内容交错混乱。为了保证线程安全，我们需要为 `writer` 添加锁。
+以上代码在单线程环境下工作良好，但在多线程环境中，多个线程同时调用 `print` 可能会导致输出内容交错混乱。
 
-你可以使用 `std.Thread.Mutex` 来实现一个线程安全的 `writer`。我们鼓励你阅读[标准库源码](https://ziglang.org/documentation/master/std/#std.Thread.Mutex)来深入了解其工作原理。
+为了保证线程安全，我们需要为 `writer` 添加锁。
+
+你可以使用 `std.Thread.Mutex` 来实现一个线程安全的 `writer`。
+
+我们鼓励你阅读[标准库源码](https://ziglang.org/documentation/master/std/#std.Thread.Mutex)来深入了解其工作原理。
 
 ## 了解更多
 
