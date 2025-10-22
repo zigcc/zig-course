@@ -141,49 +141,6 @@ PS: 说实话，我认为这个设计并不太好。
 为什么是作用域顶层呢？实际上，Zig 将一个源码文件看作是一个容器。
 :::
 
-## `usingnamespace`
-
-关键字 `usingnamespace` 可以将一个容器中的所有 `pub` 声明混入到当前的容器中。
-
-例如，可以使用 `usingnamespace` 将 `std` 标准库混入到 `main.zig` 这个容器中：
-
-```zig
-const T = struct {
-    usingnamespace @import("std");
-};
-pub fn main() !void {
-    T.debug.print("Hello, World!\n", .{});
-}
-```
-
-注意：无法在结构体 `T` 内部直接使用混入的声明，需要使用 `T.debug` 这种方式才可以！
-
-`usingnamespace` 还可以使用 `pub` 关键字进行修饰，用于转发声明，这常用于组织 API 文件和 C 语言的 `import`。
-
-```zig
-pub usingnamespace @cImport({
-    @cInclude("epoxy/gl.h");
-    @cInclude("GLFW/glfw3.h");
-    @cDefine("STBI_ONLY_PNG", "");
-    @cDefine("STBI_NO_STDIO", "");
-    @cInclude("stb_image.h");
-});
-```
-
-相关的使用方法可以是这样的：
-
-```zig
-pub usingnamespace @cImport({
-    @cInclude("xcb/xcb.h");
-    @cInclude("xcb/xproto.h");
-});
-```
-
-针对以上引入的头文件，我们可以这样使用 `@This().xcb_generic_event_t`。
-
-> [!IMPORTANT]
-> 初次阅读此处感到困惑是正常的。在学习完后续概念后，此处内容将自然理解。
-
 ## `threadlocal`
 
 变量可以使用 `threadlocal` 修饰符，使得该变量在不同线程中拥有不同的实例：
