@@ -1,5 +1,3 @@
-const std = @import("std");
-
 pub fn main() !void {
     try One.main();
     try Two.main();
@@ -8,6 +6,7 @@ pub fn main() !void {
 
 const One = struct {
     // #region one
+    const std = @import("std");
     pub fn main() !void {
         std.debug.print("Hello, World!\n", .{});
     }
@@ -16,6 +15,7 @@ const One = struct {
 
 const Two = struct {
     // #region two
+    const std = @import("std");
     pub fn main() !void {
         var stdout_buffer: [1024]u8 = undefined;
         var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
@@ -35,6 +35,7 @@ const Two = struct {
 
 const Three = struct {
     // #region three
+    const std = @import("std");
     pub fn main() !void {
         // 定义两个缓冲区
         var stdout_buffer: [1024]u8 = undefined; // [!code focus]
