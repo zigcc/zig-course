@@ -28,4 +28,4 @@ C 很好，非常好，它非常成功，以至于 C 现在已经不再是一门
 
 Zig 的社区需要更多的人来构建，所以我写了这个文档，帮助新人来更好的理解和学习 Zig！
 
-![Cover Image](./public/cover_image.png "Cover Image")
+![Cover Image](/cover_image.png "Cover Image")
