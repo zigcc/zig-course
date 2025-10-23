@@ -116,24 +116,25 @@ bun check
 ```
 
 这会运行：
+
 - Prettier 处理 Markdown/TypeScript/JavaScript
 - `zig fmt` 处理 Zig 源文件
 - AutoCorrect 处理中文文本格式
 
 ## 关键文件及其用途
 
-| 文件/目录 | 用途 |
-|-----------|------|
-| `build.zig` | 主构建编排器，检测 Zig 版本并委托给对应的构建脚本 |
-| `build/0.15.zig` | 当前活跃的构建脚本，具有智能示例发现功能 |
-| `course/.vitepress/config.mts` | VitePress 配置（语言、主题、SEO） |
-| `course/.vitepress/sidebar.ts` | 定义课程导航结构 |
-| `course/code/15/` | Zig 0.15 可运行示例（当前活跃版本） |
-| `course/basic/` | Zig 基础概念（变量、类型、控制流） |
-| `course/advanced/` | 进阶主题（comptime、异步、内存管理） |
-| `course/update/` | 版本迁移指南 |
-| `package.json` | 构建脚本和 Node.js 依赖 |
-| `.github/workflows/build.yml` | 跨平台和版本的 CI/CD 测试 |
+| 文件/目录                      | 用途                                              |
+| ------------------------------ | ------------------------------------------------- |
+| `build.zig`                    | 主构建编排器，检测 Zig 版本并委托给对应的构建脚本 |
+| `build/0.15.zig`               | 当前活跃的构建脚本，具有智能示例发现功能          |
+| `course/.vitepress/config.mts` | VitePress 配置（语言、主题、SEO）                 |
+| `course/.vitepress/sidebar.ts` | 定义课程导航结构                                  |
+| `course/code/15/`              | Zig 0.15 可运行示例（当前活跃版本）               |
+| `course/basic/`                | Zig 基础概念（变量、类型、控制流）                |
+| `course/advanced/`             | 进阶主题（comptime、异步、内存管理）              |
+| `course/update/`               | 版本迁移指南                                      |
+| `package.json`                 | 构建脚本和 Node.js 依赖                           |
+| `.github/workflows/build.yml`  | 跨平台和版本的 CI/CD 测试                         |
 
 ## 代码示例组织方式
 
@@ -199,6 +200,7 @@ bun check
 ### 主构建脚本（`build.zig`）
 
 主构建脚本：
+
 1. 检测当前 Zig 编译器版本
 2. 分发到 `build/` 目录下对应的版本特定构建脚本
 3. 优雅处理版本兼容性
@@ -206,6 +208,7 @@ bun check
 ### 版本特定构建脚本（`build/0.15.zig`）
 
 每个版本构建脚本：
+
 1. **发现示例**：扫描 `course/code/VERSION/` 目录
 2. **分类**：
    - 独立 `.zig` 文件 → 编译为可执行文件
@@ -256,6 +259,7 @@ bun check
 ### 提交信息
 
 遵循 Conventional Commits：
+
 ```
 <type>(<scope>): <description>
 
@@ -283,17 +287,20 @@ update/<description>     # 版本更新
 ### 代码风格
 
 **Zig 代码**：
+
 - 使用 `zig fmt`（在 CI 中强制执行）
 - 遵循 Zig 风格指南原则
 - 为公共 API 添加文档注释
 
 **Markdown**：
+
 - 中文文本使用中文标点（。，！？）
 - 中文和英文/数字之间添加空格
 - 代码块使用具体语言标记：` ```zig`，不要用 ` ```
 - 图片使用相对路径：`![描述](../picture/...)`
 
 **中文文本**：
+
 - 正确使用标点符号（。不是 .）
 - 正确使用引号（「」不是 ""）
 - 中英文之间加空格
@@ -302,16 +309,19 @@ update/<description>     # 版本更新
 ### 文件组织
 
 **文档文件**：
+
 - 放在 `course/` 下的适当分类中
 - 使用英文描述性文件名
 - 如添加新页面需更新 `course/.vitepress/sidebar.ts`
 
 **代码示例**：
+
 - 放在 `course/code/15/`（或当前版本）
 - 尽可能匹配文档结构
 - 包含解释概念的文档注释
 
 **图片**：
+
 - 放在 `course/picture/` 中
 - 使用子目录组织
 - 提交前优化图片
