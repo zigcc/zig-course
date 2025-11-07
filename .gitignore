@@ -12,3 +12,4 @@ zig-cache
 .zig-cache
 .direnv
 PDF
+.DS_Store
