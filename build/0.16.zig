@@ -2,11 +2,10 @@ const std = @import("std");
 const Build = std.Build;
 const ChildProcess = std.process.Child;
 
-const log = std.log.scoped(.For_0_15_0);
+const log = std.log.scoped(.For_0_16_0);
+const version = "16";
 
 const args = [_][]const u8{ "zig", "build" };
-
-const version = "15";
 
 const relative_path = "course/code/" ++ version;
 
