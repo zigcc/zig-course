@@ -121,308 +121,118 @@ bun check
 - `zig fmt` 处理 Zig 源文件
 - AutoCorrect 处理中文文本格式
 
-## 关键文件及其用途
+## 版本兼容性维护
 
-| 文件/目录                      | 用途                                              |
-| ------------------------------ | ------------------------------------------------- |
-| `build.zig`                    | 主构建编排器，检测 Zig 版本并委托给对应的构建脚本 |
-| `build/0.15.zig`               | 当前活跃的构建脚本，具有智能示例发现功能          |
-| `course/.vitepress/config.mts` | VitePress 配置（语言、主题、SEO）                 |
-| `course/.vitepress/sidebar.ts` | 定义课程导航结构                                  |
-| `course/code/15/`              | Zig 0.15 可运行示例（当前活跃版本）               |
-| `course/basic/`                | Zig 基础概念（变量、类型、控制流）                |
-| `course/advanced/`             | 进阶主题（comptime、异步、内存管理）              |
-| `course/update/`               | 版本迁移指南                                      |
-| `package.json`                 | 构建脚本和 Node.js 依赖                           |
-| `.github/workflows/build.yml`  | 跨平台和版本的 CI/CD 测试                         |
+### 多版本构建系统架构
 
-## 代码示例组织方式
+项目采用版本分发架构来支持多个 Zig 版本：
 
-示例按 Zig 版本组织在 `course/code/` 目录下：
+1. **主构建入口** (`build.zig`): 检测当前 Zig 编译器版本，自动分发到对应的版本特定构建脚本
+2. **版本构建脚本** (`build/0.XX.zig`): 每个版本有独立的构建逻辑
+3. **代码示例目录** (`course/code/XX/`): 每个版本维护独立的示例代码
 
-### 结构模式
+### 修复不同版本编译问题的工作流程
 
-1. **独立文件**：简单示例作为单个 `.zig` 文件
-   - 示例：`course/code/15/array.zig`、`course/code/15/comptime.zig`
-   - 构建脚本自动发现并编译这些文件
+当需要修复特定 Zig 版本的编译问题时，需要处理以下目录：
 
-2. **子项目**：复杂示例拥有自己的 `build.zig`
-   - 示例：`course/code/15/build_system/`、`course/code/15/package_management_importer/`
-   - 构建脚本递归调用子构建
+#### 1. 更新构建脚本
 
-### 添加新示例
+**路径**: `build/0.XX.zig`
 
-添加新示例时：
+当 Zig 编译器 API 发生变更时需要更新：
+- 构建系统 API 变更（如 `std.Build` 接口改变）
+- 模块系统变更（如 `root_module` 相关 API）
+- 目标平台和优化选项变更
 
-1. **简单概念**：在 `course/code/15/` 创建独立 `.zig` 文件
-2. **复杂功能**：创建带有 `build.zig` 的子目录
-3. **更新文档**：在相应章节添加对应的 `.md` 文件
-4. **确保编译**：运行 `zig build` 验证
-5. **格式化代码**：提交前运行 `bun format`
+**示例场景**:
+- Zig 0.12 引入模块系统，需要从 `addExecutable` 迁移到 `addModule`
+- Zig 0.14 更改了目标解析方式，需要更新 `resolved_target` 相关代码
 
-## 文档结构
+#### 2. 更新代码示例
 
-课程遵循渐进式学习路径：
+**路径**: `course/code/XX/`
 
-1. **环境搭建**（`course/environment/`）
-   - 安装指南
-   - 编辑器配置
-   - Zig CLI 参考
+此目录包含两类文件需要维护：
 
-2. **基础学习**（`course/basic/`）
-   - 变量和类型
-   - 控制流
-   - 错误处理
-   - 类型系统基础
+##### a) 单文件示例（直接的 .zig 文件）
+这些文件会被构建脚本直接编译为可执行文件和测试：
+- `hello_world.zig`
+- `array.zig`
+- `comptime.zig`
+- 等等...
 
-3. **进阶学习**（`course/advanced/`）
-   - 编译期计算（comptime）
-   - 异步/await
-   - 内存管理
-   - C 互操作
-   - 反射和元编程
+**修复重点**:
+- 标准库 API 变更（如 `std.debug.print`、`std.mem.Allocator`）
+- 语法变更（如错误处理、可选类型语法）
+- 类型系统变更
 
-4. **工程实践**（`course/engineering/`）
-   - 构建系统
-   - 包管理
-   - 单元测试
-   - 代码风格指南
+##### b) 项目类型示例（子目录包含 build.zig）
+这些是完整的 Zig 项目，有自己的构建系统：
+- `build_system/` - 构建系统示例
+- `import_dependency_build/` - 依赖管理示例
+- `import_vcpkg/` - C 库集成示例
 
-5. **实战示例**（`course/examples/`）
-   - 完整项目（如 TCP 服务器）
+**修复重点**:
+- 项目自己的 `build.zig` 需要同步更新
+- 依赖声明方式的变更（如 `build.zig.zon`）
+- 模块导入和导出方式的变更
 
-6. **版本指南**（`course/update/`）
-   - 版本发布说明
-   - 迁移指南
+#### 3. 版本符号链接维护
 
-## 构建系统内部机制
+**当前符号链接**:
+- `course/code/13/` → `./12` (Zig 0.13 与 0.12 兼容)
+- `course/code/release/` → `./15` (指向最新稳定版)
 
-### 主构建脚本（`build.zig`）
+**维护规则**:
+- 如果新版本完全兼容旧版本，可以创建符号链接而不是复制代码
+- 当有破坏性变更时，必须创建独立目录并更新所有示例
 
-主构建脚本：
+#### 4. 验证流程
 
-1. 检测当前 Zig 编译器版本
-2. 分发到 `build/` 目录下对应的版本特定构建脚本
-3. 优雅处理版本兼容性
+在根目录运行 `zig build` 验证修复：
 
-### 版本特定构建脚本（`build/0.15.zig`）
+```bash
+# 主 build.zig 会自动选择对应版本的构建脚本
+zig build
 
-每个版本构建脚本：
-
-1. **发现示例**：扫描 `course/code/VERSION/` 目录
-2. **分类**：
-   - 独立 `.zig` 文件 → 编译为可执行文件
-   - 包含 `build.zig` 的目录 → 作为子项目调用
-3. **平台处理**：应用平台特定配置
-4. **测试执行**：运行内嵌的单元测试
-
-### 示例发现算法
-
-```
-对于 course/code/VERSION/ 中的每个项目：
-  如果项目是 .zig 文件：
-    → 创建可执行文件构建步骤
-  否则如果项目是目录：
-    如果目录包含 build.zig：
-      → 创建对子项目构建的依赖
-    否则：
-      → 跳过（可能是支持文件）
+# 构建过程会：
+# 1. 编译 course/code/XX/ 下的所有单文件示例
+# 2. 运行所有测试
+# 3. 递归构建子目录中的项目示例
 ```
 
-## CI/CD 流水线
+#### 5. 常见破坏性变更类型
 
-### 构建工作流（`.github/workflows/build.yml`）
+**标准库变更**:
+- 分配器 API (`std.heap.GeneralPurposeAllocator`)
+- 文件系统 API (`std.fs`)
+- 网络 API (`std.net`)
 
-- **触发器**：`.zig` 文件、构建脚本或配置文件变更
-- **矩阵**：3 个操作系统（Ubuntu、macOS、Windows）× 6 个 Zig 版本
-- **目的**：确保所有示例在各平台和版本上都能编译
-- **调度**：每日运行
+**语言特性变更**:
+- 错误处理语法
+- 可选类型语法
+- 编译时特性
 
-### 部署工作流（`.github/workflows/deploy.yml`）
+**构建系统变更**:
+- `std.Build` API
+- 模块系统
+- 依赖管理（`build.zig.zon`）
 
-- **触发器**：推送到 `main` 分支
-- **目的**：构建并部署文档到 GitHub Pages
-- **步骤**：
-  1. 安装 Bun
-  2. 安装依赖
-  3. 构建 VitePress 站点
-  4. 上传到 GitHub Pages
+#### 6. 实用技巧
 
-### 检查工作流（`.github/workflows/check.yml`）
+**批量测试多个版本**:
+项目的 CI 系统（`.github/workflows/build.yml`）会在多个平台和 Zig 版本上运行构建，可以参考 CI 配置来本地测试多版本兼容性。
 
-- **触发器**：Pull Request、推送
-- **目的**：验证代码格式
-- **工具**：Prettier、Zig fmt、AutoCorrect
+**创建新版本支持**:
+1. 复制最近版本的 `build/0.XX.zig` 到新版本
+2. 复制或链接 `course/code/XX/` 目录
+3. 在主 `build.zig` 中添加新版本的 case 分支
+4. 运行构建并修复所有编译错误
+5. 更新 `course/code/release/` 符号链接（如果是最新稳定版）
 
-## 编码规范
-
-### 提交信息
-
-遵循 Conventional Commits：
-
+**检查依赖项目**:
+不要忘记检查子目录项目的构建：
+```bash
+cd course/code/15/build_system
+zig build
 ```
-<type>(<scope>): <description>
-
-类型: feat, fix, docs, refactor, chore, test, style
-作用域: course/basic, course/advanced, build, ci 等
-
-示例:
-- feat(course/basic): 为 0.15 添加数组示例
-- fix(build): 修正平台检测逻辑
-- docs(course/update): 更新 0.15.1 迁移指南
-- refactor(course/code/15): 简化 comptime 示例
-```
-
-### 分支命名
-
-```
-feature/<description>    # 新功能
-fix/<description>        # Bug 修复
-docs/<description>       # 文档更新
-update/<description>     # 版本更新
-
-示例: update/fix-0.15.1
-```
-
-### 代码风格
-
-**Zig 代码**：
-
-- 使用 `zig fmt`（在 CI 中强制执行）
-- 遵循 Zig 风格指南原则
-- 为公共 API 添加文档注释
-
-**Markdown**：
-
-- 中文文本使用中文标点（。，！？）
-- 中文和英文/数字之间添加空格
-- 代码块使用具体语言标记：` ```zig`，不要用 ` ```
-- 图片使用相对路径：`![描述](../picture/...)`
-
-**中文文本**：
-
-- 正确使用标点符号（。不是 .）
-- 正确使用引号（「」不是 ""）
-- 中英文之间加空格
-- 由 CI 中的 AutoCorrect 检查
-
-### 文件组织
-
-**文档文件**：
-
-- 放在 `course/` 下的适当分类中
-- 使用英文描述性文件名
-- 如添加新页面需更新 `course/.vitepress/sidebar.ts`
-
-**代码示例**：
-
-- 放在 `course/code/15/`（或当前版本）
-- 尽可能匹配文档结构
-- 包含解释概念的文档注释
-
-**图片**：
-
-- 放在 `course/picture/` 中
-- 使用子目录组织
-- 提交前优化图片
-
-## 常见任务
-
-### 添加新的语言概念
-
-1. **创建文档**：`course/basic/<topic>.md` 或 `course/advanced/<topic>.md`
-2. **添加代码示例**：`course/code/15/<topic>.zig`
-3. **更新侧边栏**：在 `course/.vitepress/sidebar.ts` 添加条目
-4. **测试编译**：运行 `zig build`
-5. **格式化**：运行 `bun format`
-6. **提交**：使用规范的提交信息
-
-### 为新 Zig 版本更新
-
-1. **创建新构建脚本**：`build/0.XX.zig`（从上一版本复制并修改）
-2. **复制示例**：`cp -r course/code/15 course/code/XX`
-3. **更新符号链接**：`ln -sf XX course/code/release`
-4. **修复破坏性变更**：根据需要更新代码示例
-5. **记录变更**：创建 `course/update/upgrade-0.XX.md`
-6. **更新 CI**：在 `.github/workflows/build.yml` 矩阵中添加新版本
-7. **彻底测试**：确保所有示例都能编译
-
-### 修复文档问题
-
-1. **定位文件**：使用 grep 或文件搜索
-2. **编辑内容**：保持中文文档风格
-3. **预览**：运行 `bun dev` 查看变更
-4. **格式化**：运行 `bun format`
-5. **提交**：使用 `docs(<scope>): <description>` 格式
-
-### 添加复杂示例
-
-1. **创建目录**：`course/code/15/<project-name>/`
-2. **添加 build.zig**：创建适当的构建配置
-3. **添加源文件**：实现示例
-4. **添加 README**：解释示例演示的内容
-5. **更新文档**：在相关 `.md` 文件中引用示例
-6. **测试**：从项目根目录运行 `zig build`
-
-## 版本兼容性策略
-
-项目使用以下方式维护跨 Zig 版本兼容性：
-
-1. **独立代码目录**：每个主要版本有自己的示例
-2. **版本特定构建脚本**：处理语法/API 差异
-3. **符号链接**：用于兼容版本（如 0.13 → 0.12）
-4. **迁移指南**：记录破坏性变更和升级路径
-5. **CI 矩阵测试**：通过自动化测试确保兼容性
-
-## 技术栈
-
-- **语言**：Zig（0.11 - 0.16）
-- **文档**：VitePress（Vue 3、TypeScript）
-- **包管理器**：Bun（也可使用 npm/yarn）
-- **CI/CD**：GitHub Actions
-- **托管**：GitHub Pages
-- **格式化**：Prettier、Zig fmt、AutoCorrect
-
-## AI 助手重要注意事项
-
-### 处理文档时
-
-1. **语言**：使用简体中文编写，使用正确的标点符号
-2. **代码块**：始终指定语言：` ```zig`，绝不使用纯 ` ```
-3. **格式化**：中文文本应使用中文标点（。而非 .）
-4. **间距**：在中文字符和英文/数字之间添加空格
-5. **链接**：内部文档使用相对路径
-
-### 处理代码示例时
-
-1. **版本**：除非另有说明，目标版本为 Zig 0.15
-2. **位置**：添加到 `course/code/15/`
-3. **测试**：确保代码能编译和运行
-4. **文档**：代码配合解释性文档
-5. **注释**：为公共 API 使用文档注释（`///`）
-
-### 修改构建系统时
-
-1. **主 build.zig**：很少需要更改（处理版本分发）
-2. **版本脚本**：修改适当的 `build/0.XX.zig`
-3. **发现逻辑**：理解自动示例检测机制
-4. **平台处理**：考虑 Linux、macOS、Windows 差异
-
-### 更新 CI/CD 时
-
-1. **构建矩阵**：保持版本矩阵更新
-2. **缓存**：保留 Zig 编译器缓存以提高速度
-3. **平台测试**：确保跨平台兼容性
-4. **部署工作流**：仅在 main 分支运行
-
-## 资源链接
-
-- [Zig 官方文档](https://ziglang.org/documentation/)
-- [VitePress 文档](https://vitepress.dev/)
-- [Conventional Commits](https://www.conventionalcommits.org/)
-- [贡献指南](CONTRIBUTING.md)
-- [行为准则](CODE_OF_CONDUCT.md)
-
----
-
-最后更新：2025-10-22（由 AI 助手自动生成）
