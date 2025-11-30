@@ -208,18 +208,19 @@ const MemoryPool = struct {
 
     pub fn main() !void {
         // 此处为了演示，直接使用page allocator
-        var pool = std.heap.MemoryPool(u32).init(std.heap.page_allocator);
-        defer pool.deinit();
+        // Zig 0.16 中 MemoryPool 使用 .empty 常量初始化
+        var pool: std.heap.MemoryPool(u32) = .empty;
+        defer pool.deinit(std.heap.page_allocator);
 
         // 连续申请三个对象
-        const p1 = try pool.create();
-        const p2 = try pool.create();
-        const p3 = try pool.create();
+        const p1 = try pool.create(std.heap.page_allocator);
+        const p2 = try pool.create(std.heap.page_allocator);
+        const p3 = try pool.create(std.heap.page_allocator);
 
         // 回收p2
         pool.destroy(p2);
         // 再申请一个新的对象
-        const p4 = try pool.create();
+        const p4 = try pool.create(std.heap.page_allocator);
 
         // 注意，此时p2和p4指向同一块内存
         _ = p1;

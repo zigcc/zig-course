@@ -106,17 +106,23 @@ const TypeInfo3 = struct {
 
     fn ExternAlignOne(comptime T: type) type {
         // 获得类型信息，并断言为Struct.
-        comptime var struct_info = @typeInfo(T).@"struct";
-        // 将内存布局改为 extern
-        struct_info.layout = .@"extern";
-        // 复制字段信息（原为只读切片，故需复制）
-        comptime var new_fields = struct_info.fields[0..struct_info.fields.len].*;
-        // 修改每个字段对齐为1
-        inline for (&new_fields) |*f| f.alignment = 1;
-        // 替换字段定义
-        struct_info.fields = &new_fields;
-        // 重新构造类型
-        return @Type(.{ .@"struct" = struct_info });
+        const struct_info = @typeInfo(T).@"struct";
+        // 准备字段名称
+        comptime var field_names: [struct_info.fields.len][]const u8 = undefined;
+        comptime var field_types: [struct_info.fields.len]type = undefined;
+        comptime var field_attrs: [struct_info.fields.len]std.builtin.Type.StructField.Attributes = undefined;
+
+        inline for (struct_info.fields, 0..) |field, i| {
+            field_names[i] = field.name;
+            field_types[i] = field.type;
+            // 设置对齐为 1，其他属性使用默认值
+            field_attrs[i] = .{
+                .@"align" = 1,
+            };
+        }
+
+        // 使用 @Struct 构造新类型（extern 布局，对齐为 1）
+        return @Struct(.@"extern", null, &field_names, &field_types, &field_attrs);
     }
 
     const MyStruct = struct {
@@ -244,22 +250,14 @@ const Type = struct {
     // #region Type
     const std = @import("std");
 
-    const T = @Type(.{
-        .@"struct" = .{
-            .layout = .auto,
-            .fields = &.{
-                .{
-                    .alignment = 8,
-                    .name = "b",
-                    .type = u32,
-                    .is_comptime = false,
-                    .default_value_ptr = null,
-                },
-            },
-            .decls = &.{},
-            .is_tuple = false,
-        },
-    });
+    // Zig 0.16 使用 @Struct 替代 @Type
+    const T = @Struct(
+        .auto, // layout
+        null, // BackingInt
+        &.{"b"}, // field_names
+        &.{u32}, // field_types
+        &.{.{ .@"align" = 8 }}, // field_attrs
+    );
 
     pub fn main() void {
         const D = T{

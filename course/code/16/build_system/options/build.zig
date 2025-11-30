@@ -17,8 +17,9 @@ pub fn build(b: *std.Build) void {
         }),
     });
 
-    // 通过标准库获取时间戳
-    const timestamp = std.time.timestamp();
+    // 获取一个简单的时间值用于演示 options 功能
+    // 注意：Zig 0.16 移除了 std.time.timestamp()，这里使用示例值
+    const timestamp: i64 = 1700000000; // 示例时间戳
 
     // 创建一个 options
     const options = b.addOptions();

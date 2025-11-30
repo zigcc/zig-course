@@ -36,7 +36,7 @@ pub fn build(b: *std.Build) !void {
 
     // 尝试运行命令并捕获标准输出
     // 也可以使用 captureStdErr 来捕获标准错误输出
-    const output = run_sys_cmd.captureStdOut();
+    const output = run_sys_cmd.captureStdOut(.{});
 
     // 添加一个匿名的依赖
     exe.root_module.addAnonymousImport("hello", .{ .root_source_file = output });

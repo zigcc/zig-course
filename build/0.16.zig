@@ -33,7 +33,6 @@ pub fn build(b: *Build) void {
             // get the entry name, entry can be file or directory
             const output_name = std.mem.trimRight(u8, entry.name, ".zig");
             if (entry.kind == .file) {
-
                 // connect path
                 const path = std.fs.path.join(b.allocator, &[_][]const u8{ relative_path, entry.name }) catch |err| {
                     log.err("fmt path for examples failed, err is {}", .{err});

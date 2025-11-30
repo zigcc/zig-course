@@ -147,12 +147,12 @@ const EnumLiteral_ = struct {
     const std = @import("std");
     pub fn main() !void {
         // #region enum_literal
-        // 使用内建函数 @Type 构造出一个 EnumLiteral 类型
-        // 这是目前官方文档中的使用方案
-        const EnumLiteral: type = @Type(.enum_literal);
+        // 使用内建函数 @EnumLiteral 构造出一个 EnumLiteral 类型
+        // Zig 0.16 使用 @EnumLiteral() 替代 @Type(.enum_literal)
+        const EnumLiteralType: type = @EnumLiteral();
 
-        // 定义一个常量 enum_literal，它的类型为 EnumLiteral，并赋值为 “.kkk”
-        const enum_literal: EnumLiteral = .kkk;
+        // 定义一个常量 enum_literal，它的类型为 EnumLiteral，并赋值为 ".kkk"
+        const enum_literal: EnumLiteralType = .kkk;
 
         // 使用内建函数 @tagName 获取 enum_literal 的 tag name，并进行打印
         std.debug.print("enum_literal is {s}", .{@tagName(enum_literal)});
