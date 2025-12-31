@@ -92,6 +92,8 @@ $ zig fetch https://github.com/webui-dev/zig-webui/archive/main.tar.gz
 ```sh
 # 获取哈希值，并将其作为依赖项保存到 build.zig.zon
 zig fetch --save https://github.com/webui-dev/zig-webui/archive/main.tar.gz
+# 或者使用 git+https 形式，会自动更新到 build.zig.zon
+zig fetch --save git+https://github.com/david-vanderson/dvui.git#main
 ```
 
 当包在其 `build.zig.zon` 中定义了 `name` 字段时，`zig fetch` 会自动使用该名称。你也可以使用 `--save=<custom-name>` 来指定一个自定义的依赖名称，例如 `--save=webuizig`。
