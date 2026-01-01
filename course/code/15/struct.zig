@@ -1,9 +1,10 @@
 pub fn main() !void {
     Struct.main();
+    StructInitBasic.main();
     SelfReference1.main();
     SelfReference2.main();
     try SelfReference3.main();
-    AutoReference.main();
+    StructInitInferred.main();
     DefaultField.main();
     EmptyStruct.main();
     Tuple_.main();
@@ -214,19 +215,63 @@ const SelfReference3 = struct {
     // #endregion more_self_reference3
 };
 
-const AutoReference = struct {
+const StructInitBasic = struct {
     pub fn main() void {
-        // #region auto_reference
-        const Point = struct { x: i32, y: i32 };
+        // #region struct_init_basic
+        const Point = struct {
+            x: i32,
+            y: i32,
+        };
 
-        const pt: Point = .{
+        // 使用完整的结构体字面量语法初始化
+        const pt1 = Point{ .x = 10, .y = 20 };
+
+        // 也可以先声明类型，再使用完整语法初始化
+        const pt2: Point = Point{ .x = 30, .y = 40 };
+        // #endregion struct_init_basic
+
+        _ = pt1;
+        _ = pt2;
+    }
+};
+
+const StructInitInferred = struct {
+    // #region struct_init_inferred
+    const Point = struct {
+        x: i32,
+        y: i32,
+
+        // 在方法返回值中使用简写语法
+        pub fn origin() Point {
+            return .{ .x = 0, .y = 0 }; // 返回类型已声明为 Point，可推断
+        }
+    };
+
+    fn printPoint(p: Point) void {
+        _ = p;
+    }
+
+    pub fn main() void {
+        // 完整语法：显式指定类型名称
+        const pt1 = Point{ .x = 10, .y = 20 };
+
+        // 简写语法：当类型可推断时，可省略类型名称
+        const pt2: Point = .{
             .x = 13,
             .y = 67,
         };
-        // #endregion auto_reference
 
-        _ = pt;
+        // 在方法返回值中使用简写
+        const pt3 = Point.origin();
+
+        // 作为函数参数传递（参数类型已知时可推断）
+        printPoint(.{ .x = 100, .y = 200 });
+
+        _ = pt1;
+        _ = pt2;
+        _ = pt3;
     }
+    // #endregion struct_init_inferred
 };
 
 // #region linked_list
