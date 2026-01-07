@@ -329,7 +329,7 @@ const BasePtr = struct {
     };
 
     fn setYBasedOnX(x: *f32, y: f32) void {
-        const point: Point = @fieldParentPtr("x", x);
+        const point: *Point = @fieldParentPtr("x", x);
         point.y = y;
     }
     // #endregion base_ptr
