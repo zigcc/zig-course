@@ -105,7 +105,7 @@ bun dev
 
 ```sh
 bun dev          # 启动开发服务器（热重载）
-bun build        # 构建生产版本
+bun run build        # 构建生产版本
 bun preview      # 预览构建结果
 bun format       # 格式化代码（prettier + zig fmt + autocorrect）
 bun check        # 检查代码格式
