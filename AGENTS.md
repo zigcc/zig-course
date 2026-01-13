@@ -140,11 +140,13 @@ bun check
 **路径**: `build/0.XX.zig`
 
 当 Zig 编译器 API 发生变更时需要更新：
+
 - 构建系统 API 变更（如 `std.Build` 接口改变）
 - 模块系统变更（如 `root_module` 相关 API）
 - 目标平台和优化选项变更
 
 **示例场景**:
+
 - Zig 0.12 引入模块系统，需要从 `addExecutable` 迁移到 `addModule`
 - Zig 0.14 更改了目标解析方式，需要更新 `resolved_target` 相关代码
 
@@ -155,24 +157,30 @@ bun check
 此目录包含两类文件需要维护：
 
 ##### a) 单文件示例（直接的 .zig 文件）
+
 这些文件会被构建脚本直接编译为可执行文件和测试：
+
 - `hello_world.zig`
 - `array.zig`
 - `comptime.zig`
 - 等等...
 
 **修复重点**:
+
 - 标准库 API 变更（如 `std.debug.print`、`std.mem.Allocator`）
 - 语法变更（如错误处理、可选类型语法）
 - 类型系统变更
 
 ##### b) 项目类型示例（子目录包含 build.zig）
+
 这些是完整的 Zig 项目，有自己的构建系统：
+
 - `build_system/` - 构建系统示例
 - `import_dependency_build/` - 依赖管理示例
 - `import_vcpkg/` - C 库集成示例
 
 **修复重点**:
+
 - 项目自己的 `build.zig` 需要同步更新
 - 依赖声明方式的变更（如 `build.zig.zon`）
 - 模块导入和导出方式的变更
@@ -180,10 +188,12 @@ bun check
 #### 3. 版本符号链接维护
 
 **当前符号链接**:
+
 - `course/code/13/` → `./12` (Zig 0.13 与 0.12 兼容)
 - `course/code/release/` → `./15` (指向最新稳定版)
 
 **维护规则**:
+
 - 如果新版本完全兼容旧版本，可以创建符号链接而不是复制代码
 - 当有破坏性变更时，必须创建独立目录并更新所有示例
 
@@ -204,16 +214,19 @@ zig build
 #### 5. 常见破坏性变更类型
 
 **标准库变更**:
+
 - 分配器 API (`std.heap.GeneralPurposeAllocator`)
 - 文件系统 API (`std.fs`)
 - 网络 API (`std.net`)
 
 **语言特性变更**:
+
 - 错误处理语法
 - 可选类型语法
 - 编译时特性
 
 **构建系统变更**:
+
 - `std.Build` API
 - 模块系统
 - 依赖管理（`build.zig.zon`）
@@ -224,6 +237,7 @@ zig build
 项目的 CI 系统（`.github/workflows/build.yml`）会在多个平台和 Zig 版本上运行构建，可以参考 CI 配置来本地测试多版本兼容性。
 
 **创建新版本支持**:
+
 1. 复制最近版本的 `build/0.XX.zig` 到新版本
 2. 复制或链接 `course/code/XX/` 目录
 3. 在主 `build.zig` 中添加新版本的 case 分支
@@ -232,6 +246,7 @@ zig build
 
 **检查依赖项目**:
 不要忘记检查子目录项目的构建：
+
 ```bash
 cd course/code/15/build_system
 zig build
