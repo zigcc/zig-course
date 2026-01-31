@@ -4,11 +4,11 @@ outline: deep
 
 # 内存管理
 
-> zig 在内存管理方面采取了类似 C 的方案，完全由程序员管理内存，这也是为什么 zig 没有运行时开销的原因，同时这也是为什么 zig 可以在如此多环境（包括实时软件、操作系统内核、嵌入式设备和低延迟服务器）中无缝工作的原因。
+> Zig 在内存管理方面采取了类似 C 的方案，完全由程序员管理内存，这也是为什么 Zig 没有运行时开销的原因，同时这也是为什么 Zig 可以在如此多环境（包括实时软件、操作系统内核、嵌入式设备和低延迟服务器）中无缝工作的原因。
 
-事实上，在 C 开发中最难以调试的 bug 往往是由于错误的内存管理引起的，zig 在此基础上给我们提供了少量的保护，但仅仅是少量的保护，这就要求程序员在需要明白数据在内存中真实存在的模样（这就涉及到计算机组成原理和操作系统的理论知识了，当然还涉及到一点点的汇编知识）。
+事实上，在 C 开发中最难以调试的 bug 往往是由于错误的内存管理引起的，Zig 在此基础上给我们提供了少量的保护，但仅仅是少量的保护，这就要求程序员在需要明白数据在内存中真实存在的模样（这就涉及到计算机组成原理和操作系统的理论知识了，当然还涉及到一点点的汇编知识）。
 
-事实上，zig 本身的标准库为我们提供了多种内存分配模型：
+事实上，Zig 本身的标准库为我们提供了多种内存分配模型：
 
 1. [`DebugAllocator`](https://ziglang.org/documentation/master/std/#std.heap.debug_allocator.DebugAllocator)
 2. [`SmpAllocator`](https://ziglang.org/documentation/master/std/#std.heap.SmpAllocator)
@@ -20,7 +20,7 @@ outline: deep
 
 除了这八种内存分配模型外，还提供了内存池的功能 [`MemoryPool`](https://ziglang.org/documentation/master/std/#std.heap.memory_pool.MemoryPool)
 
-你可能对上面的多种内存模型感到很迷惑，C 语言中不就是 `malloc` 吗，怎么到这里这么多的“模型”，这些模型均有着不同的特点，而且它们之间有一部分还可以叠加使用，zig 在这方面提供了更多的选择，而且不仅仅是这些，你还可以自己尝试实现一个内存模型。
+你可能对上面的多种内存模型感到很迷惑，C 语言中不就是 `malloc` 吗，怎么到这里这么多的“模型”，这些模型均有着不同的特点，而且它们之间有一部分还可以叠加使用，Zig 在这方面提供了更多的选择，而且不仅仅是这些，你还可以自己尝试实现一个内存模型。
 
 :::info 🅿️ 提示
 
@@ -34,7 +34,7 @@ outline: deep
 
 :::info 🅿️ 提示
 
-补充一点，zig 的内存分配并不会自动进行 0 填充，并且 zig 并没有提供 `calloc` 这种函数，故我们需要手动实现初始化为 0 的操作，不过好在 zig 提供了 [`std.mem.zeroes`](https://ziglang.org/documentation/master/std/#std.mem.zeroes) 函数，用于直接返回某种类型的 0 值。
+补充一点，Zig 的内存分配并不会自动进行 0 填充，并且 Zig 并没有提供 `calloc` 这种函数，故我们需要手动实现初始化为 0 的操作，不过好在 Zig 提供了 [`std.mem.zeroes`](https://ziglang.org/documentation/master/std/#std.mem.zeroes) 函数，用于直接返回某种类型的 0 值。
 
 :::
 

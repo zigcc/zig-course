@@ -20,4 +20,36 @@ outline: deep
 
 :::
 
-TODO: 添加更多关于该类型使用的示例和说明！
+## 常见使用场景
+
+### 与 C 语言互操作
+
+`opaque` 类型最常见的用途是在与 C 代码交互时处理 **不透明指针**（opaque pointer）。当 C 库不公开结构体的内部细节时，Zig 可以使用 `opaque` 类型来安全地表示这些类型：
+
+```zig
+// 对应 C 中的 typedef struct FILE FILE;
+const FILE = opaque {};
+const c = @cImport(@cInclude("stdio.h"));
+
+// 使用不透明指针
+fn readFile(file: *FILE) void {
+    // file 指向一个大小未知的结构体
+    // 只能通过 C 函数来操作它
+    _ = file;
+}
+```
+
+### 类型擦除
+
+使用 `*anyopaque` 可以实现类似 C 语言 `void*` 的类型擦除功能。这在需要存储任意类型指针的场景中很有用：
+
+```zig
+const Context = struct {
+    data: *anyopaque,  // 可以指向任意类型
+    callback: *const fn (*anyopaque) void,
+};
+```
+
+::: info 🅿️ 提示
+使用 `anyopaque` 时需要格外小心类型安全。在可能的情况下，优先考虑使用泛型或联合类型来保持类型信息。
+:::

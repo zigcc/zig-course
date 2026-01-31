@@ -13,3 +13,4 @@ zig-cache
 .direnv
 PDF
 .DS_Store
+.sisyphus/plans

@@ -4,22 +4,22 @@ outline: deep
 
 # 与 C 交互
 
-zig 作为一个可以独立于 C 的语言，不依赖 libc，但 zig 仍然具有非常强大的与 C 直接交互的能力，并远超其他语言。
+Zig 作为一个可以独立于 C 的语言，不依赖 libc，但 Zig 仍然具有非常强大的与 C 直接交互的能力，并远超其他语言。
 
 > [!TIP] 什么是 libc
 > libc 是 C 语言的标准库，它提供了许多基本的程序功能，如输入 / 输出处理、字符串操作、内存管理等。在 Unix 和 Linux 系统中，libc 通常是操作系统的核心部分，它提供了系统调用的接口，使得应用程序可以使用操作系统的服务。在 Windows 系统中，类似的库是 msvcrt 库。
 
 ::: info 🅿️ 提示
 
-zig 所指的交互并不仅仅是使用 C 的库，zig 还可以作为 C 的编译器，导出 C ABI 兼容的库供其他程序使用。
+Zig 所指的交互并不仅仅是使用 C 的库，Zig 还可以作为 C 的编译器，导出 C ABI 兼容的库供其他程序使用。
 
-并且 zig 使用 C 并不是通过 [FFI](https://en.wikipedia.org/wiki/Foreign_function_interface) / bindings 实现，而是近乎原生的调用，这归功于 zig 实现了一套 C 的 [编译器](https://github.com/ziglang/zig/tree/master/lib/compiler/aro) 并且支持将 C 代码翻译为 zig 代码！
+并且 Zig 使用 C 并不是通过 [FFI](https://en.wikipedia.org/wiki/Foreign_function_interface) / bindings 实现，而是近乎原生的调用，这归功于 Zig 实现了一套 C 的 [编译器](https://github.com/ziglang/zig/tree/master/lib/compiler/aro) 并且支持将 C 代码翻译为 Zig 代码！
 
 :::
 
 ## C ABI 类型
 
-zig 定义了几个对应 C ABI 的基本类型：
+Zig 定义了几个对应 C ABI 的基本类型：
 
 - `c_char`
 - `c_short`
@@ -67,7 +67,7 @@ C 语言共享类型通常是通过引入头文件实现，这点在 zig 中可�
 
 既然可以引入头文件，那么毫无疑问同样可以引入由第三方写好的二进制 lib 库。
 
-以微软开发的跨平台开源 c/c++ 包管理器 _vcpkg_ 的库导入为例，具体安装以及设置环境变量的教程不在这里赘叙，只讲怎么 zig 使用已经编译好的 lib。
+以微软开发的跨平台开源 c/c++ 包管理器 _vcpkg_ 的库导入为例，具体安装以及设置环境变量的教程不在这里赘叙，只讲怎么 Zig 使用已经编译好的 lib。
 
 假如你所处的开发环境系统为 "Windows"、处理器架构为 "x64"、vcpkg 安装目录为 "D:\vcpkg"、并且操作模式为 classic（Classic Mode）、要使用并且已安装的库为 c 运算库 `gsl`。
 
@@ -85,13 +85,13 @@ C 语言共享类型通常是通过引入头文件实现，这点在 zig 中可�
 
 ::: info 🅿️ 提示
 
-zig 使用 c++ 库的方式同 c 一样，需要保证该库 `extern "C"`，并且在需要使用动态库的时候也同样不能少。
+Zig 使用 C++ 库的方式同 C 一样，需要保证该库 `extern "C"`，并且在需要使用动态库的时候也同样不能少。
 
 :::
 
 ## `C Translation CLI`
 
-zig 提供了一个命令行工具 `zig translate-c` 供我们使用，它可以将 C 的代码翻译为 zig 的代码，并将其输出到标准输出。
+Zig 提供了一个命令行工具 `zig translate-c` 供我们使用，它可以将 C 的代码翻译为 Zig 的代码，并将其输出到标准输出。
 
 ### 命令行参数
 
@@ -213,9 +213,9 @@ zig 支持外部（`extern`）可变参数函数：
 
 ### 为什么 zig 可以做到比 c 更好的编译
 
-实际上，zig 本身实现了一个 C 的编译器（目前仅限 linux，其他平台仍使用 llvm），当然不仅仅如此，zig 还提供了一个比较 **_magic_** 的东西—— [`glibc-abi-tool`](https://github.com/ziglang/glibc-abi-tool)，这是一个收集每个版本的 glibc 的 `.abilist` 文件的存储库，还包含一个将它们组合成一个数据集的工具。
+实际上，Zig 本身实现了一个 C 的编译器（目前仅限 Linux，其他平台仍使用 LLVM），当然不仅仅如此，Zig 还提供了一个比较 **_magic_** 的东西—— [`glibc-abi-tool`](https://github.com/ziglang/glibc-abi-tool)，这是一个收集每个版本的 glibc 的 `.abilist` 文件的存储库，还包含一个将它们组合成一个数据集的工具。
 
-所以，zig 本身所谓的“**_ships with libc_**”并不准确，它的确分发 libc，但它只携带每个版本的符号库，仅依赖这个符号库，zig 就可以实现在没有 libc 的情况下仍然正确地进行动态链接！
+所以，Zig 本身所谓的“**_ships with libc_**”并不准确，它的确分发 libc，但它只携带每个版本的符号库，仅依赖这个符号库，Zig 就可以实现在没有 libc 的情况下仍然正确地进行动态链接！
 
 ::: info 🅿️ 提示
 
@@ -241,7 +241,7 @@ zig 支持静态链接 musl（针对 linux 的另一个 libc，目标为嵌入�
 CC='zig cc -target x86_64-linux-gnu' CXX='zig cc -target x86_64-linux-gnu' go build
 ```
 
-设置 zig 作为 C 编译器来供 go 使用，只要对 zig 和 go 设置正确的 target，就可以在本机实现完善的交叉编译。
+设置 Zig 作为 C 编译器来供 Go 使用，只要对 Zig 和 Go 设置正确的 target，就可以在本机实现完善的交叉编译。
 
 再进一步，我们还可以构建出 linux 的使用 cgo 的静态链接的二进制可执行文件：
 

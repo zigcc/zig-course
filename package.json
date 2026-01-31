@@ -1,7 +1,7 @@
 {
   "type": "module",
   "scripts": {
-    "format": "prettier --write . && zig fmt . --exclude zig-out && autocorrect --fix",
+    "format": "prettier --write . && autocorrect --fix",
     "dev": "vitepress dev course",
     "build": "vitepress build course",
     "preview": "vitepress preview course",
