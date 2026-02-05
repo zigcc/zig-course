@@ -103,7 +103,7 @@
 
 在前面我们学习了结构体字面量的完整语法 `StructName{ .field = value }`。当 Zig 编译器能够从上下文推断出结构体类型时，可以省略类型名称，使用简写语法 `.{ .field = value }`。
 
-这种机制被称为**结果位置语义（Result Location Semantics）**。
+这种机制被称为**[结果位置语义（Result Location Semantics）](../../advanced/result-location.md)**。
 
 <<<@/code/release/struct.zig#struct_init_inferred
 

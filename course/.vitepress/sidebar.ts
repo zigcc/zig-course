@@ -148,6 +148,10 @@ export default [
         link: "/advanced/type_cast",
       },
       {
+        text: "结果位置语义",
+        link: "/advanced/result-location",
+      },
+      {
         text: "内存管理",
         link: "/advanced/memory_manage",
       },
