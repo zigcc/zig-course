@@ -15,21 +15,16 @@ outline: deep
 
 在讲述下列的内建函数前，我们需要了解一下前置知识：
 
-**原子操作的顺序级别**：为了实现性能和必要保证之间的平衡，原子性分为六个级别。它们按照强度顺序排列，每个级别都包含上一个级别的所有保证。
+**原子操作的顺序级别（Memory Ordering）**：为了实现性能和必要保证之间的平衡，原子操作提供了不同的内存排序级别。它们按照约束强度从弱到强排列：
 
-关于原子顺序六个级别的具体说明，见 [LLVM](https://llvm.org/docs/Atomics.html#atomic-orderings)。
+- **Unordered**：最弱的原子保证。仅保证操作本身是原子的（不会被撕裂），但不提供任何跨线程的顺序保证。
+- **Monotonic**（对应 C++ 的 `memory_order_relaxed`）：保证同一线程内对同一变量的原子操作是单调有序的，但不阻止不同变量之间的操作重排序。适用于简单的计数器等场景。
+- **Acquire**：读操作使用。保证当前线程在此读操作**之后**的所有读写操作，不会被重排到此操作之前。常用于获取锁。
+- **Release**：写操作使用。保证当前线程在此写操作**之前**的所有读写操作，不会被重排到此操作之后。常用于释放锁。
+- **AcqRel**（Acquire + Release）：同时具备 Acquire 和 Release 语义，适用于读-改-写（Read-Modify-Write）操作。
+- **SeqCst**（Sequentially Consistent）：最强的保证。除了包含 AcqRel 的所有保证外，还保证所有线程观察到的 SeqCst 操作的顺序是一致的。开销最大，但最易于推理。
 
-<!-- **NotAtomic**
-
-简单的非原子加载或者存储，即常规加载或存储。
-
-**Unordered**
-
-无序的原子级别，是最低级别。意味着一组操作可以以任意的顺序原子执行，只需要结果而不管过程以何种顺序执行。
-
-**Monotonic**
-
-保证原子操作是单调的，在一个线程中，所观察到的原子值在后续过程中必定是大于或等于当前值。但在多线程中，并不保证不会发生重排序 -->
+关于更多细节，见 [LLVM Atomics](https://llvm.org/docs/Atomics.html#atomic-orderings)。
 
 ### [`@atomicLoad`](https://ziglang.org/documentation/master/#atomicLoad)
 

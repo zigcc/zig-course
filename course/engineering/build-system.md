@@ -25,7 +25,7 @@ Zig 使用 `build.zig` 文件来描述一个项目的构建步骤。
 
 `build` 是构建的入口函数，而不是常见的 `main`，真正的 `main` 函数定义在 [`build_runner.zig`](https://github.com/ziglang/zig/blob/master/lib/compiler/build_runner.zig#L15) 中，这是由于 Zig 的构建分为两个阶段：
 
-1. 生成由 [`std.Build.Step`](https://ziglang.org/documentation/master/std/#std.Build.Step) 构成有向无环图（DAG）
+1. 生成由 [`std.Build.Step`](https://ziglang.org/documentation/master/std/#std.Build.Step) 构成的有向无环图（DAG，即 Directed Acyclic Graph——一种不包含环路的有向图结构，用于表达步骤之间的依赖关系）
 2. 执行真正的构建逻辑
 
 > [!TIP]

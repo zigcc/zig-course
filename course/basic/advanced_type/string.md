@@ -50,7 +50,7 @@ Unicode 码点字面量类型是 `comptime_int`。所有转义字符都可以在
 :::info
 
 字符串字面量中不能直接包含`<Tab>`字符（Zig 语言规范不允许在源代码中使用`<Tab>`）。但可以使用`\t`转义序列或`@embedFile`内建函数来实现类似的功能。
-参考：[enum-backed address spaces](https://github.com/ziglang/zig-spec/issues/38]
+参考：[enum-backed address spaces](https://github.com/ziglang/zig-spec/issues/38)
 
 :::
 

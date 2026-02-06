@@ -42,6 +42,4 @@ var map = std.AutoHashMap(i32, void).init(std.testing.allocator);
 
 ## 联合类型
 
-## 联合类型
-
 仅包含一种可能类型（且该类型是零大小类型）的 [联合类型](../basic/union.md) 也是零大小类型。
