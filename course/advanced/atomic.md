@@ -21,7 +21,7 @@ outline: deep
 - **Monotonic**（对应 C++ 的 `memory_order_relaxed`）：保证同一线程内对同一变量的原子操作是单调有序的，但不阻止不同变量之间的操作重排序。适用于简单的计数器等场景。
 - **Acquire**：读操作使用。保证当前线程在此读操作**之后**的所有读写操作，不会被重排到此操作之前。常用于获取锁。
 - **Release**：写操作使用。保证当前线程在此写操作**之前**的所有读写操作，不会被重排到此操作之后。常用于释放锁。
-- **AcqRel**（Acquire + Release）：同时具备 Acquire 和 Release 语义，适用于读-改-写（Read-Modify-Write）操作。
+- **AcqRel**（Acquire + Release）：同时具备 Acquire 和 Release 语义，适用于读 - 改-写（Read-Modify-Write）操作。
 - **SeqCst**（Sequentially Consistent）：最强的保证。除了包含 AcqRel 的所有保证外，还保证所有线程观察到的 SeqCst 操作的顺序是一致的。开销最大，但最易于推理。
 
 关于更多细节，见 [LLVM Atomics](https://llvm.org/docs/Atomics.html#atomic-orderings)。
