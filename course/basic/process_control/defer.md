@@ -20,15 +20,21 @@ outline: deep
 
 ## 典型用法
 
-`defer` 最常见的用途是配合内存分配器使用，确保分配的内存在作用域结束时被释放：
+`defer` 最常见的用途是配合内存分配器使用，确保分配的内存在作用域正常结束时被释放：
 
 ```zig
 const allocator = std.heap.page_allocator;
 const data = try allocator.alloc(u8, 100);
 defer allocator.free(data);
 // 使用 data...
-// 无论后续代码如何退出（正常返回或错误返回），data 都会被释放
+// 当作用域正常退出时，data 会被释放
 ```
+
+:::warning ⚠️ 注意
+`defer` 仅在作用域**正常退出**时执行。如果函数因返回错误而退出，已注册的 `defer` **不会执行**。如果需要在错误返回时执行清理操作，请使用 `errdefer`。
+
+因此在实际的资源管理中，通常需要 `defer` 和 `errdefer` 搭配使用——`defer` 负责正常路径的清理，`errdefer` 负责错误路径的清理。
+:::
 
 ## `errdefer`
 
