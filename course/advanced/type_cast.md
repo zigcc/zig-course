@@ -126,7 +126,7 @@ undefined 是一个神奇的值，它可以赋值给所有类型，代表这个�
 
 ## 对等类型转换
 
-对等类型转换（**Peer Type Resolution**），这个词汇仅仅在 zig 的文档中出现过，它看起来与前面提到的普通类型解析很像，根据 zig 的[开发手册](https://ziglang.org/documentation/master/)所述，它发生在以下情况：
+对等类型转换（**Peer Type Resolution**）是 Zig 类型系统中的一种类型推断机制。其核心思想是：当多个表达式需要产生统一类型的结果时，编译器会自动寻找它们的**最小公共超类型（Least Upper Bound）**——即能够无损表示所有参与类型的最小类型。根据 Zig 的[开发手册](https://ziglang.org/documentation/master/)所述，它发生在以下情况：
 
 - `switch` 的表达式
 - `if` 的表达式

@@ -18,7 +18,7 @@ outline: deep
 6. [`page_allocator`](https://ziglang.org/documentation/master/std/#std.heap.page_allocator)
 7. [`StackFallbackAllocator`](https://ziglang.org/documentation/master/std/#std.heap.StackFallbackAllocator)
 
-除了这八种内存分配模型外，还提供了内存池的功能 [`MemoryPool`](https://ziglang.org/documentation/master/std/#std.heap.memory_pool.MemoryPool)
+除了这七种内存分配模型外，还提供了内存池的功能 [`MemoryPool`](https://ziglang.org/documentation/master/std/#std.heap.memory_pool.MemoryPool)
 
 你可能对上面的多种内存模型感到很迷惑，C 语言中不就是 `malloc` 吗，怎么到这里这么多的“模型”，这些模型均有着不同的特点，而且它们之间有一部分还可以叠加使用，Zig 在这方面提供了更多的选择，而且不仅仅是这些，你还可以自己尝试实现一个内存模型。
 
