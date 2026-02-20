@@ -171,7 +171,20 @@ const WhileBasic = struct {
 };
 
 const WhileContinue = struct {
+    const std = @import("std");
+
     pub fn main() void {
+        {
+            // #region while_continue_fix
+            // 将while语句的基础代码用continue表达式改写
+            var i: usize = 0;
+            while (i < 10) : (i += 1) {
+                if (i == 5) continue;
+                std.debug.print("i is {}\n", .{i});
+            }
+            // #endregion while_continue_fix
+        }
+
         {
             // #region while_continue_1
             var i: usize = 0;
