@@ -9,7 +9,7 @@
     "export-pdf": "press-export-pdf export course"
   },
   "devDependencies": {
-    "@types/node": "^25.2.3",
+    "@types/node": "^25.3.0",
     "prettier": "^3.8.1",
     "vitepress": "^1.6.4",
     "vitepress-export-pdf": "^1.0.0"
