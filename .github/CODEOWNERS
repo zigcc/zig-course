@@ -1,3 +1,5 @@
 # https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners#example-of-a-codeowners-file
 
-*       @jinzhongjia @jiacai2050 @xihale
+*          @jinzhongjia @jiacai2050 @xihale
+*.json     @jinzhongjia
+bun.lock   @jinzhongjia
