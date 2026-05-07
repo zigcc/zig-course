@@ -154,7 +154,7 @@ Project-Specific Options:
 
 通常，二进制可执行程序的构建结果会输出在 `zig-out/bin` 下，而链接库的构建结果会输出在 `zig-out/lib` 下。
 
-如果要连接到系统的库，则使用 `exe.linkSystemLibrary`，Zig 内部借助 pkg-config 实现该功能。示例：
+如果要连接到系统的库，在 Zig 0.16 的模块化构建 API 中通常使用 `exe.root_module.linkSystemLibrary`，Zig 内部借助 pkg-config 实现该功能。类似地，链接其他库或添加 C/C++ 源文件时，也通常是操作 `root_module`。示例：
 
 <<<@/code/release/build_system/system_lib/build.zig
 
@@ -266,9 +266,9 @@ zig 的构建系统还允许我们执行一些额外的命令，例如根据 jso
 
 ::: info 🅿️ 提示
 
-关于头文件的引入，可以使用 `addIncludePath`
+关于头文件的引入，可以使用 `root_module.addIncludePath`
 
-针对多个 C 源代码文件，zig 提供了函数 `addCSourceFiles` 用于便捷地添加多个源文件。
+针对多个 C 源代码文件，zig 提供了 `root_module.addCSourceFiles` 用于便捷地添加多个源文件。
 
 :::
 

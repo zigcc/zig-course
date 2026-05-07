@@ -42,7 +42,7 @@ outline: deep
 
 这是一个用于调试的分配器，现阶段适用于在调试模式下使用该分配器，它的性能并不高！
 
-这个分配器的目的不是为了性能，而是为了安全，它支持线程安全，安全检查，检查是否存在泄露等特性，这些特性均可手动配置是否开启。
+这个分配器的目的不是为了性能，而是为了安全。默认配置下它支持线程安全、安全检查、泄漏检测等能力，并且这些特性都可以按需配置。
 
 <<<@/code/release/memory_manager.zig#DebugAllocator
 
@@ -66,7 +66,7 @@ outline: deep
 
 ## `FixedBufferAllocator`
 
-这个分配器是固定大小的内存缓冲区，无法扩容，常常在你需要缓冲某些东西时使用，注意默认情况下它不是线程安全的，但是存在着变体 [`ThreadSafeAllocator`](https://ziglang.org/documentation/master/std/#std.heap.ThreadSafeAllocator)，使用 `ThreadSafeAllocator` 包裹一下它即可。
+这个分配器是固定大小的内存缓冲区，无法扩容，常常在你需要缓冲某些东西时使用。注意默认情况下它不是线程安全的；而在 Zig 0.16 中，`ThreadSafeAllocator` 已被移除。如果你需要跨线程共享同一个 `FixedBufferAllocator`，应当像示例那样在外层自行加锁，或者直接改用更适合并发场景的 `SmpAllocator`。
 
 ::: code-group
 
@@ -84,7 +84,7 @@ outline: deep
 
 ## `c_allocator`
 
-这是纯粹的 C 的 `malloc`，它会直接尝试调用 C 库的内存分配，使用它需要在 `build.zig` 中添加上 `linkLibC` 功能：
+这是纯粹的 C 的 `malloc`，它会直接尝试调用 C 库的内存分配。使用它时，需要在 `build.zig` 中让对应模块链接 libc，例如 `exe.root_module.linkSystemLibrary("c", .{})`：
 
 <<<@/code/release/memory_manager.zig#c_allocator
 

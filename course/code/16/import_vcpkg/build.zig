@@ -16,13 +16,13 @@ const Build = struct {
         });
         // #region c_import
         // 增加 include 搜索目录
-        exe.addIncludePath(.{ .cwd_relative = "D:\\vcpkg\\installed\\windows-x64\\include" });
+        exe.root_module.addIncludePath(.{ .cwd_relative = "D:\\vcpkg\\installed\\windows-x64\\include" });
         // 增加 lib 搜索目录
-        exe.addLibraryPath(.{ .cwd_relative = "D:\\vcpkg\\installed\\windows-x64\\lib" });
+        exe.root_module.addLibraryPath(.{ .cwd_relative = "D:\\vcpkg\\installed\\windows-x64\\lib" });
         // 链接标准c库
-        exe.linkLibC();
+        exe.root_module.linkSystemLibrary("c", .{});
         // 链接第三方库gsl
-        exe.linkSystemLibrary("gsl");
+        exe.root_module.linkSystemLibrary("gsl", .{});
         // #endregion c_import
 
         b.installArtifact(exe);

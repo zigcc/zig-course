@@ -20,13 +20,13 @@ pub fn build(b: *std.Build) void {
 
     if (target.result.os.tag == .windows)
         // 连接到系统的 ole32
-        exe.linkSystemLibrary("ole32")
+        exe.root_module.linkSystemLibrary("ole32", .{})
     else
         // 链接到系统的 libz
-        exe.linkSystemLibrary("z");
+        exe.root_module.linkSystemLibrary("z", .{});
 
     // 链接到 libc
-    exe.linkLibC();
+    exe.root_module.linkSystemLibrary("c", .{});
 
     b.installArtifact(exe);
 }

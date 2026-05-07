@@ -106,9 +106,9 @@ outline: deep
 
 <<<@/code/release/result-location.zig#stdlib_arraylist
 
-### GeneralPurposeAllocator
+### DebugAllocator
 
-<<<@/code/release/result-location.zig#stdlib_gpa
+<<<@/code/release/result-location.zig#stdlib_debug_allocator
 
 ## 字段和声明不可重名
 
