@@ -25,7 +25,7 @@ pub fn build(b: *std.Build) void {
         }),
     });
 
-    exe.linkLibrary(lib);
+    exe.root_module.linkLibrary(lib);
 
     b.installArtifact(exe);
 }

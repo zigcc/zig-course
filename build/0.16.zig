@@ -1,7 +1,5 @@
 const std = @import("std");
 const Build = std.Build;
-const ChildProcess = std.process.Child;
-
 const log = std.log.scoped(.For_0_16_0);
 const version = "16";
 
@@ -13,25 +11,31 @@ pub fn build(b: *Build) void {
     // get target and optimize
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
+    const io = b.graph.io;
 
     var lazy_path = b.path(relative_path);
 
     const full_path = lazy_path.getPath(b);
 
     // open dir
-    var dir = std.fs.openDirAbsolute(full_path, .{ .iterate = true }) catch |err| {
-        log.err("open 15 path failed, err is {}", .{err});
+    var dir = std.Io.Dir.openDirAbsolute(io, full_path, .{ .iterate = true }) catch |err| {
+        log.err("open 16 path failed, err is {}", .{err});
         std.process.exit(1);
     };
-    defer dir.close();
+    defer dir.close(io);
 
     // make a iterate for release ath
     var iterate = dir.iterate();
 
-    while (iterate.next()) |val| {
-        if (val) |entry| {
+    while (iterate.next(io) catch |err| {
+        log.err("iterate examples_path failed, err is {}", .{err});
+        std.process.exit(1);
+    }) |entry| {
             // get the entry name, entry can be file or directory
-            const output_name = std.mem.trimRight(u8, entry.name, ".zig");
+            const output_name = if (std.mem.endsWith(u8, entry.name, ".zig"))
+                entry.name[0 .. entry.name.len - ".zig".len]
+            else
+                entry.name;
             if (entry.kind == .file) {
                 // connect path
                 const path = std.fs.path.join(b.allocator, &[_][]const u8{ relative_path, entry.name }) catch |err| {
@@ -48,11 +52,11 @@ pub fn build(b: *Build) void {
                         .optimize = optimize,
                     }),
                 });
-                exe.linkLibC();
+                exe.root_module.linkSystemLibrary("c", .{});
 
                 if (exe.root_module.resolved_target.?.result.os.tag == .windows and std.mem.eql(u8, "echo_tcp_server.zig", entry.name)) {
                     std.log.info("link ws2_32 for {s}", .{entry.name});
-                    exe.linkSystemLibrary("ws2_32");
+                    exe.root_module.linkSystemLibrary("ws2_32", .{});
                 }
                 // add to default install
                 b.installArtifact(exe);
@@ -75,8 +79,6 @@ pub fn build(b: *Build) void {
             } else if (entry.kind == .directory) {
 
                 // build child process
-                var child = ChildProcess.init(&args, b.allocator);
-
                 // build cwd
                 const cwd = std.fs.path.join(b.allocator, &[_][]const u8{
                     full_path,
@@ -87,25 +89,19 @@ pub fn build(b: *Build) void {
                 };
 
                 // open entry dir
-                const entry_dir = std.fs.openDirAbsolute(cwd, .{}) catch unreachable;
-                entry_dir.access("build.zig", .{}) catch {
+                const entry_dir = std.Io.Dir.openDirAbsolute(io, cwd, .{}) catch unreachable;
+                defer entry_dir.close(io);
+
+                entry_dir.access(io, "build.zig", .{}) catch {
                     log.err("not found build.zig in path {s}", .{cwd});
                     std.process.exit(1);
                 };
 
-                // set child cwd
-                // this api maybe changed in the future
-                child.cwd = cwd;
-
-                // spawn and wait child process
-                _ = child.spawnAndWait() catch unreachable;
+                var child = std.process.spawn(io, .{
+                    .argv = &args,
+                    .cwd = .{ .path = cwd },
+                }) catch unreachable;
+                _ = child.wait(io) catch unreachable;
             }
-        } else {
-            // Stop endless loop
-            break;
-        }
-    } else |err| {
-        log.err("iterate examples_path failed, err is {}", .{err});
-        std.process.exit(1);
     }
 }

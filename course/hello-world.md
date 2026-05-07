@@ -42,7 +42,7 @@ Zig 默认可导入三个核心模块：
 - **参数**：第二个参数是一个元组，你可以将其理解为一个匿名结构体。
 
 ::: warning ⚠️ 注意
-`std.debug.print` 主要用于调试，不推荐在生产环境中使用。因为它会将信息打印到 `stderr`，且在某些构建模式下可能会被编译器优化掉。
+`std.debug.print` 主要用于调试，不推荐在生产环境中作为正式输出接口使用。因为它会将信息打印到 `stderr`，更适合调试信息而不是程序的正常输出。
 这只是一个入门示例，接下来我们将探讨更“正确”的打印方式。
 :::
 
@@ -52,7 +52,7 @@ Zig 默认可导入三个核心模块：
 
 “打印 Hello, World”看似简单，但在 Zig 中，它能引导我们思考一些底层设计。
 
-Zig 本身没有内置的 `@print()` 函数，输出功能通常由标准库的 `log` 和 `io` 包提供。`std.debug.print` 是一个特例，主要用于调试。
+Zig 本身没有内置的 `@print()` 函数，输出功能通常由标准库的 `log` 和 `Io` 包提供。`std.debug.print` 是一个特例，主要用于调试。
 
 让我们看一个更规范的例子（**但请注意，此代码同样不建议直接用于生产环境**）：
 
@@ -65,9 +65,9 @@ Zig 本身没有内置的 `@print()` 函数，输出功能通常由标准库的 
 这段代码分别向 `stdout` 和 `stderr` 输出了信息。
 
 - `stdout` (标准输出)：用于输出程序的正常信息。写入 `stdout` 的操作可能会失败。
-- `stderr` (标准错误)：用于输出错误信息。我们通常假定写入 `stderr` 的操作不会失败（由操作系统保证）。
+- `stderr` (标准错误)：用于输出错误信息。写入 `stderr` 同样可能失败，因此示例里也使用了 `try` 来处理错误。
 
-我们通过 `std.io` 模块获取了标准输出和标准错误的 `writer`，它们提供了 `print` 方法，可以将格式化的字符串写入对应的 I/O 流。
+我们通过 `std.Io.File.stdout()` 和 `std.Io.File.stderr()` 获取标准输出和标准错误，并基于传入的 `io` 实例创建 `writer`。示例中的 `io` 一般来自入口函数 `main(init: std.process.Init)` 中的 `init.io`。
 
 ### 考虑性能：使用缓冲区
 
@@ -77,17 +77,17 @@ Zig 本身没有内置的 `@print()` 函数，输出功能通常由标准库的 
 
 <<<@/code/release/hello_world.zig#three
 
-通过 `std.io.bufferedWriter`，我们为 `stdout` 和 `stderr` 的 `writer` 添加了缓冲功能，从而提高了性能。
+这里直接为 `stdout` 和 `stderr` 各自提供了一块固定缓冲区，`writer` 会先把内容写入缓冲区，再在 `flush` 时真正输出，从而减少系统调用。
 
 ## 更进一步：线程安全
 
 以上代码在单线程环境下工作良好，但在多线程环境中，多个线程同时调用 `print` 可能会导致输出内容交错混乱。
 
-为了保证线程安全，我们需要为 `writer` 添加锁。
+为了保证线程安全，通常需要在共享 `writer` 的外层自行做同步。
 
-你可以使用 `std.Thread.Mutex` 来实现一个线程安全的 `writer`。
+在 Zig 0.16 中，常见做法是使用 `std.Io.Mutex`（需要 `Io` 实例）或基于 `std.atomic.Mutex` 的轻量自旋锁，根据具体场景选择。
 
-我们鼓励你阅读[标准库源码](https://ziglang.org/documentation/master/std/#std.Thread.Mutex)来深入了解其工作原理。
+我们鼓励你阅读[标准库源码](https://ziglang.org/documentation/master/std/#std.Io.Mutex)来深入了解其工作原理。
 
 ## 了解更多
 

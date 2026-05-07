@@ -86,16 +86,19 @@ const ThreadSafeFixedBufferAllocator = struct {
         // 获取内存allocator
         const allocator = fba.allocator();
 
-        // 使用 ThreadSafeAllocator 包裹, 你需要设置使用的内存分配器，还可以配置使用的mutex
-        var thread_safe_fba = std.heap.ThreadSafeAllocator{ .child_allocator = allocator };
+        // Zig 0.16 移除了 ThreadSafeAllocator。
+        // 如果需要在线程间共享 FixedBufferAllocator，需要自行保护临界区。
+        var mutex: std.atomic.Mutex = .unlocked;
 
-        // 获取线程安全的内存allocator
-        const thread_safe_allocator = thread_safe_fba.allocator();
+        while (!mutex.tryLock()) {
+            std.atomic.spinLoopHint();
+        }
+        defer mutex.unlock();
 
         // 申请内存
-        const memory = try thread_safe_allocator.alloc(u8, 100);
+        const memory = try allocator.alloc(u8, 100);
         // 释放内存
-        defer thread_safe_allocator.free(memory);
+        defer allocator.free(memory);
     }
     // #endregion ThreadSafeFixedBufferAllocator
 };
@@ -129,11 +132,11 @@ const ArenaAllocator = struct {
 
     pub fn main() !void {
         // 使用模型，一定要是变量，不能是常量
-        var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+        var gpa = std.heap.DebugAllocator(.{}){};
         // 拿到一个allocator
         const allocator = gpa.allocator();
 
-        // defer 用于执行general_purpose_allocator善后工作
+        // defer 用于执行 debug allocator 善后工作
         defer {
             const deinit_status = gpa.deinit();
 

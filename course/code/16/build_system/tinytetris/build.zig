@@ -26,17 +26,17 @@ pub fn build(b: *std.Build) void {
     // 源代码路径（相对于build.zig）
     // 传递的 flags
     // 多个 C 源代码文件可以使用 addCSourceFiles
-    exe.addCSourceFile(.{
+    exe.root_module.addCSourceFile(.{
         .file = b.path("src/main.cc"),
         .flags = &.{},
     });
 
-    // 链接C++ 标准库
-    // 同理对于 C 标准库可以使用 linkLibC
-    exe.linkLibCpp();
+    // 链接 C++ 标准库
+    // 同理对于 C 标准库可以使用 `exe.root_module.linkSystemLibrary("c", .{})`
+    exe.root_module.linkSystemLibrary("c++", .{});
 
     // 链接系统库 ncurses
-    exe.linkSystemLibrary("ncurses");
+    exe.root_module.linkSystemLibrary("ncurses", .{});
 
     // 添加到顶级 install step 中作为依赖
     b.installArtifact(exe);

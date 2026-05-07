@@ -140,7 +140,7 @@ const SelfReference3 = struct {
     // #region more_self_reference3
     const std = @import("std");
 
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    var gpa = std.heap.DebugAllocator(.{}){};
 
     // #region deault_self_reference3
     const User = struct {
