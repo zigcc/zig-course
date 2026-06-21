@@ -59,8 +59,6 @@ pub const c = @cImport({
     @cInclude("math.h");
     @cInclude("stdlib.h");
 });
-
-const c = @import("c.zig").c;
 ```
 
 新写法：
