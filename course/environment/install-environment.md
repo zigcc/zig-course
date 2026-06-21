@@ -154,14 +154,14 @@ port install zig
 2. 安装 asdf [Zig 插件](https://github.com/asdf-community/asdf-zig)：
 
 ```bash
-asdf plugin-add zig https://github.com/asdf-community/asdf-zig.git
+asdf plugin add zig https://github.com/asdf-community/asdf-zig.git
 ```
 
 3. 安装完成后，便可使用 asdf 管理 Zig 版本。以下是一些常用命令：
 
 ```bash
 # 列举所有可安装的版本
-asdf list-all zig
+asdf list all zig
 
 # 安装指定版本的 Zig
 asdf install zig <version>
@@ -170,8 +170,8 @@ asdf install zig <version>
 asdf uninstall zig <version>
 
 # 设置全局默认版本，会写到 $HOME/.tool-versions 文件
-asdf global zig <version>
+asdf set -u zig <version>
 
 # 设置当前目录使用的版本，会写到 $(pwd)/.tool-versions 文件
-asdf local zig <version>
+asdf set zig <version>
 ```
