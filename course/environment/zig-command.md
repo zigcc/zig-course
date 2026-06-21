@@ -84,7 +84,7 @@ outline: deep
 ```sh
 # 仅获取包的哈希值
 $ zig fetch https://github.com/webui-dev/zig-webui/archive/main.tar.gz
-12202809180bab2c7ae3382781b2fc65395e74b49d99ff2595f3fea9f7cf66cfa963
+# 输出形如：包名-版本-哈希（以实际命令为准）
 ```
 
 如果你希望将包直接添加为依赖项，可以附加 `--save` 参数：

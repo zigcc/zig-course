@@ -104,7 +104,7 @@ const exe = b.addExecutable(.{
 const c = @import("c");
 ```
 
-这样翻译出来的 C 代码与以前用 `@cImport` 的结果是一致的；如果需要更细的翻译参数控制，可以把官方 `translate-c` 包作为显式依赖加入。
+这样翻译出来的 C 代码与以前用 `@cImport` 的结果是一致的；如果需要更细的[翻译参数控制](https://codeberg.org/ziglang/translate-c/src/commit/41c10fa66ac81343c33f2b8c746f181b41eaaa27/build/Translator.zig#L40)，可以把官方 [`translate-c`](https://codeberg.org/ziglang/translate-c/src/commit/41c10fa66ac81343c33f2b8c746f181b41eaaa27/build/Translator.zig#L40) 包作为显式依赖加入。
 
 如果你升级到 `0.16.0` 后发现同一份 C 头文件翻译结果和以前不一致，也不用急着怀疑自己。因为 `translate-c` 的底层实现已经从 `libclang` 切换到了 Aro，这类差异更应该视为 bug 并反馈给 Zig。
 
@@ -122,6 +122,52 @@ const c = @import("c");
 - `@Struct()`
 - `@Union()`
 - `@Enum()`
+
+```zig
+@EnumLiteral() type
+
+@Int(comptime signedness: std.builtin.Signedness, comptime bits: u16) type
+
+@Tuple(comptime field_types: []const type) type
+
+@Pointer(
+    comptime size: std.builtin.Type.Pointer.Size,
+    comptime attrs: std.builtin.Type.Pointer.Attributes,
+    comptime Element: type,
+    comptime sentinel: ?Element,
+) type
+
+@Fn(
+    comptime param_types: []const type,
+    comptime param_attrs: *const [param_types.len]std.builtin.Type.Fn.Param.Attributes,
+    comptime ReturnType: type,
+    comptime attrs: std.builtin.Type.Fn.Attributes,
+) type
+
+@Struct(
+    comptime layout: std.builtin.Type.ContainerLayout,
+    comptime BackingInt: ?type,
+    comptime field_names: []const []const u8,
+    comptime field_types: *const [field_names.len]type,
+    comptime field_attrs: *const [field_names.len]std.builtin.Type.StructField.Attributes,
+) type
+
+@Union(
+    comptime layout: std.builtin.Type.ContainerLayout,
+    /// Either the integer tag type, or the integer backing type, depending on `layout`.
+    comptime ArgType: ?type,
+    comptime field_names: []const []const u8,
+    comptime field_types: *const [field_names.len]type,
+    comptime field_attrs: *const [field_names.len]std.builtin.Type.UnionField.Attributes,
+) type
+
+@Enum(
+    comptime TagInt: type,
+    comptime mode: std.builtin.Type.Enum.Mode,
+    comptime field_names: []const []const u8,
+    comptime field_values: *const [field_names.len]TagInt,
+) type
+```
 
 常见迁移：
 
@@ -339,27 +385,50 @@ const MyStruct = @Struct(.auto, null, std.meta.fieldNames(MyEnum), &@splat(Field
 
 需要注意的是，**这套新 builtin 里没有 `@Float`**——因为运行时浮点类型只有 5 种，在用户代码里实现这件事很轻松；如果非要从位数构造浮点类型，可以用 `std.meta.Float`。
 
+这套新 builtin 里也没有下面这些类型构造函数：
+
+- 没有 `@Array`：直接用普通数组语法即可。一个通用 `Array` 函数可以写成这样：
+
+  ```zig
+  fn Array(comptime len: usize, comptime Elem: type, comptime sentinel: ?Elem) type {
+      return if (sentinel) |s| [len:s]Elem else [len]Elem;
+  }
+  ```
+
+  实际使用时通常不需要这么泛化，直接把调用点替换为 `[len]Elem` 或 `[len:s]Elem` 即可。
+
+- 没有 `@Opaque`：直接写 `opaque {}`。
+- 没有 `@Optional`：直接写 `?T`。
+- 没有 `@ErrorUnion`：直接写 `E!T`。
+- 没有 `@ErrorSet`：为了简化语言，不再支持 reify error set。请用 `error{ ... }` 语法显式声明 error set。
+
 如果你的项目大量依赖元编程，这一项往往是升级时最先爆出来的报错来源。建议先全局搜索 `@Type(` 和 `std.meta.`，再逐个迁移。
 
 ### 小整数类型现在可以安全地隐式转换为浮点
 
-如果某个整数类型的所有可能值，都能被目标浮点类型精确表示，那么现在可以直接发生隐式 coercion。
+如果某个整数类型的所有可能值都能放进目标浮点类型而不发生舍入，那么这个整数可以在不显式转换的情况下 coercion 到该浮点类型。这个判断通过比较整数类型的精度位数和浮点类型的 significand 位数完成。更大的整数类型仍然需要 `@floatFromInt`。
 
 旧写法：
 
 ```zig
 var foo_int: u24 = 123;
 var foo_float: f32 = @floatFromInt(foo_int);
+
+var bar_int: u25 = 123;
+var bar_float: f32 = @floatFromInt(bar_int);
 ```
 
 新写法：
 
 ```zig
 var foo_int: u24 = 123;
-var foo_float: f32 = foo_int;
+var foo_float: f32 = foo_int; // 安全 coercion
+
+var bar_int: u25 = 123;
+var bar_float: f32 = @floatFromInt(bar_int); // 仍然需要显式转换
 ```
 
-注意这只适用于“不会丢精度”的情况。像 `u25 -> f32` 这种仍然需要显式写 `@floatFromInt`。
+这是“改善 Zig 游戏开发人体工学”这项更大工作的组成部分。
 
 ### 运行时向量索引被禁止
 
@@ -385,6 +454,8 @@ for (&array) |elem| {
 ```
 
 如果你确实需要逐项遍历向量，请先把它显式 coercion 成数组，再做索引或遍历。
+
+这项变化是 `Reworked Byval Syntax Lowering` 的一部分。
 
 ### 数组与向量不再支持旧式内存强转
 
@@ -446,13 +517,13 @@ fn bar() noreturn {
 
 后续官方计划继续以同样的思路加入更多类似的编译错误。
 
-### `packed` 与 `extern` 规则更严格
+### `packed union` 中不再允许 unused bits
 
-#### `packed union` 需要明确 backing integer，并保证各字段 bit size 一致
+此前 `packed union` 的表示到 bit 的映射并不总是只有一种明显方式，而这种唯一性是其他 packed 类型想要具备的属性。例如，`enum(u5) { ... }` 明确表示 5 个 bit，方式也显然，因此允许出现在 packed 上下文中；但 `?u8` 有两种合理方式映射到 9 个 bit，因此不允许出现在 packed 上下文中。
 
-以前 Zig 对 `packed union` 的位级布局有一些隐式推断。`0.16.0` 开始要求它更明确。
+现在通过要求 `packed union` 的所有字段都具有与 backing integer 类型相同的 `@bitSizeOf` 来消除这种歧义。
 
-旧写法：
+升级指南：
 
 ```zig
 const U = packed union {
@@ -461,7 +532,7 @@ const U = packed union {
 };
 ```
 
-新写法：
+⬇️
 
 ```zig
 const U = packed union(u16) {
@@ -473,21 +544,36 @@ const U = packed union(u16) {
 };
 ```
 
-总结一下这条规则：如果你需要 `packed union`，就请明确写出 backing integer，并保证每个字段都能映射到同样大小的位表示。
+### `packed struct` / `packed union` 不再允许指针字段
 
-之前 `packed struct(T)` 已经可以指定 backing integer，但 `packed union(T)` 不行；`0.16.0` 把这条限制也去掉了。下面是用普通声明语法和用 `@Union` builtin 同时构造同一个 packed union 的例子：
+`packed struct` 和 `packed union` 类型的字段不再允许是指针。这实现了 proposal [#24657](https://github.com/ziglang/zig/issues/24657)。
+
+这项变化的主要原因是：包含非字节对齐指针的常量值无法在绝大多数二进制格式中表示。另外，一些目标平台上的指针不能仅用地址位表示，还包含额外 metadata bit；在这种情况下，把指针打包进整数没有意义，而 `packed` 类型承诺的正是这种整数式位级表示。
+
+如果你依赖了 `packed` 类型中的指针字段，可以改用 `usize` 字段，并通过 `@ptrFromInt` 和 `@intFromPtr` 在指针与整数之间转换：
 
 ```zig
-// 用普通声明语法
+const addr: usize = @intFromPtr(ptr);
+const ptr_again: *T = @ptrFromInt(addr);
+```
+
+### `packed union` 允许显式 backing integer
+
+旧版本 Zig 已经允许 `packed struct` 类型用 `packed struct(T)` 语法指定 backing integer 类型，但不允许 `packed union` 这么做。Zig `0.16.0` 现在允许了。
+
+`packed_union_explicit_backing_int.zig`
+
+```zig
+// 常规声明 packed union 类型
 const Split16 = packed union(u16) {
     raw: MaybeSigned16,
     split: packed struct { low: u8, high: u8 },
 };
 
-// 用 `@Union` builtin
+// 使用 `@Union` 构造 packed union 类型
 const MaybeSigned16 = @Union(
     .@"packed",
-    u16, // backing integer
+    u16, // backing integer type
     &.{ "unsigned", "signed" },
     &.{ u16, i16 },
     &@splat(.{}),
@@ -499,70 +585,149 @@ test "use packed union type with explicit backing integer" {
     try testing.expectEqual(0xFE, u.split.low);
     try testing.expectEqual(0xFF, u.split.high);
 }
+
+const testing = @import("std").testing;
 ```
 
-由于下面 “`extern` 场景必须显式指定 tag type / backing type” 这条规则的存在，现在某些场景下显式指定 packed union 的 backing integer 是必须的。
+Shell：
 
-#### `packed struct` / `packed union` 不再允许指针字段
-
-如果你过去把指针直接塞进 `packed` 类型里，现在需要改成整数保存地址：
-
-```zig
-const addr: usize = @intFromPtr(ptr);
-const ptr_again: *T = @ptrFromInt(addr);
+```sh
+$ zig test packed_union_explicit_backing_int.zig
+1/1 packed_union_explicit_backing_int.test.use packed union type with explicit backing integer...OK
+All 1 tests passed.
 ```
 
-这项变更的核心原因是：很多目标平台里，指针并不只是“裸地址位”，而 `packed` 类型又承诺了精确的位级布局，因此两者不再兼容。
+注意，由于下面 “`extern` 场景必须显式指定 tag type / backing type” 这条规则的存在，现在某些场景下显式指定 packed union 的 backing integer 是必须的。
 
-#### `extern` 场景下必须显式指定 tag type / backing type
+### `extern` 场景下必须显式指定 tag type / backing type
 
-`enum`、`packed struct`、`packed union` 只要被用于 `extern` / `export` 场景，就不能再依赖隐式推断的底层整数类型。
+具有推断整数 tag type 的 `enum` 类型，以及具有推断整数 backing type 的 `packed struct` 和 `packed union` 类型，不再被视为合法的 `extern` 类型。这实现了 proposal [#24714](https://github.com/ziglang/zig/issues/24714)。
 
-旧写法：
+这项 breaking change 是为了避免一个类型的 ABI 完全由字段隐式决定。尤其是因为 `u8` 和 `i8` 在某些上下文中可能有不同 ABI；如果选择是隐式的，就不清楚到底使用哪一个。
+
+如果这在你的代码中引入了编译错误，请添加显式 tag type 或 backing type 来解决。（另见上面 “`packed union` 允许显式 backing integer” 这项 Zig `0.16.0` 相关语言变化。）
+
+`extern_implicit_backing_type.zig`
 
 ```zig
 const Enum = enum { a, b, c, d };
 const PackedStruct = packed struct { a: u4, b: u4 };
 const PackedUnion = packed union { a: u8, b: i8 };
+
+export var some_enum: Enum = .a;
+export var some_packed_struct: PackedStruct = .{ .a = 1, .b = 2 };
+export var some_packed_union: PackedUnion = .{ .a = 123 };
 ```
 
-新写法：
+Shell：
+
+```sh
+$ zig test extern_implicit_backing_type.zig
+/home/ci/.cache/act/0d10aab40ec56bb3/hostexecutor/src/download/0.16.0/release-notes/extern_implicit_backing_type.zig:5:1: error: unable to export type 'extern_implicit_backing_type.Enum'
+export var some_enum: Enum = .a;
+^~~~~~
+/home/ci/.cache/act/0d10aab40ec56bb3/hostexecutor/src/download/0.16.0/release-notes/extern_implicit_backing_type.zig:1:14: note: integer tag type of enum is inferred
+const Enum = enum { a, b, c, d };
+ ^~~~~~~~~~~~~~~~~~~
+/home/ci/.cache/act/0d10aab40ec56bb3/hostexecutor/src/download/0.16.0/release-notes/extern_implicit_backing_type.zig:1:14: note: consider explicitly specifying the integer tag type
+/home/ci/.cache/act/0d10aab40ec56bb3/hostexecutor/src/download/0.16.0/release-notes/extern_implicit_backing_type.zig:1:14: note: enum declared here
+/home/ci/.cache/act/0d10aab40ec56bb3/hostexecutor/src/download/0.16.0/release-notes/extern_implicit_backing_type.zig:6:1: error: unable to export type 'extern_implicit_backing_type.PackedStruct'
+export var some_packed_struct: PackedStruct = .{ .a = 1, .b = 2 };
+^~~~~~
+/home/ci/.cache/act/0d10aab40ec56bb3/hostexecutor/src/download/0.16.0/release-notes/extern_implicit_backing_type.zig:6:1: note: inferred backing integer of packed struct has unspecified signedness
+/home/ci/.cache/act/0d10aab40ec56bb3/hostexecutor/src/download/0.16.0/release-notes/extern_implicit_backing_type.zig:2:29: note: struct declared here
+const PackedStruct = packed struct { a: u4, b: u4 };
+ ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+/home/ci/.cache/act/0d10aab40ec56bb3/hostexecutor/src/download/0.16.0/release-notes/extern_implicit_backing_type.zig:7:1: error: unable to export type 'extern_implicit_backing_type.PackedUnion'
+export var some_packed_union: PackedUnion = .{ .a = 123 };
+^~~~~~
+/home/ci/.cache/act/0d10aab40ec56bb3/hostexecutor/src/download/0.16.0/release-notes/extern_implicit_backing_type.zig:7:1: note: inferred backing integer of packed union has unspecified signedness
+/home/ci/.cache/act/0d10aab40ec56bb3/hostexecutor/src/download/0.16.0/release-notes/extern_implicit_backing_type.zig:3:28: note: union declared here
+const PackedUnion = packed union { a: u8, b: i8 };
+ ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+```
+
+⬇️ `extern_explicit_backing_type.zig`
 
 ```zig
 const Enum = enum(u8) { a, b, c, d };
 const PackedStruct = packed struct(u8) { a: u4, b: u4 };
 const PackedUnion = packed union(u8) { a: u8, b: i8 };
+
+export var some_enum: Enum = .a;
+export var some_packed_struct: PackedStruct = .{ .a = 1, .b = 2 };
+export var some_packed_union: PackedUnion = .{ .a = 123 };
 ```
 
-如果你的类型需要跨 ABI 边界导出，请把 tag type 或 backing type 明确写出来，不要再依赖编译器推断。
+Shell：
+
+```sh
+$ zig test extern_explicit_backing_type.zig
+All 0 tests passed.
+```
 
 ### 浮点取整内建现在可以直接产出整数
 
-`@floor`、`@ceil`、`@round`、`@trunc` 现在可以直接把浮点值转成整数值。
+`@floor`、`@ceil`、`@round` 和 `@trunc` 现在可以用于把浮点值转换成整数值：
 
-旧写法：
-
-```zig
-const x: i32 = @intFromFloat(@round(value));
-```
-
-新写法：
+`float-conversion.zig`
 
 ```zig
-const x: i32 = @round(value);
+const std = @import("std");
+const expectEqual = std.testing.expectEqual;
+
+test "round to int" {
+    try example(12, 12.34);
+    try example(13, 12.50);
+}
+
+fn example(expected: u8, value: f32) !void {
+    const actual: u8 = @round(value);
+    try expectEqual(expected, actual);
+}
 ```
 
-这项改动本身不一定会让旧代码报错，但会让很多“先取整、再转整数”的写法明显简化。
+Shell：
+
+```sh
+$ zig test float-conversion.zig
+1/1 float-conversion.test.round to int...OK
+All 1 tests passed.
+```
+
+`@intFromFloat` 现在与 `@trunc` 重复，因此已被 deprecated。
+
+这是“改善 Zig 游戏开发人体工学”这项更大工作的组成部分。
 
 ### 一元浮点内建会向下转发结果类型
 
-`@sqrt`、`@sin`、`@cos`、`@tan`、`@exp`、`@exp2`、`@log`、`@log2`、`@log10`、`@floor`、`@ceil`、`@trunc`、`@round` 现在都会把外层的结果类型向内转发，于是下面这种过去无法直接写的式子在 `0.16.0` 是合法的：
+过去 Zig 不会通过下面这些 builtin 函数继续转发结果类型：
+
+```zig
+@sqrt
+@sin
+@cos
+@tan
+@exp
+@exp2
+@log
+@log2
+@log10
+@floor
+@ceil
+@trunc
+@round
+```
+
+现在这一点已经改变。过去你不能写：
 
 ```zig
 const x: f64 = @sqrt(@floatFromInt(N));
 ```
 
-之前 `@sqrt` 不会把 `f64` 这个结果类型传给内层的 `@floatFromInt`，所以你必须手工加一层中间变量。这项改动不会让旧代码报错，但能消除大量样板。
+因为 `@sqrt` 不会把 `f64` 这个结果类型传给 `@floatFromInt`；现在可以了。
+
+这是“改善 Zig 游戏开发人体工学”这项更大工作的组成部分。
 
 ### `*u8` 与 `*align(1) u8` 不再是同一个类型
 
@@ -572,17 +737,55 @@ const x: f64 = @sqrt(@floatFromInt(N));
 
 只有在你显式比较 `@TypeOf(...)` 的相等性、或者依赖 `@typeInfo` 反射时，才需要顺手处理一下。
 
+这项变化是 `Reworked Type Resolution` 的一部分。
+
+### 依赖环规则被简化
+
+现在有一些新场景会被视为 dependency loop，而旧版本里不会。
+
+不过，由于类型检查规则被简化、编译错误信息被增强，现在 dependency loop 为什么存在会更明显。这也降低了正式描述 Zig 语言规范的难度。
+
+这项变化是 `Reworked Type Resolution` 的一部分。
+
 ### Zero-bit tuple 字段不再被隐式标记为 `comptime`
 
-`0.14` 时引入的“tuple 中 zero-bit 字段自动变成 `comptime` 字段”这个隐式规则在 `0.16.0` 被回滚。也就是说：
+在 `0.14.0` 时，一个无意引入的规则会把 zero-bit 类型的 tuple 字段隐式提升为 `comptime` 字段：
 
 ```zig
-const S = struct { void };
-@typeInfo(S).@"struct".fields[0].is_comptime
-// 0.15.x 下为 true，0.16.0 下为 false
+comptime {
+    const S = struct { void };
+    @compileLog(@typeInfo(S).@"struct".fields[0].is_comptime); // @as(bool, true)
+}
 ```
 
-这个改动几乎不会影响任何真实代码，因为 zero-bit 字段的值依然是 comptime-known 的。但如果你直接读 `std.builtin.StructField.is_comptime`，或者依赖“带 / 不带 `comptime` 的 tuple 互为同一类型”的写法，就需要相应调整。
+Zig `0.16.0` 回滚了这个变化：上面的 tuple 字段不再被视为 `comptime` 字段。不过，这**不会**阻止该字段的值始终是 comptime-known：
+
+```zig
+test "zero-bit tuple field is comptime-known" {
+    const S = struct { u32, void };
+    var runtime_known: S = undefined;
+    runtime_known = .{ 123, {} };
+    // 即便 tuple 是 runtime-known，zero-bit 字段仍然是 comptime-known：
+    comptime assert(runtime_known[1] == {});
+}
+const assert = @import("std").debug.assert;
+```
+
+换句话说，这项变化几乎完全不是 breaking。唯一可能影响旧代码的情况是：你直接依赖 `@typeInfo` 中的 `std.builtin.StructField.is_comptime`，或者依赖“带显式 `comptime` 字段的 tuple 与不带显式 `comptime` 字段的 tuple 互相等价”：
+
+```zig
+//! 这两个测试在 Zig 0.15.x 中都会通过，但在 Zig 0.16.x 中会失败。
+test "zero-bit tuple field is comptime" {
+    const S = struct { void };
+    try expect(@typeInfo(S).@"struct".fields[0].is_comptime);
+}
+test "comptime annotation on zero-bit field is irrelevant to type equivalence" {
+    const A = struct { void };
+    const B = struct { comptime void = {} };
+    try expect(A == B);
+}
+const expect = @import("std").testing.expect;
+```
 
 ### 字段分析变成 lazy
 
@@ -838,7 +1041,7 @@ const err = std.process.replace(io, .{ .argv = argv });
 
 ### `std.Thread.Pool` 被移除
 
-`std.Thread.Pool` 已经从标准库中移除。最常见的迁移方向，是改用 `std.Io.async` 或 `std.Io.Group.async`。
+`std.Thread.Pool` 已经从标准库中移除。官方迁移建议更谨慎：如果旧代码只是用 `spawnWg` 这类“启动一组任务，然后等待 group 完成”的简单模式，可以迁到 `std.Io.async` / `std.Io.Group.async`；如果依赖复杂同步、必须保证任务真正并发执行才正确，或需要控制并发度，应参考 `std.Io.concurrent` 相关文档，而不是直接机械替换。
 
 如果你过去用的是“提交一组任务，然后等待全部结束”的模式，通常可以这样迁移：
 
@@ -1066,62 +1269,62 @@ file.close(io);
 
 重命名 / 迁移过的 API（节选最常用的部分）：
 
-| 0.15.x | 0.16.0 |
-| --- | --- |
-| `fs.Dir` | `std.Io.Dir` |
-| `fs.File` | `std.Io.File` |
-| `fs.cwd` | `std.Io.Dir.cwd` |
-| `fs.copyFileAbsolute` | `std.Io.Dir.copyFileAbsolute` |
-| `fs.makeDirAbsolute` | `std.Io.Dir.createDirAbsolute` |
-| `fs.deleteDirAbsolute` | `std.Io.Dir.deleteDirAbsolute` |
-| `fs.openDirAbsolute` | `std.Io.Dir.openDirAbsolute` |
-| `fs.openFileAbsolute` | `std.Io.Dir.openFileAbsolute` |
-| `fs.accessAbsolute` | `std.Io.Dir.accessAbsolute` |
-| `fs.createFileAbsolute` | `std.Io.Dir.createFileAbsolute` |
-| `fs.deleteFileAbsolute` | `std.Io.Dir.deleteFileAbsolute` |
-| `fs.renameAbsolute` | `std.Io.Dir.renameAbsolute` |
-| `fs.readLinkAbsolute` | `std.Io.Dir.readLinkAbsolute` |
-| `fs.symLinkAbsolute` | `std.Io.Dir.symLinkAbsolute` |
-| `fs.realpath` | `std.Io.Dir.realPathFileAbsolute` |
-| `fs.realpathAlloc` | `std.Io.Dir.realPathFileAbsoluteAlloc` |
-| `fs.rename` | `std.Io.Dir.rename` |
-| `fs.has_executable_bit` | `std.Io.File.Permissions.has_executable_bit` |
-| `fs.defaultWasiCwd` | `std.os.defaultWasiCwd` |
-| `fs.openSelfExe` | `std.process.openExecutable` |
-| `fs.selfExePath` | `std.process.executablePath` |
-| `fs.selfExePathAlloc` | `std.process.executablePathAlloc` |
-| `fs.selfExeDirPath` | `std.process.executableDirPath` |
-| `fs.selfExeDirPathAlloc` | `std.process.executableDirPathAlloc` |
-| `fs.Dir.setAsCwd` | `std.process.setCurrentDir` |
-| `fs.Dir.realpath` | `std.Io.Dir.realPathFile` |
-| `fs.Dir.realpathAlloc` | `std.Io.Dir.realPathFileAlloc` |
-| `fs.Dir.makeDir` | `std.Io.Dir.createDir` |
-| `fs.Dir.makePath` | `std.Io.Dir.createDirPath` |
-| `fs.Dir.makeOpenDir` | `std.Io.Dir.createDirPathOpen` |
-| `fs.Dir.atomicSymLink` | `std.Io.Dir.symLinkAtomic` |
-| `fs.Dir.chmod` | `std.Io.Dir.setPermissions` |
-| `fs.Dir.chown` | `std.Io.Dir.setOwner` |
-| `fs.File.Mode` | `std.Io.File.Permissions` |
-| `fs.File.PermissionsWindows` | `std.Io.File.Permissions` |
-| `fs.File.PermissionsUnix` | `std.Io.File.Permissions` |
-| `fs.File.default_mode` | `std.Io.File.Permissions.default_file` |
-| `fs.File.getOrEnableAnsiEscapeSupport` | `std.Io.File.enableAnsiEscapeCodes` |
-| `fs.File.setEndPos` | `std.Io.File.setLength` |
-| `fs.File.getEndPos` | `std.Io.File.length` |
+| 0.15.x                                      | 0.16.0                                                          |
+| ------------------------------------------- | --------------------------------------------------------------- |
+| `fs.Dir`                                    | `std.Io.Dir`                                                    |
+| `fs.File`                                   | `std.Io.File`                                                   |
+| `fs.cwd`                                    | `std.Io.Dir.cwd`                                                |
+| `fs.copyFileAbsolute`                       | `std.Io.Dir.copyFileAbsolute`                                   |
+| `fs.makeDirAbsolute`                        | `std.Io.Dir.createDirAbsolute`                                  |
+| `fs.deleteDirAbsolute`                      | `std.Io.Dir.deleteDirAbsolute`                                  |
+| `fs.openDirAbsolute`                        | `std.Io.Dir.openDirAbsolute`                                    |
+| `fs.openFileAbsolute`                       | `std.Io.Dir.openFileAbsolute`                                   |
+| `fs.accessAbsolute`                         | `std.Io.Dir.accessAbsolute`                                     |
+| `fs.createFileAbsolute`                     | `std.Io.Dir.createFileAbsolute`                                 |
+| `fs.deleteFileAbsolute`                     | `std.Io.Dir.deleteFileAbsolute`                                 |
+| `fs.renameAbsolute`                         | `std.Io.Dir.renameAbsolute`                                     |
+| `fs.readLinkAbsolute`                       | `std.Io.Dir.readLinkAbsolute`                                   |
+| `fs.symLinkAbsolute`                        | `std.Io.Dir.symLinkAbsolute`                                    |
+| `fs.realpath`                               | `std.Io.Dir.realPathFileAbsolute`                               |
+| `fs.realpathAlloc`                          | `std.Io.Dir.realPathFileAbsoluteAlloc`                          |
+| `fs.rename`                                 | `std.Io.Dir.rename`                                             |
+| `fs.has_executable_bit`                     | `std.Io.File.Permissions.has_executable_bit`                    |
+| `fs.defaultWasiCwd`                         | `std.os.defaultWasiCwd`                                         |
+| `fs.openSelfExe`                            | `std.process.openExecutable`                                    |
+| `fs.selfExePath`                            | `std.process.executablePath`                                    |
+| `fs.selfExePathAlloc`                       | `std.process.executablePathAlloc`                               |
+| `fs.selfExeDirPath`                         | `std.process.executableDirPath`                                 |
+| `fs.selfExeDirPathAlloc`                    | `std.process.executableDirPathAlloc`                            |
+| `fs.Dir.setAsCwd`                           | `std.process.setCurrentDir`                                     |
+| `fs.Dir.realpath`                           | `std.Io.Dir.realPathFile`                                       |
+| `fs.Dir.realpathAlloc`                      | `std.Io.Dir.realPathFileAlloc`                                  |
+| `fs.Dir.makeDir`                            | `std.Io.Dir.createDir`                                          |
+| `fs.Dir.makePath`                           | `std.Io.Dir.createDirPath`                                      |
+| `fs.Dir.makeOpenDir`                        | `std.Io.Dir.createDirPathOpen`                                  |
+| `fs.Dir.atomicSymLink`                      | `std.Io.Dir.symLinkAtomic`                                      |
+| `fs.Dir.chmod`                              | `std.Io.Dir.setPermissions`                                     |
+| `fs.Dir.chown`                              | `std.Io.Dir.setOwner`                                           |
+| `fs.File.Mode`                              | `std.Io.File.Permissions`                                       |
+| `fs.File.PermissionsWindows`                | `std.Io.File.Permissions`                                       |
+| `fs.File.PermissionsUnix`                   | `std.Io.File.Permissions`                                       |
+| `fs.File.default_mode`                      | `std.Io.File.Permissions.default_file`                          |
+| `fs.File.getOrEnableAnsiEscapeSupport`      | `std.Io.File.enableAnsiEscapeCodes`                             |
+| `fs.File.setEndPos`                         | `std.Io.File.setLength`                                         |
+| `fs.File.getEndPos`                         | `std.Io.File.length`                                            |
 | `fs.File.seekTo` / `seekBy` / `seekFromEnd` | `std.Io.File.Reader.seekTo` / `Reader.seekBy` / `Writer.seekTo` |
-| `fs.File.getPos` | `std.Io.File.Reader.logicalPos` / `std.Io.Writer.logicalPos` |
-| `fs.File.mode` | `std.Io.File.stat().permissions.toMode` |
-| `fs.File.chmod` | `std.Io.File.setPermissions` |
-| `fs.File.chown` | `std.Io.File.setOwner` |
-| `fs.File.updateTimes` | `std.Io.File.setTimestamps` / `setTimestampsNow` |
-| `fs.File.read` / `readv` | `std.Io.File.readStreaming` |
-| `fs.File.pread` / `preadv` | `std.Io.File.readPositional` |
-| `fs.File.preadAll` | `std.Io.File.readPositionalAll` |
-| `fs.File.write` / `writev` | `std.Io.File.writeStreaming` |
-| `fs.File.pwrite` / `pwritev` | `std.Io.File.writePositional` |
-| `fs.File.writeAll` | `std.Io.File.writeStreamingAll` |
-| `fs.File.pwriteAll` | `std.Io.File.writePositionalAll` |
-| `fs.File.copyRange` / `copyRangeAll` | `std.Io.File.writer` |
+| `fs.File.getPos`                            | `std.Io.File.Reader.logicalPos` / `std.Io.Writer.logicalPos`    |
+| `fs.File.mode`                              | `std.Io.File.stat().permissions.toMode`                         |
+| `fs.File.chmod`                             | `std.Io.File.setPermissions`                                    |
+| `fs.File.chown`                             | `std.Io.File.setOwner`                                          |
+| `fs.File.updateTimes`                       | `std.Io.File.setTimestamps` / `setTimestampsNow`                |
+| `fs.File.read` / `readv`                    | `std.Io.File.readStreaming`                                     |
+| `fs.File.pread` / `preadv`                  | `std.Io.File.readPositional`                                    |
+| `fs.File.preadAll`                          | `std.Io.File.readPositionalAll`                                 |
+| `fs.File.write` / `writev`                  | `std.Io.File.writeStreaming`                                    |
+| `fs.File.pwrite` / `pwritev`                | `std.Io.File.writePositional`                                   |
+| `fs.File.writeAll`                          | `std.Io.File.writeStreamingAll`                                 |
+| `fs.File.pwriteAll`                         | `std.Io.File.writePositionalAll`                                |
+| `fs.File.copyRange` / `copyRangeAll`        | `std.Io.File.writer`                                            |
 
 这一表里许多函数除了改名，还顺手在签名里塞了一个 `io: std.Io` 参数。
 

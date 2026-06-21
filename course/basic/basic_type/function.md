@@ -153,11 +153,11 @@ closure()  # 输出：Hello, World!
 `extern` 用于引用非 Zig 实现的库，而 `export` 则是 Zig 将函数对外暴露供其他语言使用！
 :::
 
-### `@setCold`
+### `@branchHint(.cold)`
 
-`@setCold(comptime is_cold: bool) void`
+`@branchHint(comptime hint: std.builtin.BranchHint) void`
 
-告诉优化器当前函数很少被调用（或不被调用）。该函数仅在函数作用域内有效。
+使用 `@branchHint(.cold)` 告诉优化器当前分支或函数很少被调用（或不被调用）。
 
 <<<@/code/release/function.zig#abort
 

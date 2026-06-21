@@ -12,7 +12,7 @@
 - 位操作符 (`>>`, `<<`, `&`, `|`,`~`, ... )
 - 比较运算符 (`<`, `>`, `==`, ...)
 
-禁止混合使用标量（单个数字）和向量进行数学运算。Zig 提供了 [`@splat`](https://ziglang.org/documentation/master/#splat) 内建函数，可以方便地将标量转换为向量。同时，可以使用 [`@reduce`](https://ziglang.org/documentation/master/#reduce) 和数组索引语法将向量转换为标量。向量还支持直接赋值给已知长度的固定长度数组。如果需要重新排列元素，可以使用 [`@shuffle`](https://ziglang.org/documentation/master/#shuffle) 和 [`@select`](https://ziglang.org/documentation/master/#select) 函数。
+禁止混合使用标量（单个数字）和向量进行数学运算。Zig 提供了 [`@splat`](https://ziglang.org/documentation/master/#splat) 内建函数，可以方便地将标量转换为向量。同时，可以使用 [`@reduce`](https://ziglang.org/documentation/master/#reduce) 和编译期已知的下标将向量转换为标量；如果下标只能在运行时确定，需要先把向量转换为数组。向量还支持直接赋值给已知长度的固定长度数组。如果需要重新排列元素，可以使用 [`@shuffle`](https://ziglang.org/documentation/master/#shuffle) 和 [`@select`](https://ziglang.org/documentation/master/#select) 函数。
 
 <<<@/code/release/vector.zig#basic
 

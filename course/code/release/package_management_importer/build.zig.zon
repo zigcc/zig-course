@@ -1,0 +1,27 @@
+// #region package_management
+.{
+    // 包名字
+    .name = .importer,
+    // 包版本
+    .version = "0.0.0",
+    .fingerprint = 0x64e883e88dde22e2,
+    // 包依赖
+    .dependencies = .{
+        // 包依赖项的名字
+        .@"tarball-exporter" = .{
+            .url = "https://github.com/zigcc/zig-msgpack/archive/33771261cc6bba98cee380392f6e95fbca30d956.tar.gz",
+            .hash = "zig_msgpack-0.0.8-evvueB_ZAQBNRm7kdh1FslBxMvpu5WKvU2RrYhUY_Dne",
+        },
+        .@"path-exporter" = .{
+            // path 为本地包的路径
+            .path = "../package_management_exporter",
+        },
+    },
+    // 包所包含的源文件，一般用于在对外提供包时才使用，还是建议养成写清楚paths的习惯
+    .paths = .{
+        "src",
+        "build.zig",
+        "build.zig.zon",
+    },
+}
+// #endregion package_management

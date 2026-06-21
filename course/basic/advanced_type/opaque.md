@@ -29,7 +29,7 @@ outline: deep
 ```zig
 // 对应 C 中的 typedef struct FILE FILE;
 const FILE = opaque {};
-const c = @cImport(@cInclude("stdio.h"));
+// C 头文件推荐在 build.zig 中用 addTranslateC 翻译后，再在 Zig 代码里 @import("c")。
 
 // 使用不透明指针
 fn readFile(file: *FILE) void {

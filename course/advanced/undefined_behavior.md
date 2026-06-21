@@ -194,11 +194,11 @@ f = Foo{ .float = 12.34 };
 
 ## 浮点转换整数发生越界
 
-当将浮点数转换为整数时，如果浮点数的值超出了整数类型的范围，就会发生非法越界，例如：
+当使用 `@trunc`、`@floor`、`@ceil` 或 `@round` 把浮点数转换为整数时，如果浮点数的值超出了整数类型的范围，就会发生非法越界，例如：
 
 ```zig
 const float: f32 = 4294967296;
-const int: i32 = @intFromFloat(float);
+const int: i32 = @trunc(float);
 ```
 
 ## 指针强制转换为 Null
