@@ -9,8 +9,8 @@
     .dependencies = .{
         // 包依赖项的名字
         .@"tarball-exporter" = .{
-            .url = "https://github.com/zigcc/zig-msgpack/archive/33771261cc6bba98cee380392f6e95fbca30d956.tar.gz",
-            .hash = "zig_msgpack-0.0.8-evvueB_ZAQBNRm7kdh1FslBxMvpu5WKvU2RrYhUY_Dne",
+            .url = "https://github.com/zigcc/zig-msgpack/archive/refs/tags/0.0.17.tar.gz",
+            .hash = "zig_msgpack-0.0.14-evvueL5SBQACmim6j6klQ9wWIIG_UxGlPvVYdiNy0KT8",
         },
         .@"path-exporter" = .{
             // path 为本地包的路径
