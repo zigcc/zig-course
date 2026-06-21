@@ -1,5 +1,6 @@
 pub fn main() !void {}
 
+// #region Basic
 const Basic = struct {
     const std = @import("std");
 
@@ -22,7 +23,9 @@ const Basic = struct {
         return number + 1;
     }
 };
+// #endregion Basic
 
+// #region Nestd
 const Nestd = struct {
     const std = @import("std");
     const expect = std.testing.expect;
@@ -64,11 +67,13 @@ const Nestd = struct {
         }
     };
 };
+// #endregion Nestd
 
 test "all" {
     _ = Basic;
 }
 
+// #region allDecl
 const allDecl = struct {
     const std = @import("std");
     const builtin = @import("builtin");
@@ -80,3 +85,4 @@ const allDecl = struct {
         }
     }
 };
+// #endregion allDecl

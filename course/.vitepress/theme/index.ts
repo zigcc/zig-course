@@ -4,6 +4,7 @@ import DefaultTheme from "vitepress/theme";
 
 import giscus from "./giscus.js";
 import version from "./version.js";
+import copyToLLM from "./copyToLLM.js";
 import "./style/print.css";
 
 import { h } from "vue";
@@ -31,7 +32,7 @@ export default {
   Layout() {
     return h(DefaultTheme.Layout, null, {
       "doc-after": () => h(giscus),
-      "doc-before": () => h(version),
+      "doc-before": () => [h(version), h(copyToLLM)],
     });
   },
 } satisfies Theme;

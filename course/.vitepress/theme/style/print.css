@@ -4,7 +4,8 @@
   .VPDocFooter {
     display: none !important;
   }
-  .version_tag {
+  .version_tag,
+  .copy_llm {
     display: none !important;
   }
   .vp-code-group .tabs {

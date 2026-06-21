@@ -1,6 +1,9 @@
 import { defineConfig } from "vitepress";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import themeConfig from "./themeConfig.js";
+import { llmMarkdownPlugin } from "./llmMarkdown.js";
 
 export default defineConfig({
   lang: "zh-CN",
@@ -13,6 +16,20 @@ export default defineConfig({
   lastUpdated: true,
   themeConfig: themeConfig,
   cleanUrls: true,
+  vite: {
+    plugins: [
+      llmMarkdownPlugin({
+        srcDir: path.resolve(
+          path.dirname(fileURLToPath(import.meta.url)),
+          "..",
+        ),
+        outDir: path.resolve(
+          path.dirname(fileURLToPath(import.meta.url)),
+          "dist",
+        ),
+      }),
+    ],
+  },
   head: [
     ["link", { rel: "icon", href: "./favicon.ico" }],
     [
