@@ -82,7 +82,7 @@ zig-course/
 ### 环境要求
 
 - **Node.js**: 推荐使用 [Bun](https://bun.sh/) 作为包管理器
-- **Zig**: 支持 0.11-0.15 版本
+- **Zig**: 支持 0.11-0.16 版本
 - **autocorrect**: 用于中英文排版优化（可选）
 
 ### 快速开始
@@ -104,12 +104,12 @@ bun dev
 ### 可用命令
 
 ```sh
-bun dev          # 启动开发服务器（热重载）
+bun run dev          # 启动开发服务器（热重载）
 bun run build        # 构建生产版本
-bun preview      # 预览构建结果
-bun format       # 格式化代码（prettier + zig fmt + autocorrect）
-bun check        # 检查代码格式
-bun export-pdf   # 导出 PDF 版本
+bun run preview      # 预览构建结果
+bun run format       # 格式化代码（prettier + zig fmt + autocorrect）
+bun run check        # 检查代码格式
+bun run export-pdf   # 导出 PDF 版本
 ```
 
 ## 🤝 参与贡献
