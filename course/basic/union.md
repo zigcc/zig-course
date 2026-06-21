@@ -20,7 +20,7 @@ outline: deep
 
 :::info 🅿️ 提示
 
-需要注意的是，Zig 不保证普通联合类型在内存中的具体表现形式。如果需要确保其内存布局与 C 兼容，可以使用 `extern union` 或 `packed union`。
+需要注意的是，Zig 不保证普通联合类型在内存中的具体表现形式。如果需要确保其内存布局与目标 C ABI 兼容，应使用 `extern union`；`packed union` 用于位级紧凑布局，不等同于 C ABI 布局。
 
 :::
 
@@ -92,4 +92,4 @@ Zig 也支持自动推断联合类型：
 
 ## `packed union`
 
-`packed union` 保证其内存布局与声明顺序相同，并且尽可能紧凑。具体用法请参见 [`packed struct`](advanced_type/struct.md#packed) 部分。
+`packed union(uN)` 用于位级紧凑布局，需要显式指定整数作为背后类型，并且所有字段都必须刚好占满该位宽，不能留下未使用位；字段中也不能包含指针。具体用法请参见 [`packed struct`](advanced_type/struct.md#packed) 部分。

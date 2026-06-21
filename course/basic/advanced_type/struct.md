@@ -260,7 +260,7 @@
 在 64 位系统上，Foo 的内存布局是：
 
 ```sh
-|   4(i32)  |  8(pointer)    |   4(padding)  |
+|   4(i32)  |  8(usize)      |   4(padding)  |
 ```
 
 额外的讨论信息：[github issue #20265](https://github.com/ziglang/zig/issues/20265)

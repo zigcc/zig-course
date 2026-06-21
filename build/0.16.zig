@@ -31,77 +31,94 @@ pub fn build(b: *Build) void {
         log.err("iterate examples_path failed, err is {}", .{err});
         std.process.exit(1);
     }) |entry| {
-            // get the entry name, entry can be file or directory
-            const output_name = if (std.mem.endsWith(u8, entry.name, ".zig"))
-                entry.name[0 .. entry.name.len - ".zig".len]
-            else
-                entry.name;
-            if (entry.kind == .file) {
-                // connect path
-                const path = std.fs.path.join(b.allocator, &[_][]const u8{ relative_path, entry.name }) catch |err| {
-                    log.err("fmt path for examples failed, err is {}", .{err});
-                    std.process.exit(1);
-                };
+        // get the entry name, entry can be file or directory
+        const output_name = if (std.mem.endsWith(u8, entry.name, ".zig"))
+            entry.name[0 .. entry.name.len - ".zig".len]
+        else
+            entry.name;
+        if (entry.kind == .file) {
+            // connect path
+            const path = std.fs.path.join(b.allocator, &[_][]const u8{ relative_path, entry.name }) catch |err| {
+                log.err("fmt path for examples failed, err is {}", .{err});
+                std.process.exit(1);
+            };
 
-                // build exe
-                const exe = b.addExecutable(.{
-                    .name = output_name,
-                    .root_module = b.addModule(output_name, .{
-                        .root_source_file = b.path(path),
-                        .target = target,
-                        .optimize = optimize,
-                    }),
+            const imports: []const std.Build.Module.Import = if (std.mem.eql(u8, entry.name, "interact_with_c.zig")) imports: {
+                const c_header = b.addWriteFiles().add("interact_with_c.h",
+                    \\#define _NO_CRT_STDIO_INLINE 1
+                    \\#include <stdio.h>
+                );
+                const translate_c = b.addTranslateC(.{
+                    .root_source_file = c_header,
+                    .target = target,
+                    .optimize = optimize,
                 });
-                exe.root_module.linkSystemLibrary("c", .{});
-
-                if (exe.root_module.resolved_target.?.result.os.tag == .windows and std.mem.eql(u8, "echo_tcp_server.zig", entry.name)) {
-                    std.log.info("link ws2_32 for {s}", .{entry.name});
-                    exe.root_module.linkSystemLibrary("ws2_32", .{});
-                }
-                // add to default install
-                b.installArtifact(exe);
-
-                // build test
-                const test_name = std.fmt.allocPrint(b.allocator, "{s}_test", .{output_name}) catch |err| {
-                    log.err("fmt test name failed, err is {}", .{err});
-                    std.process.exit(1);
+                break :imports &[_]std.Build.Module.Import{
+                    .{ .name = "c", .module = translate_c.createModule() },
                 };
-                const unit_tests = b.addTest(.{
-                    .root_module = b.addModule(test_name, .{
-                        .root_source_file = b.path(path),
-                        .target = target,
-                        .optimize = optimize,
-                    }),
-                });
+            } else &.{};
 
-                // add to default install
-                b.getInstallStep().dependOn(&b.addRunArtifact(unit_tests).step);
-            } else if (entry.kind == .directory) {
+            // build exe
+            const exe = b.addExecutable(.{
+                .name = output_name,
+                .root_module = b.addModule(output_name, .{
+                    .root_source_file = b.path(path),
+                    .target = target,
+                    .optimize = optimize,
+                    .imports = imports,
+                }),
+            });
+            exe.root_module.linkSystemLibrary("c", .{});
 
-                // build child process
-                // build cwd
-                const cwd = std.fs.path.join(b.allocator, &[_][]const u8{
-                    full_path,
-                    entry.name,
-                }) catch |err| {
-                    log.err("fmt path for examples failed, err is {}", .{err});
-                    std.process.exit(1);
-                };
-
-                // open entry dir
-                const entry_dir = std.Io.Dir.openDirAbsolute(io, cwd, .{}) catch unreachable;
-                defer entry_dir.close(io);
-
-                entry_dir.access(io, "build.zig", .{}) catch {
-                    log.err("not found build.zig in path {s}", .{cwd});
-                    std.process.exit(1);
-                };
-
-                var child = std.process.spawn(io, .{
-                    .argv = &args,
-                    .cwd = .{ .path = cwd },
-                }) catch unreachable;
-                _ = child.wait(io) catch unreachable;
+            if (exe.root_module.resolved_target.?.result.os.tag == .windows and std.mem.eql(u8, "echo_tcp_server.zig", entry.name)) {
+                std.log.info("link ws2_32 for {s}", .{entry.name});
+                exe.root_module.linkSystemLibrary("ws2_32", .{});
             }
+            // add to default install
+            b.installArtifact(exe);
+
+            // build test
+            const test_name = std.fmt.allocPrint(b.allocator, "{s}_test", .{output_name}) catch |err| {
+                log.err("fmt test name failed, err is {}", .{err});
+                std.process.exit(1);
+            };
+            const unit_tests = b.addTest(.{
+                .root_module = b.addModule(test_name, .{
+                    .root_source_file = b.path(path),
+                    .target = target,
+                    .optimize = optimize,
+                    .imports = imports,
+                }),
+            });
+
+            // add to default install
+            b.getInstallStep().dependOn(&b.addRunArtifact(unit_tests).step);
+        } else if (entry.kind == .directory) {
+
+            // build child process
+            // build cwd
+            const cwd = std.fs.path.join(b.allocator, &[_][]const u8{
+                full_path,
+                entry.name,
+            }) catch |err| {
+                log.err("fmt path for examples failed, err is {}", .{err});
+                std.process.exit(1);
+            };
+
+            // open entry dir
+            const entry_dir = std.Io.Dir.openDirAbsolute(io, cwd, .{}) catch unreachable;
+            defer entry_dir.close(io);
+
+            entry_dir.access(io, "build.zig", .{}) catch {
+                log.err("not found build.zig in path {s}", .{cwd});
+                std.process.exit(1);
+            };
+
+            var child = std.process.spawn(io, .{
+                .argv = &args,
+                .cwd = .{ .path = cwd },
+            }) catch unreachable;
+            _ = child.wait(io) catch unreachable;
+        }
     }
 }

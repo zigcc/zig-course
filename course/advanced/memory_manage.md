@@ -66,15 +66,9 @@ outline: deep
 
 ## `FixedBufferAllocator`
 
-这个分配器是固定大小的内存缓冲区，无法扩容，常常在你需要缓冲某些东西时使用。注意默认情况下它不是线程安全的；而在 Zig 0.16 中，`ThreadSafeAllocator` 已被移除。如果你需要跨线程共享同一个 `FixedBufferAllocator`，应当像示例那样在外层自行加锁，或者直接改用更适合并发场景的 `SmpAllocator`。
+这个分配器是固定大小的内存缓冲区，无法扩容，常常在你需要缓冲某些东西时使用。注意默认情况下它不是线程安全的；而在 Zig 0.16 中，旧的线程安全包装分配器已被移除。如果只是需要线程安全分配，优先使用更适合并发场景的 `SmpAllocator`；如果必须跨线程共享同一个 `FixedBufferAllocator`，应在调用方使用与执行模型匹配的锁（例如 `std.Io.Mutex`）保护临界区。
 
-::: code-group
-
-<<<@/code/release/memory_manager.zig#FixedBufferAllocator [default]
-
-<<<@/code/release/memory_manager.zig#ThreadSafeFixedBufferAllocator [thread_safe]
-
-:::
+<<<@/code/release/memory_manager.zig#FixedBufferAllocator
 
 ## `ArenaAllocator`
 

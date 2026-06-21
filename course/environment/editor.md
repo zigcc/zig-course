@@ -110,9 +110,11 @@ zls 已支持保存时自动检查代码的功能，但此功能默认关闭。
 ```zig
 const exe_check = b.addExecutable(.{
     .name = "foo",
-    .root_source_file = b.path("src/main.zig"),
-    .target = target,
-    .optimize = optimize,
+    .root_module = b.createModule(.{
+        .root_source_file = b.path("src/main.zig"),
+        .target = target,
+        .optimize = optimize,
+    }),
 });
 
 const check = b.step("check", "Check if foo compiles");
