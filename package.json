@@ -8,11 +8,16 @@
     "check": "prettier --check .",
     "pdf": "bun run scripts/pdf/main.ts",
     "pdf:sample": "bun run scripts/pdf/main.ts --sample",
-    "pdf:fonts": "bun run scripts/pdf/build-fonts.ts"
+    "pdf:fonts": "bun run scripts/pdf/build-fonts.ts",
+    "epub": "bun run course/.vitepress/epub/build.ts"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "@types/markdown-it": "^14.1.2",
     "@types/node": "^26.0.0",
     "jspdf": "^4.2.1",
+    "jszip": "^3.10.1",
+    "markdown-it": "^14.2.0",
     "marked": "^18.0.5",
     "prettier": "^3.8.4",
     "sharp": "^0.35.2",

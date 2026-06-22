@@ -1,0 +1,240 @@
+/* 与 PDF 同方案：中文用思源宋体（衬线），正文英文用 Inter（无衬线），代码用 JetBrains Mono */
+@font-face {
+  font-family: "Noto Serif SC";
+  src: url("../fonts/cjk.woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("../fonts/sans.woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("../fonts/mono.woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: "Inter", "Noto Serif SC", serif;
+  line-height: 1.75;
+  font-size: 1em;
+  padding: 0 0.4em;
+  color: #1a1a1a;
+  word-wrap: break-word;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Inter", "Noto Serif SC", serif;
+  line-height: 1.3;
+  margin: 1.2em 0 0.6em;
+  font-weight: 700;
+}
+h1 {
+  font-size: 1.6em;
+  border-bottom: 2px solid #f7a41d;
+  padding-bottom: 0.3em;
+}
+h2 {
+  font-size: 1.35em;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.2em;
+}
+h3 {
+  font-size: 1.18em;
+}
+
+p {
+  margin: 0.8em 0;
+}
+
+a {
+  color: #c8730b;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* 行内代码 */
+code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.9em;
+  background: #f4f4f4;
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+
+/* Shiki 代码块 */
+pre.shiki {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.82em;
+  line-height: 1.5;
+  padding: 0.9em 1em;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 1em 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  border: 1px solid #e2e2e2;
+}
+pre.shiki code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* 普通 fenced code（无 shiki 时回退） */
+pre {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.82em;
+  background: #f6f8fa;
+  padding: 0.9em 1em;
+  border-radius: 6px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* 引用 */
+blockquote {
+  margin: 1em 0;
+  padding: 0.2em 1em;
+  border-left: 4px solid #f7a41d;
+  background: #fff8ec;
+  color: #555;
+}
+
+/* 表格 */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+  font-size: 0.9em;
+}
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 0.4em 0.6em;
+  text-align: left;
+}
+th {
+  background: #f5f5f5;
+}
+
+/* 图片 */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1em auto;
+}
+
+/* VitePress 容器转换后的 callout */
+.callout {
+  margin: 1em 0;
+  padding: 0.6em 1em;
+  border-radius: 6px;
+  border-left: 4px solid;
+}
+.callout-title {
+  font-weight: 700;
+  margin: 0 0 0.4em;
+}
+.callout-info {
+  background: #eef4ff;
+  border-color: #3b82f6;
+}
+.callout-info .callout-title {
+  color: #2563eb;
+}
+.callout-tip {
+  background: #effaf2;
+  border-color: #10b981;
+}
+.callout-tip .callout-title {
+  color: #059669;
+}
+.callout-warning {
+  background: #fff8e6;
+  border-color: #f59e0b;
+}
+.callout-warning .callout-title {
+  color: #d97706;
+}
+.callout-danger {
+  background: #fdeeee;
+  border-color: #ef4444;
+}
+.callout-danger .callout-title {
+  color: #dc2626;
+}
+.callout-details {
+  background: #f5f5f5;
+  border-color: #9ca3af;
+}
+.callout-details .callout-title {
+  color: #4b5563;
+}
+.callout-important {
+  background: #f3eefe;
+  border-color: #8b5cf6;
+}
+.callout-important .callout-title {
+  color: #7c3aed;
+}
+.callout-caution {
+  background: #fdeeee;
+  border-color: #ef4444;
+}
+.callout-caution .callout-title {
+  color: #dc2626;
+}
+
+/* 封面页 */
+.cover {
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+.cover img {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+/* 目录页 */
+.toc-page h1 {
+  text-align: center;
+}
+.toc-list {
+  list-style: none;
+  padding-left: 0;
+}
+.toc-list li {
+  margin: 0.35em 0;
+}
+.toc-list .toc-l0 {
+  font-weight: 700;
+  font-size: 1.05em;
+}
+.toc-list .toc-l1 {
+  padding-left: 1.2em;
+}
+.toc-list .toc-l2 {
+  padding-left: 2.4em;
+  font-size: 0.95em;
+}

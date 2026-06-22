@@ -5,6 +5,7 @@ package-lock.json
 # 构建产物
 dist/
 PDF
+zig-course.epub
 *.zip
 
 # VitePress
@@ -23,6 +24,9 @@ zig-pkg
 
 # PDF 字体源缓存（由 bun pdf:fonts 下载，产物字体单独提交）
 scripts/pdf/.font-src/
+
+# EPUB 字体下载缓存（bun epub 构建时下载）
+course/.vitepress/epub/.cache/
 
 # 工具 / 编辑器 / 系统
 .direnv
