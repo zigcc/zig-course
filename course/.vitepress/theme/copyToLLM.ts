@@ -1,15 +1,5 @@
-import {
-  Teleport,
-  computed,
-  defineComponent,
-  h,
-  nextTick,
-  onMounted,
-  ref,
-} from "vue";
-import { onContentUpdated, useData, withBase } from "vitepress";
-
-const targetId = "copy-llm-actions";
+import { computed, defineComponent, h, ref } from "vue";
+import { useData, withBase } from "vitepress";
 
 const actionRowStyle = {
   display: "flex",
@@ -61,35 +51,15 @@ const itemStyle = {
 
 export default defineComponent({
   setup() {
-    const { frontmatter, page, title } = useData();
+    const { frontmatter, page } = useData();
     const open = ref(false);
     const copied = ref<"link" | "markdown" | "error" | null>(null);
-    const targetReady = ref(false);
     const llmPath = computed(() => withBase(`/llms/${page.value.filePath}`));
     const llmUrl = computed(() =>
       typeof window === "undefined"
         ? ""
         : new URL(llmPath.value, window.location.origin).href,
     );
-
-    function ensureTarget(): void {
-      const title = document.querySelector(".vp-doc h1");
-      if (!title) {
-        targetReady.value = false;
-        return;
-      }
-
-      let target = document.getElementById(targetId);
-      if (!target) {
-        target = document.createElement("div");
-        target.id = targetId;
-      }
-
-      if (target.previousElementSibling !== title) {
-        title.insertAdjacentElement("afterend", target);
-      }
-      targetReady.value = true;
-    }
 
     async function copyText(text: string): Promise<void> {
       if (navigator.clipboard) {
@@ -109,9 +79,10 @@ export default defineComponent({
 
     async function copy(kind: "link" | "markdown"): Promise<void> {
       try {
+        // 链接：直接复制裸 URL（不是 [标题](URL) 这种 Markdown 超链接格式）
         const text =
           kind === "link"
-            ? `[${title.value}](${llmUrl.value})`
+            ? llmUrl.value
             : await fetch(llmPath.value)
                 .then((response) => {
                   if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -145,112 +116,94 @@ export default defineComponent({
       );
     }
 
-    onMounted(() => nextTick(ensureTarget));
-    onContentUpdated(() => nextTick(ensureTarget));
-
     return () => {
-      if (
-        frontmatter.value.copyToLLM === false ||
-        page.value.isNotFound ||
-        !targetReady.value
-      ) {
-        return h("div");
+      if (frontmatter.value.copyToLLM === false || page.value.isNotFound) {
+        return null;
       }
 
-      return h(Teleport, { to: `#${targetId}` }, [
-        h("div", { class: "copy_llm", style: actionRowStyle }, [
+      return h("div", { class: "copy_llm", style: actionRowStyle }, [
+        h("div", { style: { position: "relative", display: "inline-block" } }, [
           h(
-            "div",
+            "button",
             {
-              style: {
-                position: "relative",
-                display: "inline-block",
+              type: "button",
+              style: triggerStyle,
+              onClick: () => {
+                open.value = !open.value;
               },
             },
             [
               h(
-                "button",
+                "svg",
                 {
-                  type: "button",
-                  style: triggerStyle,
-                  onClick: () => {
-                    open.value = !open.value;
-                  },
+                  width: "18",
+                  height: "18",
+                  viewBox: "0 0 24 24",
+                  fill: "none",
+                  stroke: "currentColor",
+                  "stroke-width": "2",
+                  "stroke-linecap": "round",
+                  "stroke-linejoin": "round",
+                  "aria-hidden": "true",
                 },
                 [
-                  h(
-                    "svg",
-                    {
-                      width: "18",
-                      height: "18",
-                      viewBox: "0 0 24 24",
-                      fill: "none",
-                      stroke: "currentColor",
-                      "stroke-width": "2",
-                      "stroke-linecap": "round",
-                      "stroke-linejoin": "round",
-                      "aria-hidden": "true",
-                    },
-                    [
-                      h("rect", {
-                        x: "9",
-                        y: "9",
-                        width: "13",
-                        height: "13",
-                        rx: "2",
-                        ry: "2",
-                      }),
-                      h("path", {
-                        d: "M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1",
-                      }),
-                    ],
-                  ),
-                  copied.value === "error"
-                    ? "复制失败"
-                    : copied.value
-                      ? "已复制"
-                      : "复制给 LLM",
-                  h(
-                    "svg",
-                    {
-                      width: "14",
-                      height: "14",
-                      viewBox: "0 0 24 24",
-                      fill: "none",
-                      stroke: "currentColor",
-                      "stroke-width": "2",
-                      "stroke-linecap": "round",
-                      "stroke-linejoin": "round",
-                      "aria-hidden": "true",
-                    },
-                    [h("path", { d: "m6 9 6 6 6-6" })],
-                  ),
+                  h("rect", {
+                    x: "9",
+                    y: "9",
+                    width: "13",
+                    height: "13",
+                    rx: "2",
+                    ry: "2",
+                  }),
+                  h("path", {
+                    d: "M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1",
+                  }),
                 ],
               ),
-              open.value
-                ? h("div", { style: menuStyle }, [
-                    h(
-                      "button",
-                      {
-                        type: "button",
-                        style: itemStyle,
-                        onClick: () => copy("link"),
-                      },
-                      "复制 Markdown 链接",
-                    ),
-                    h(
-                      "button",
-                      {
-                        type: "button",
-                        style: itemStyle,
-                        onClick: () => copy("markdown"),
-                      },
-                      "复制 Markdown 正文",
-                    ),
-                  ])
-                : null,
+              copied.value === "error"
+                ? "复制失败"
+                : copied.value
+                  ? "已复制"
+                  : "复制给 LLM",
+              h(
+                "svg",
+                {
+                  width: "14",
+                  height: "14",
+                  viewBox: "0 0 24 24",
+                  fill: "none",
+                  stroke: "currentColor",
+                  "stroke-width": "2",
+                  "stroke-linecap": "round",
+                  "stroke-linejoin": "round",
+                  "aria-hidden": "true",
+                },
+                [h("path", { d: "m6 9 6 6 6-6" })],
+              ),
             ],
           ),
+          open.value
+            ? h("div", { style: menuStyle }, [
+                h(
+                  "button",
+                  {
+                    type: "button",
+                    style: itemStyle,
+                    onClick: () => copy("link"),
+                  },
+                  "复制 Markdown 链接",
+                ),
+                h(
+                  "button",
+                  {
+                    type: "button",
+                    style: itemStyle,
+                    onClick: () => copy("markdown"),
+                  },
+                  "复制 Markdown 正文",
+                ),
+              ])
+            : null,
         ]),
       ]);
     };
