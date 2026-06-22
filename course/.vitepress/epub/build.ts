@@ -13,7 +13,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { config } from "./config.ts";
-import { resolveChapters } from "./sidebar.ts";
+import { resolveChapters, buildNavTree } from "./sidebar.ts";
 import { preprocess } from "./preprocess.ts";
 import { rewriteLinksAndImages } from "./links.ts";
 import { ImageCollector, toPng } from "./images.ts";
@@ -26,8 +26,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 async function main() {
   console.log(`[epub] 开始构建《${config.title}》`);
 
-  // 1. 解析章节
+  // 1. 解析章节 + 构建层级目录树
   const { chapters, routeToFile } = resolveChapters(config);
+  const navTree = buildNavTree(routeToFile);
   console.log(`[epub] 共 ${chapters.length} 个章节`);
 
   // 2. 准备渲染器与图片收集器
@@ -83,6 +84,7 @@ async function main() {
   const epub = await packageEpub({
     config,
     chapters,
+    navTree,
     renderedChapters: rendered,
     images: imageMap,
     fonts,

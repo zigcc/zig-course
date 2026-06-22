@@ -216,25 +216,27 @@ img {
   max-width: 100%;
 }
 
-/* 目录页 */
+/* 目录页（嵌套层级） */
 .toc-page h1 {
   text-align: center;
 }
-.toc-list {
+.toc-page ul {
   list-style: none;
+  padding-left: 1.2em;
+}
+.toc-page > ul {
   padding-left: 0;
 }
-.toc-list li {
+.toc-page li {
   margin: 0.35em 0;
 }
-.toc-list .toc-l0 {
+/* 顶级条目（分组/一级章节）加粗 */
+.toc-page > ul > li > a,
+.toc-page > ul > li > span {
   font-weight: 700;
   font-size: 1.05em;
 }
-.toc-list .toc-l1 {
-  padding-left: 1.2em;
-}
-.toc-list .toc-l2 {
-  padding-left: 2.4em;
-  font-size: 0.95em;
+/* 分组标题（无链接）用 span，弱化为非链接色 */
+.toc-page span {
+  color: #555;
 }

@@ -1,6 +1,6 @@
 import JSZip from "jszip";
 import type { EpubConfig } from "./config.ts";
-import type { Chapter } from "./sidebar.ts";
+import type { Chapter, NavNode } from "./sidebar.ts";
 import { escapeXml, wrapXhtml } from "./render.ts";
 
 export interface RenderedChapter {
@@ -12,6 +12,8 @@ export interface RenderedChapter {
 export interface PackageInput {
   config: EpubConfig;
   chapters: Chapter[];
+  /** 层级目录树（保留 sidebar 父/子结构） */
+  navTree: NavNode[];
   renderedChapters: RenderedChapter[];
   /** epubPath(去掉 ../) -> bytes，统一 PNG */
   images: Map<string, Uint8Array>;
@@ -31,9 +33,34 @@ function mimeOf(p: string): string {
   return "application/octet-stream";
 }
 
+/**
+ * 递归渲染层级目录为嵌套列表。
+ * - 有 href 的节点 -> <a>；分组节点 -> <span>（EPUB nav 允许，用于不可点击的层级标题）；
+ * - 子节点嵌套在父 <li> 内的子列表中。
+ * @param tag nav.xhtml 必须用 ol；可见目录页用 ul 便于样式化
+ */
+function renderNavTree(
+  nodes: NavNode[],
+  hrefPrefix: string,
+  tag: "ol" | "ul",
+): string {
+  const items = nodes
+    .map((n) => {
+      const head = n.href
+        ? `<a href="${hrefPrefix}${n.href}">${escapeXml(n.text)}</a>`
+        : `<span>${escapeXml(n.text)}</span>`;
+      const sub = n.children.length
+        ? `\n${renderNavTree(n.children, hrefPrefix, tag)}\n`
+        : "";
+      return `<li>${head}${sub}</li>`;
+    })
+    .join("\n");
+  return `<${tag}>\n${items}\n</${tag}>`;
+}
+
 /** 组装并生成 EPUB3 二进制 */
 export async function packageEpub(input: PackageInput): Promise<Uint8Array> {
-  const { config, chapters, renderedChapters, images, fonts, css, cover } =
+  const { config, navTree, renderedChapters, images, fonts, css, cover } =
     input;
   const lang = config.language;
   const bookId = "urn:uuid:" + crypto.randomUUID();
@@ -64,15 +91,10 @@ export async function packageEpub(input: PackageInput): Promise<Uint8Array> {
     `<div class="cover"><img src="../images/cover.png" alt="封面"/></div>`,
     lang,
   );
-  const tocItems = chapters
-    .map(
-      (ch) =>
-        `<li class="toc-l${Math.min(ch.item.level, 2)}"><a href="${ch.fileName}">${escapeXml(ch.item.text)}</a></li>`,
-    )
-    .join("\n");
+  // 目录页：保留 sidebar 的父/子层级（嵌套 ul）。toc.xhtml 与章节同在 text/ 目录，故无路径前缀
   const tocXhtml = wrapXhtml(
     "目录",
-    `<div class="toc-page"><h1>目录</h1><ul class="toc-list">\n${tocItems}\n</ul></div>`,
+    `<div class="toc-page"><h1>目录</h1>\n${renderNavTree(navTree, "", "ul")}\n</div>`,
     lang,
   );
 
@@ -142,13 +164,7 @@ export async function packageEpub(input: PackageInput): Promise<Uint8Array> {
 </package>`;
   oebps.file("content.opf", opf);
 
-  // ---- nav.xhtml ----
-  const navList = chapters
-    .map(
-      (ch) =>
-        `<li><a href="text/${ch.fileName}">${escapeXml(ch.item.text)}</a></li>`,
-    )
-    .join("\n      ");
+  // ---- nav.xhtml ----（nav.xhtml 在 OEBPS/ 下，章节在 text/，故前缀 text/）
   oebps.file(
     "nav.xhtml",
     `<?xml version="1.0" encoding="UTF-8"?>
@@ -158,9 +174,7 @@ export async function packageEpub(input: PackageInput): Promise<Uint8Array> {
 <body>
   <nav epub:type="toc" id="toc">
     <h1>目录</h1>
-    <ol>
-      ${navList}
-    </ol>
+${renderNavTree(navTree, "text/", "ol")}
   </nav>
 </body>
 </html>`,

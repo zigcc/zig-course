@@ -84,3 +84,35 @@ export function resolveChapters(config: EpubConfig): {
 
   return { chapters, routeToFile };
 }
+
+/** 层级目录节点：保留 sidebar 的父/子结构用于生成嵌套 TOC */
+export interface NavNode {
+  text: string;
+  /** 对应章节的 xhtml 文件名；分组节点（无可解析链接）则为空 */
+  href?: string;
+  children: NavNode[];
+}
+
+/**
+ * 按 sidebar 原始树构建层级目录。
+ * - 有 link 且能解析到章节的节点 -> 带 href 的可点击项；
+ * - 分组节点（仅有 items、无 link）-> 无 href 的标题项，其下嵌套子节点；
+ * - 既无法链接又无子节点的空节点跳过。
+ */
+export function buildNavTree(routeToFile: Record<string, string>): NavNode[] {
+  const conv = (nodes: SidebarNode[]): NavNode[] => {
+    const out: NavNode[] = [];
+    for (const node of nodes) {
+      const children = node.items ? conv(node.items) : [];
+      let href: string | undefined;
+      if (node.link) {
+        const route = normalizeRouteKey(node.link);
+        href = routeToFile[route] || routeToFile[route + "/"];
+      }
+      if (!href && children.length === 0) continue;
+      out.push({ text: node.text, href, children });
+    }
+    return out;
+  };
+  return conv(sidebar as unknown as SidebarNode[]);
+}
