@@ -109,9 +109,9 @@ bun run build        # 构建生产版本
 bun run preview      # 预览构建结果
 bun run format       # 格式化代码（prettier + zig fmt + autocorrect）
 bun run check        # 检查代码格式
-bun run pdf          # 导出 PDF 版本（jsPDF 离线生成 -> PDF/zig_course.pdf）
-bun run pdf:sample   # 仅渲染几篇代表页快速验证 -> PDF/zig_course_sample.pdf
-bun run epub         # 导出 EPUB3 电子书 -> zig-course.epub
+bun run pdf          # 导出 PDF 版本（jsPDF 离线生成 -> books/zig_course.pdf）
+bun run pdf:sample   # 仅渲染几篇代表页快速验证 -> books/zig_course_sample.pdf
+bun run epub         # 导出 EPUB3 电子书 -> books/zig-course.epub
 ```
 
 ## 🤝 参与贡献

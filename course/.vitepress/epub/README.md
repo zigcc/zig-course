@@ -6,10 +6,10 @@
 
 ```bash
 bun install   # 安装依赖（首次）
-bun run epub  # 生成 zig-course.epub（输出在仓库根目录）
+bun run epub  # 生成 books/zig-course.epub
 ```
 
-构建产物默认写入仓库根目录的 `zig-course.epub`，可在 `config.ts` 中调整。
+构建产物默认写入仓库根目录的 `books/zig-course.epub`，可在 `config.ts` 中调整。
 
 ## 特性
 

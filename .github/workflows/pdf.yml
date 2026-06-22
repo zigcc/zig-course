@@ -1,4 +1,4 @@
-name: Generate PDF
+name: Generate PDF & EPUB
 
 permissions:
   contents: write
@@ -28,7 +28,12 @@ jobs:
       - name: Export PDF with Bun
         run: bun pdf
 
+      - name: Export EPUB with Bun
+        run: bun epub
+
       - name: Create and Upload Release
         uses: softprops/action-gh-release@v2
         with:
-          files: PDF/zig_course.pdf
+          files: |
+            books/zig_course.pdf
+            books/zig-course.epub

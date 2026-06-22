@@ -9,7 +9,7 @@
  *
  * 纯 TypeScript 实现，零 Python 依赖。字体在构建时下载并即时子集化。
  */
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { config } from "./config.ts";
@@ -92,6 +92,7 @@ async function main() {
     cover,
   });
 
+  mkdirSync(path.dirname(config.outFile), { recursive: true });
   writeFileSync(config.outFile, epub);
   console.log(
     `[epub] ✅ 生成完成：${config.outFile}（${(epub.length / 1024 / 1024).toFixed(2)} MB）`,

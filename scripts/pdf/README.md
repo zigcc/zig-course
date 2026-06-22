@@ -3,13 +3,13 @@
 为 zig-course（VitePress）自带的离线 PDF 生成器。直接读取项目的
 `course/.vitepress/sidebar.ts`，逐页解析 Markdown 并用
 [jsPDF](https://github.com/parallax/jsPDF) 矢量绘制，输出带书签与可点击链接的
-`PDF/zig_course.pdf`。**不依赖无头浏览器**（替代旧的 `vitepress-export-pdf` 方案）。
+`books/zig_course.pdf`。**不依赖无头浏览器**（替代旧的 `vitepress-export-pdf` 方案）。
 
 ## 使用
 
 ```bash
-bun pdf          # 全量构建 -> PDF/zig_course.pdf
-bun pdf:sample   # 仅渲染几篇代表页 -> PDF/zig_course_sample.pdf（快速验证）
+bun pdf          # 全量构建 -> books/zig_course.pdf
+bun pdf:sample   # 仅渲染几篇代表页 -> books/zig_course_sample.pdf（快速验证）
 ```
 
 本项目用 [Bun](https://bun.sh) 直接执行 TypeScript，无需预编译或 tsx。运行依赖：

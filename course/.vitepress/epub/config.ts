@@ -53,7 +53,7 @@ export const config: EpubConfig = {
   publisher: "ZigCC",
   language: "zh-CN",
   courseDir: COURSE_DIR,
-  outFile: path.resolve(COURSE_DIR, "..", "zig-course.epub"),
+  outFile: path.resolve(COURSE_DIR, "..", "books", "zig-course.epub"),
   coverImage: "public/cover_image.png",
   shikiTheme: "github-light",
   shikiLangs: [

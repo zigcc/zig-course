@@ -2,8 +2,8 @@
 // 主入口：读取项目 sidebar -> 逐页解析 markdown -> jsPDF 渲染 -> 绑定链接 -> 写书签 -> 输出。
 //
 // 运行方式（已在 package.json 注册）：
-//   pnpm pdf            # 全量构建 -> PDF/zig_course.pdf
-//   pnpm pdf --sample   # 仅渲染几篇代表性页面，快速验证
+//   bun pdf            # 全量构建 -> books/zig_course.pdf
+//   bun pdf:sample     # 仅渲染几篇代表性页面，快速验证
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
@@ -19,7 +19,7 @@ import sidebar from "../../course/.vitepress/sidebar.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "../..");
 const COURSE = path.join(ROOT, "course");
-const OUT_DIR = path.join(ROOT, "PDF");
+const OUT_DIR = path.join(ROOT, "books");
 
 // 支持 --sample 只渲染几篇代表性页面用于快速验证
 const SAMPLE = process.argv.includes("--sample");

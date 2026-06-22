@@ -11,7 +11,7 @@
 ## 1. 这是什么
 
 一个**不依赖无头浏览器**的离线 PDF 生成器，把整套 zig-course 课程渲染为带书签、
-可点击站内/外链的单一 PDF（`PDF/zig_course.pdf`）。它替代了旧的
+可点击站内/外链的单一 PDF（`books/zig_course.pdf`）。它替代了旧的
 `vitepress-export-pdf`（基于 Puppeteer）方案。
 
 核心实现思路：直接复用项目的 `course/.vitepress/sidebar.ts` 作为目录与顺序的**唯一数据源**，
@@ -22,8 +22,8 @@ VitePress 同款的 [Shiki](https://shiki.style/) 引擎。
 ### 运行方式
 
 ```bash
-bun pdf          # 全量构建 -> PDF/zig_course.pdf
-bun pdf:sample   # 仅渲染几篇代表页 -> PDF/zig_course_sample.pdf（快速验证，秒级）
+bun pdf          # 全量构建 -> books/zig_course.pdf
+bun pdf:sample   # 仅渲染几篇代表页 -> books/zig_course_sample.pdf（快速验证，秒级）
 ```
 
 两个脚本都通过 [Bun](https://bun.sh) **直接执行 TypeScript**（`bun run scripts/pdf/main.ts`），
@@ -75,7 +75,7 @@ PdfToken[]
    │  renderer.finalize()   用 anchors/routeStart 把 pendingLinks 绑定为 doc.link 跳转
    │  main.ts 同步用 outline.add() 写书签
    ▼
-renderer.output()  ->  PDF/zig_course.pdf
+renderer.output()  ->  books/zig_course.pdf
 ```
 
 ---

@@ -4,8 +4,7 @@ package-lock.json
 
 # 构建产物
 dist/
-PDF
-zig-course.epub
+books/
 *.zip
 
 # VitePress
