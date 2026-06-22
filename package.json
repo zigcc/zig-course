@@ -6,15 +6,25 @@
     "build": "vitepress build course",
     "preview": "vitepress preview course",
     "check": "prettier --check .",
-    "export-pdf": "press-export-pdf export course"
+    "pdf": "bun run scripts/pdf/main.ts",
+    "pdf:sample": "bun run scripts/pdf/main.ts --sample",
+    "pdf:fonts": "bun run scripts/pdf/build-fonts.ts"
   },
   "devDependencies": {
     "@types/node": "^26.0.0",
+    "jspdf": "^4.2.1",
+    "marked": "^18.0.5",
     "prettier": "^3.8.4",
-    "vitepress": "^1.6.4",
-    "vitepress-export-pdf": "^1.0.0"
+    "sharp": "^0.35.2",
+    "shiki": "1.29.2",
+    "subset-font": "^2.5.0",
+    "typescript": "^5.7.2",
+    "vitepress": "^1.6.4"
   },
   "dependencies": {
     "@giscus/vue": "^3.1.1"
-  }
+  },
+  "trustedDependencies": [
+    "core-js"
+  ]
 }

@@ -1,18 +1,31 @@
+# 依赖
 node_modules
-.vscode
+package-lock.json
+
+# 构建产物
+dist/
+PDF
+*.zip
+
+# VitePress
 course/.vitepress/cache/
 course/.vitepress/dist/
-dist/
 course/.vitepress/.temp/
-package-lock.json
-*/zig-cache
-*/.zig-cache
-*/zig-out
+
+# Zig
 zig-out
 zig-cache
 .zig-cache
 zig-pkg
+*/zig-out
+*/zig-cache
+*/.zig-cache
+
+# PDF 字体源缓存（由 bun pdf:fonts 下载，产物字体单独提交）
+scripts/pdf/.font-src/
+
+# 工具 / 编辑器 / 系统
 .direnv
-PDF
+.vscode
 .DS_Store
 .sisyphus/plans
