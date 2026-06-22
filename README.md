@@ -4,7 +4,7 @@
 [![build](https://github.com/zigcc/zig-course/actions/workflows/build.yml/badge.svg)](https://github.com/zigcc/zig-course/actions/workflows/build.yml)
 [![check](https://github.com/zigcc/zig-course/actions/workflows/check.yml/badge.svg)](https://github.com/zigcc/zig-course/actions/workflows/check.yml)
 [![deploy](https://github.com/zigcc/zig-course/actions/workflows/deploy.yml/badge.svg)](https://github.com/zigcc/zig-course/actions/workflows/deploy.yml)
-[![pdf](https://github.com/zigcc/zig-course/actions/workflows/pdf.yml/badge.svg)](https://github.com/zigcc/zig-course/actions/workflows/pdf.yml)
+[![release](https://github.com/zigcc/zig-course/actions/workflows/release.yml/badge.svg)](https://github.com/zigcc/zig-course/actions/workflows/release.yml)
 
 > Zig is a general-purpose programming language and toolchain for maintaining robust, optimal and reusable software.
 >
