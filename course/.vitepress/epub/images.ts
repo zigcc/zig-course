@@ -74,5 +74,7 @@ export async function toPng(raw: Buffer): Promise<Uint8Array> {
     const resvg = new Resvg(raw, { fitTo: { mode: "width", value: 1000 } });
     return resvg.render().asPng();
   }
-  return new Uint8Array(await sharp(raw).png().toBuffer());
+  return new Uint8Array(
+    await sharp(raw).png({ compressionLevel: 9, effort: 10 }).toBuffer(),
+  );
 }

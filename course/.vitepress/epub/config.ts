@@ -17,7 +17,7 @@ export interface EpubConfig {
   courseDir: string;
   /** 输出 epub 文件的绝对路径 */
   outFile: string;
-  /** 封面图相对 courseDir 的路径（位于 public 下） */
+  /** 封面图相对 courseDir 的路径 */
   coverImage: string;
   /** Shiki 主题 */
   shikiTheme: string;
@@ -58,7 +58,7 @@ export const config: EpubConfig = {
   language: "zh-CN",
   courseDir: COURSE_DIR,
   outFile: path.resolve(COURSE_DIR, "..", "books", "zig-course.epub"),
-  coverImage: "public/cover_image.png",
+  coverImage: ".vitepress/epub/cover.png",
   shikiTheme: "github-light",
   shikiLangs: [
     "zig",
