@@ -154,6 +154,45 @@ function transformContainers(lines: string[]): string[] {
   return out;
 }
 
+// step E: 仅在非代码围栏区，把成对的 **文本** 改写为 <strong>文本</strong>，
+// 绕过 marked 对 CJK 相邻 ** 的 flanking 解析限制。
+// 为避免误伤代码块（如其他语言里的 **），逐行扫描并跳过 ``` / ~~~ 围栏内部。
+export function fixCjkStrong(lines: string[]): string[] {
+  let inFence = false;
+  let fenceMark = "";
+  return lines.map((ln) => {
+    const fence = ln.match(/^\s*(```+|~~~+)/);
+    if (fence) {
+      if (!inFence) {
+        inFence = true;
+        fenceMark = fence[1][0];
+      } else if (fence[1][0] === fenceMark) {
+        inFence = false;
+        fenceMark = "";
+      }
+      return ln;
+    }
+    if (inFence) return ln;
+    // 跳过行内代码 `...`：先用占位符保护，替换后再还原，避免动到代码里的 **
+    const codeSpans: string[] = [];
+    let protectedLine = ln.replace(/`[^`]*`/g, (m) => {
+      codeSpans.push(m);
+      return `\u0000${codeSpans.length - 1}\u0000`;
+    });
+    // 成对、非贪婪、内部不含 ** 的加粗 -> <strong>
+    protectedLine = protectedLine.replace(
+      /\*\*(?!\s)([^*\n]+?)(?<!\s)\*\*/g,
+      "<strong>$1</strong>",
+    );
+    // 还原行内代码
+    protectedLine = protectedLine.replace(
+      /\u0000(\d+)\u0000/g,
+      (_m, i) => codeSpans[Number(i)],
+    );
+    return protectedLine;
+  });
+}
+
 export async function preprocess(
   content: string,
   courseDir: string,
@@ -175,6 +214,11 @@ export async function preprocess(
   lines = lines.map((ln) =>
     ln.replace(/(!?\[[^\]]*\]\([^)]*\))\{[^}]*\}/g, "$1"),
   );
+  // step E: 修复 CJK 相邻的 **加粗** 解析失败
+  // CommonMark 的强调定界符（flanking）规则在 ** 被 CJK 标点/文字包夹时会判定其无效，
+  // 导致 marked 原样输出字面 **。这里在非代码区把 **文本** 改写为 <strong>文本</strong>，
+  // marked 会将其拆为 html 标签 token，再由渲染器消费为加粗（见 renderer 的 flatten）。
+  lines = fixCjkStrong(lines);
   return lines.join("\n");
 }
 

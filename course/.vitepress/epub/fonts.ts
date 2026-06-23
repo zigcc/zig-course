@@ -16,8 +16,12 @@ async function download(url: string, cachePath: string): Promise<Buffer> {
 export interface SubsetFonts {
   /** 子集化后的中文正文字体（woff2） */
   cjk: Uint8Array;
+  /** 子集化后的中文粗体（woff2） */
+  cjkBold: Uint8Array;
   /** 子集化后的英文正文字体（woff2） */
   sans: Uint8Array;
+  /** 子集化后的英文粗体（woff2） */
+  sansBold: Uint8Array;
   /** 子集化后的代码等宽字体（woff2） */
   mono: Uint8Array;
 }
@@ -51,11 +55,21 @@ export async function prepareFonts(
     " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`" +
     "abcdefghijklmnopqrstuvwxyz{|}~";
 
-  const [cjk, sans, mono] = await Promise.all([
-    buildOne(config.fonts.cjk, usedText, config.cacheDir),
-    buildOne(config.fonts.sans, usedText, config.cacheDir),
-    buildOne(config.fonts.mono, asciiText + usedText, config.cacheDir),
-  ]);
+  // 先串行预热下载（填充磁盘缓存），避免 normal/bold 共享同一 fileName 时并发写缓存的竞态。
+  // 由于同一字体文件的下载被 download() 缓存，这里只会实际下载三个原始可变字体。
+  const cjk = await buildOne(config.fonts.cjk, usedText, config.cacheDir);
+  const cjkBold = await buildOne(config.fonts.cjkBold, usedText, config.cacheDir);
+  const sans = await buildOne(config.fonts.sans, usedText, config.cacheDir);
+  const sansBold = await buildOne(
+    config.fonts.sansBold,
+    usedText,
+    config.cacheDir,
+  );
+  const mono = await buildOne(
+    config.fonts.mono,
+    asciiText + usedText,
+    config.cacheDir,
+  );
 
-  return { cjk, sans, mono };
+  return { cjk, cjkBold, sans, sansBold, mono };
 }

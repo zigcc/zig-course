@@ -18,7 +18,13 @@ export interface PackageInput {
   /** epubPath(去掉 ../) -> bytes，统一 PNG */
   images: Map<string, Uint8Array>;
   /** 子集化后的字体 */
-  fonts: { cjk: Uint8Array; sans: Uint8Array; mono: Uint8Array };
+  fonts: {
+    cjk: Uint8Array;
+    cjkBold: Uint8Array;
+    sans: Uint8Array;
+    sansBold: Uint8Array;
+    mono: Uint8Array;
+  };
   /** 样式表内容 */
   css: string;
   /** 封面 PNG 字节（可选） */
@@ -82,7 +88,9 @@ export async function packageEpub(input: PackageInput): Promise<Uint8Array> {
   const oebps = zip.folder("OEBPS")!;
   oebps.file("styles/style.css", css);
   oebps.file("fonts/cjk.woff2", fonts.cjk);
+  oebps.file("fonts/cjk-bold.woff2", fonts.cjkBold);
   oebps.file("fonts/sans.woff2", fonts.sans);
+  oebps.file("fonts/sans-bold.woff2", fonts.sansBold);
   oebps.file("fonts/mono.woff2", fonts.mono);
 
   // 封面页 + 目录页
@@ -111,7 +119,9 @@ export async function packageEpub(input: PackageInput): Promise<Uint8Array> {
   const manifestItems: string[] = [
     `<item id="css" href="styles/style.css" media-type="text/css"/>`,
     `<item id="font-cjk" href="fonts/cjk.woff2" media-type="font/woff2"/>`,
+    `<item id="font-cjk-bold" href="fonts/cjk-bold.woff2" media-type="font/woff2"/>`,
     `<item id="font-sans" href="fonts/sans.woff2" media-type="font/woff2"/>`,
+    `<item id="font-sans-bold" href="fonts/sans-bold.woff2" media-type="font/woff2"/>`,
     `<item id="font-mono" href="fonts/mono.woff2" media-type="font/woff2"/>`,
     `<item id="nav" href="nav.xhtml" properties="nav" media-type="application/xhtml+xml"/>`,
   ];

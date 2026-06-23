@@ -179,6 +179,45 @@ export function stripImageAttrs(md: string): string {
   return md.replace(/(!?\[[^\]]*\]\([^)]*\))\{[^}\n]*\}/g, "$1");
 }
 
+/**
+ * 修复 CJK 相邻的 **加粗** 解析失败。
+ * CommonMark 的强调定界符（flanking）规则在 ** 被 CJK 标点/文字包夹时会判定其无效，
+ * 导致 markdown-it 原样输出字面 **（例如“。**文本。**”）。
+ * 这里在非代码区把 **文本** 改写为 <strong>文本</strong>；markdown-it 开启了 html:true，
+ * 会原样保留该标签，阅读器会正常加粗。
+ * 为避免误伤代码块（其他语言里的 **），逐行扫描并跳过 ``` / ~~~ 围栏内部；
+ * 同时跳过行内代码 `...` 中的内容。
+ */
+export function fixCjkStrong(md: string): string {
+  let inFence = false;
+  let fenceMark = "";
+  return md
+    .split(/\r?\n/)
+    .map((ln) => {
+      const fence = ln.match(/^\s*(```+|~~~+)/);
+      if (fence) {
+        if (!inFence) {
+          inFence = true;
+          fenceMark = fence[1][0];
+        } else if (fence[1][0] === fenceMark) {
+          inFence = false;
+          fenceMark = "";
+        }
+        return ln;
+      }
+      if (inFence) return ln;
+      const codeSpans: string[] = [];
+      let s = ln.replace(/`[^`]*`/g, (m) => {
+        codeSpans.push(m);
+        return `\u0000${codeSpans.length - 1}\u0000`;
+      });
+      s = s.replace(/\*\*(?!\s)([^*\n]+?)(?<!\s)\*\*/g, "<strong>$1</strong>");
+      s = s.replace(/\u0000(\d+)\u0000/g, (_m, i) => codeSpans[Number(i)]);
+      return s;
+    })
+    .join("\n");
+}
+
 /** 完整预处理管线 */
 export function preprocess(md: string, courseDir: string): string {
   md = stripFrontmatter(md);
@@ -187,5 +226,6 @@ export function preprocess(md: string, courseDir: string): string {
   md = transformCodeGroupTabs(md);
   md = transformContainers(md);
   md = stripImageAttrs(md);
+  md = fixCjkStrong(md);
   return md;
 }
