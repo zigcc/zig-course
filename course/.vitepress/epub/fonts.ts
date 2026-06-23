@@ -55,25 +55,30 @@ export async function prepareFonts(
     " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`" +
     "abcdefghijklmnopqrstuvwxyz{|}~";
 
-  // 先串行预热下载（填充磁盘缓存），避免 normal/bold 共享同一 fileName 时并发写缓存的竞态。
-  // 由于同一字体文件的下载被 download() 缓存，这里只会实际下载三个原始可变字体。
-  const cjk = await buildOne(config.fonts.cjk, usedText, config.cacheDir);
-  const cjkBold = await buildOne(
+  // 先并行预热下载唯一的原始字体文件（按 fileName 去重），填充磁盘缓存；
+  // 否则随后并行子集化时，共享同一 fileName 的 normal/bold 会并发写缓存产生竞态。
+  const specs = [
+    config.fonts.cjk,
     config.fonts.cjkBold,
-    usedText,
-    config.cacheDir,
-  );
-  const sans = await buildOne(config.fonts.sans, usedText, config.cacheDir);
-  const sansBold = await buildOne(
+    config.fonts.sans,
     config.fonts.sansBold,
-    usedText,
-    config.cacheDir,
-  );
-  const mono = await buildOne(
     config.fonts.mono,
-    asciiText + usedText,
-    config.cacheDir,
+  ];
+  const uniqueByFile = new Map(specs.map((s) => [s.fileName, s]));
+  await Promise.all(
+    [...uniqueByFile.values()].map((s) =>
+      download(s.url, path.join(config.cacheDir, s.fileName)),
+    ),
   );
+
+  // 缓存已就绪，buildOne 内的 download 均命中缓存（只读），可安全并行子集化
+  const [cjk, cjkBold, sans, sansBold, mono] = await Promise.all([
+    buildOne(config.fonts.cjk, usedText, config.cacheDir),
+    buildOne(config.fonts.cjkBold, usedText, config.cacheDir),
+    buildOne(config.fonts.sans, usedText, config.cacheDir),
+    buildOne(config.fonts.sansBold, usedText, config.cacheDir),
+    buildOne(config.fonts.mono, asciiText + usedText, config.cacheDir),
+  ]);
 
   return { cjk, cjkBold, sans, sansBold, mono };
 }
