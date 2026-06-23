@@ -11,7 +11,7 @@
 //   sans = Inter                                              → 正文英文/数字（无衬线）
 //   mono = JetBrains Mono                                     → 代码/行内代码（等宽）
 //
-// 运行：bun run scripts/pdf/build-fonts.ts （或 bun pdf:fonts）
+// 运行：bun run scripts/pdf/build-fonts.ts（或 bun pdf:fonts）
 import subsetFont from "subset-font";
 import {
   readFileSync,
@@ -108,6 +108,8 @@ for (const f of FONTS) {
   });
   const out = path.join(OUT, `zigcourse-${f.name}.ttf`);
   writeFileSync(out, sub);
-  console.log(`✓ ${f.name} -> ${out}  ${(sub.byteLength / 1024).toFixed(0)} KB`);
+  console.log(
+    `✓ ${f.name} -> ${out}  ${(sub.byteLength / 1024).toFixed(0)} KB`,
+  );
 }
 console.log("完成。");

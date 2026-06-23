@@ -38,7 +38,9 @@ export interface ResolvedImage {
 // ---------- sidebar -> 有序页面列表 ----------
 // 返回有序节点列表。isGroup=true 表示纯分组标题（无对应 md 页面，仅用于书签层级）。
 // 与 VitePress 侧边栏目录完全一致，同时保留带 link 的页面与不带 link 的分组。
-export function flattenSidebar(sidebar: DefaultTheme.SidebarItem[]): FlatNode[] {
+export function flattenSidebar(
+  sidebar: DefaultTheme.SidebarItem[],
+): FlatNode[] {
   const nodes: FlatNode[] = [];
   function walk(items: DefaultTheme.SidebarItem[], level: number): void {
     for (const item of items) {
@@ -131,7 +133,7 @@ export function resolveImagePath(
 // 处理 // [!code focus] / [!code highlight] / [!code ++] / [!code --] /
 // [!code warning] / [!code error] / [!code focus:n] / [!code word:xxx] 等。
 // 这些指令可能独占一行注释，也可能紧跟在代码或另一段注释之后（如
-// `// 获取writer句柄// [!code focus]`），需统一移除指令本身并清理多余空白。
+// `// 获取 writer 句柄// [!code focus]`），需统一移除指令本身并清理多余空白。
 function stripCodeDirectives(line: string): string {
   let out = line.replace(/\s*\/\/\s*\[!code[^\]]*\]/g, "");
   out = out.replace(/[ \t]+$/g, "");
@@ -185,7 +187,7 @@ export async function resolveCodeImport(
   const absFile = path.join(courseDir, rel);
   const ext = path.extname(absFile).slice(1) || "text";
   const lang = ext === "zig" ? "zig" : ext;
-  if (!existsSync(absFile)) return { lang, code: `// 文件不存在: ${rel}` };
+  if (!existsSync(absFile)) return { lang, code: `// 文件不存在：${rel}` };
   const src = await readFile(absFile, "utf-8");
   const lines = src.split("\n");
 

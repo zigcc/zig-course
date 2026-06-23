@@ -53,9 +53,7 @@ async function main(): Promise<void> {
     await readFile(path.join(ROOT, "assets/fonts/zigcourse-mono.ttf"))
   ).toString("base64");
 
-  let nodes: FlatNode[] = flattenSidebar(
-    sidebar as DefaultTheme.SidebarItem[],
-  );
+  let nodes: FlatNode[] = flattenSidebar(sidebar as DefaultTheme.SidebarItem[]);
   // 仅对页面节点应用排除；分组节点保留（其下无页面会被自动跳过）。
   nodes = nodes.filter(
     (n) => n.isGroup || !EXCLUDE.some((re) => re.test(n.route!)),
@@ -66,14 +64,23 @@ async function main(): Promise<void> {
   const pageCount = nodes.filter((n) => !n.isGroup).length;
   console.log(`将渲染 ${pageCount} 个页面${SAMPLE ? "（样例模式）" : ""}`);
 
-  const renderer = new PdfRenderer({ fontCjk, fontSans, fontMono, courseDir: COURSE });
+  const renderer = new PdfRenderer({
+    fontCjk,
+    fontSans,
+    fontMono,
+    courseDir: COURSE,
+  });
 
   const outline = (renderer.doc as any).outline;
   const bookmarkStack: Bookmark[] = [];
 
   // 分组节点的书签延迟创建：等其下第一个页面渲染完才知道起始页。
   const pendingGroups: FlatNode[] = [];
-  const addBookmark = (level: number, title: string, pageNumber: number): unknown => {
+  const addBookmark = (
+    level: number,
+    title: string,
+    pageNumber: number,
+  ): unknown => {
     while (
       bookmarkStack.length &&
       bookmarkStack[bookmarkStack.length - 1].level >= level
@@ -102,7 +109,7 @@ async function main(): Promise<void> {
         ? altPath
         : null;
     if (!file) {
-      console.warn(`✗ 找不到: ${route}`);
+      console.warn(`✗ 找不到：${route}`);
       continue;
     }
     const content = await readFile(file, "utf-8");
@@ -128,7 +135,7 @@ async function main(): Promise<void> {
   const buf = renderer.output();
   await writeFile(outFile, buf);
   console.log(
-    `\n已生成: ${outFile}  共 ${renderer.page} 页, ${(buf.length / 1024 / 1024).toFixed(1)} MB`,
+    `\n已生成：${outFile}  共 ${renderer.page} 页，${(buf.length / 1024 / 1024).toFixed(1)} MB`,
   );
 }
 

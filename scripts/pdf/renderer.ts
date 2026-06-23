@@ -56,7 +56,9 @@ interface RenderCtx {
 }
 
 /** 任意带 tokens 字段的 inline token 兼容形态。 */
-type InlineToken = Token | { type: string; text?: string; tokens?: Token[]; href?: string };
+type InlineToken =
+  | Token
+  | { type: string; text?: string; tokens?: Token[]; href?: string };
 
 /** 构造参数。 */
 export interface RendererOptions {
@@ -189,7 +191,12 @@ export class PdfRenderer {
   }
 
   // 在指定 (x, y) 绘制一整行混排文本（不换行），CJK 走 CJK 字体、拉丁走指定字体。
-  drawMixedLine(text: string, x: number, y: number, latinFont = "Sans"): number {
+  drawMixedLine(
+    text: string,
+    x: number,
+    y: number,
+    latinFont = "Sans",
+  ): number {
     let cx = x;
     let buf = "";
     let bufCjk: boolean | null = null;
@@ -344,7 +351,7 @@ export class PdfRenderer {
         }
         if (!this._dry) {
           if (bold) {
-            // 伪粗体：用填充+描边模式加粗笔画（无需额外 bold 字体）
+            // 伪粗体：用填充 + 描边模式加粗笔画（无需额外 bold 字体）
             const dc = link ? [20, 90, 200] : [30, 30, 30];
             this.doc.setDrawColor(dc[0], dc[1], dc[2]);
             this.doc.setLineWidth(0.25);
@@ -363,14 +370,27 @@ export class PdfRenderer {
     return this.y;
   }
 
-  drawHeading(token: Tokens.Heading, currentRoute: string): { anchor: string; page: number } {
-    const sizes: Record<number, number> = { 1: 20, 2: 16, 3: 13, 4: 12, 5: 11, 6: 11 };
+  drawHeading(
+    token: Tokens.Heading,
+    currentRoute: string,
+  ): { anchor: string; page: number } {
+    const sizes: Record<number, number> = {
+      1: 20,
+      2: 16,
+      3: 13,
+      4: 12,
+      5: 11,
+      6: 11,
+    };
     const size = sizes[token.depth] || 12;
     this.ensureSpace(size * 0.6);
     this.y += token.depth <= 2 ? 4 : 2;
     const anchor = slugify(token.text);
     if (!this._dry)
-      this.anchors.set(`${currentRoute}#${anchor}`, { page: this.curPage(), y: this.y });
+      this.anchors.set(`${currentRoute}#${anchor}`, {
+        page: this.curPage(),
+        y: this.y,
+      });
     this.setSize(size);
     this.doc.setTextColor(0, 0, 0);
     // 标题可能含行内链接/代码（如 ### [`@atomicLoad`](url)），用 renderCell 解析渲染
@@ -380,9 +400,25 @@ export class PdfRenderer {
         : [{ type: "text", text: token.text }];
     const lineH = size * 0.55;
     this._cellDefaultColor = [0, 0, 0];
-    const nLines = this.renderCell(headTokens, MARGIN.left, this.y, CONTENT_W, lineH, true, currentRoute);
+    const nLines = this.renderCell(
+      headTokens,
+      MARGIN.left,
+      this.y,
+      CONTENT_W,
+      lineH,
+      true,
+      currentRoute,
+    );
     this.ensureSpace(nLines * lineH);
-    this.renderCell(headTokens, MARGIN.left, this.y, CONTENT_W, lineH, false, currentRoute);
+    this.renderCell(
+      headTokens,
+      MARGIN.left,
+      this.y,
+      CONTENT_W,
+      lineH,
+      false,
+      currentRoute,
+    );
     this._cellDefaultColor = null;
     this.y += nLines * lineH + 2;
     return { anchor, page: this.curPage() };
@@ -482,7 +518,15 @@ export class PdfRenderer {
       const blockH = rowsThisPage.length * lineH + padY * 2;
       if (!this._dry) {
         this.doc.setFillColor(246, 248, 250);
-        this.doc.roundedRect(blockX, blockStartY, blockW, blockH, 1.2, 1.2, "F");
+        this.doc.roundedRect(
+          blockX,
+          blockStartY,
+          blockW,
+          blockH,
+          1.2,
+          1.2,
+          "F",
+        );
       }
       for (const { row, yy: ry } of rowsThisPage) {
         let cx = row.x;
@@ -607,12 +651,20 @@ export class PdfRenderer {
         this.doc.setTextColor(45, 45, 45);
       }
       if (inlineToks.length) {
-        this.drawInline(inlineToks, { indent: textIndent, currentRoute, lineH, size });
+        this.drawInline(inlineToks, {
+          indent: textIndent,
+          currentRoute,
+          lineH,
+          size,
+        });
       } else {
         this.y += lineH;
       }
       for (const sub of subLists) {
-        await this.drawList(sub, currentRoute, { level: level + 1, baseIndent });
+        await this.drawList(sub, currentRoute, {
+          level: level + 1,
+          baseIndent,
+        });
       }
       this.y += itemGap;
       n++;
@@ -629,7 +681,7 @@ export class PdfRenderer {
     const padX = 4; // 框内左右内边距（含竖条侧）
     const padY = 2.8; // 框内上下内边距
     const barW = 1; // 左竖条宽度
-    const contentIndent = padX + 1; // 内容相对 boxX 的左缩进（让出竖条+留白）
+    const contentIndent = padX + 1; // 内容相对 boxX 的左缩进（让出竖条 + 留白）
     const barColor: [number, number, number] = [200, 160, 40];
     const bgColor: [number, number, number] = [250, 247, 235];
 
@@ -645,7 +697,12 @@ export class PdfRenderer {
       for (const t of token.tokens) {
         const tt = t as any;
         if (tt.type === "paragraph")
-          this.drawInline(tt.tokens, { indent: contentIndent, currentRoute, size, lineH });
+          this.drawInline(tt.tokens, {
+            indent: contentIndent,
+            currentRoute,
+            size,
+            lineH,
+          });
         else if (tt.type === "text")
           this.drawInline(tt.tokens || [{ type: "text", text: tt.text }], {
             indent: contentIndent,
@@ -781,7 +838,8 @@ export class PdfRenderer {
         for (const ch of u.text) {
           const tw = this.doc.getTextWidth(part + ch);
           if (x0 - x + tw > maxW && part) {
-            if (!measureOnly) this.drawCellPiece(part, x0, y, u, measureOnly, currentRoute);
+            if (!measureOnly)
+              this.drawCellPiece(part, x0, y, u, measureOnly, currentRoute);
             x0 = x;
             y += lineH;
             lines++;
@@ -795,7 +853,8 @@ export class PdfRenderer {
             y += lineH;
             lines++;
           }
-          if (!measureOnly) this.drawCellPiece(part, x0, y, u, measureOnly, currentRoute);
+          if (!measureOnly)
+            this.drawCellPiece(part, x0, y, u, measureOnly, currentRoute);
           x0 += pw;
         }
         continue;
@@ -805,7 +864,8 @@ export class PdfRenderer {
         y += lineH;
         lines++;
       }
-      if (!measureOnly) this.drawCellPiece(u.text, x0, y, u, measureOnly, currentRoute);
+      if (!measureOnly)
+        this.drawCellPiece(u.text, x0, y, u, measureOnly, currentRoute);
       x0 += w;
     }
     return lines;
@@ -826,7 +886,14 @@ export class PdfRenderer {
     if (u.link) {
       const norm = normalizeInternalLink(u.link, currentRoute);
       if (norm)
-        this.pendingLinks.push({ page: this.curPage(), x, y: y - 3, w, h: 4.5, target: norm });
+        this.pendingLinks.push({
+          page: this.curPage(),
+          x,
+          y: y - 3,
+          w,
+          h: 4.5,
+          target: norm,
+        });
       else this.doc.link(x, y - 3, w, 4.5, { url: u.link });
       this.doc.setTextColor(20, 90, 200);
     } else {
@@ -894,16 +961,35 @@ export class PdfRenderer {
   }
 
   // 提示框（VitePress 容器）：淡色圆角背景 + 左竖条 + 标题，两遍渲染。
-  async drawAdmonition(token: AdmonitionToken, currentRoute: string): Promise<void> {
+  async drawAdmonition(
+    token: AdmonitionToken,
+    currentRoute: string,
+  ): Promise<void> {
     const styles: Record<
       string,
-      { bar: [number, number, number]; bg: [number, number, number]; title: [number, number, number] }
+      {
+        bar: [number, number, number];
+        bg: [number, number, number];
+        title: [number, number, number];
+      }
     > = {
       tip: { bar: [66, 184, 131], bg: [240, 249, 244], title: [33, 131, 88] },
-      info: { bar: [100, 150, 220], bg: [240, 244, 251], title: [60, 100, 180] },
-      warning: { bar: [234, 179, 8], bg: [252, 248, 227], title: [157, 117, 10] },
+      info: {
+        bar: [100, 150, 220],
+        bg: [240, 244, 251],
+        title: [60, 100, 180],
+      },
+      warning: {
+        bar: [234, 179, 8],
+        bg: [252, 248, 227],
+        title: [157, 117, 10],
+      },
       danger: { bar: [220, 80, 80], bg: [253, 241, 241], title: [180, 50, 50] },
-      details: { bar: [150, 150, 150], bg: [245, 245, 245], title: [90, 90, 90] },
+      details: {
+        bar: [150, 150, 150],
+        bg: [245, 245, 245],
+        title: [90, 90, 90],
+      },
     };
     const defaultTitles: Record<string, string> = {
       tip: "提示",
@@ -933,7 +1019,8 @@ export class PdfRenderer {
 
     const renderBody = async (): Promise<void> => {
       this.y += padTop + titleSize * 0.55;
-      if (!this._dry) this.doc.setTextColor(st.title[0], st.title[1], st.title[2]);
+      if (!this._dry)
+        this.doc.setTextColor(st.title[0], st.title[1], st.title[2]);
       this.drawInline([{ type: "text", text: heading }], {
         indent: contentIndent,
         size: titleSize,
@@ -950,8 +1037,8 @@ export class PdfRenderer {
       this.y += padTop * 0.5;
     };
 
-    // 第一遍：干跑测高。snap 同时记录内部计数页(this.page，供跨页增量判断)
-    // 与 jsPDF 真实页号(realPage，供 setPage 精确回滚)。
+    // 第一遍：干跑测高。snap 同时记录内部计数页 (this.page，供跨页增量判断)
+    // 与 jsPDF 真实页号 (realPage，供 setPage 精确回滚)。
     const snap = {
       y: this.y,
       page: this.page,
@@ -986,7 +1073,11 @@ export class PdfRenderer {
   }
 
   // 渲染一组 token（可复用于页面与容器内部）
-  async renderTokens(tokens: PdfToken[], route: string, ctx: RenderCtx = {}): Promise<void> {
+  async renderTokens(
+    tokens: PdfToken[],
+    route: string,
+    ctx: RenderCtx = {},
+  ): Promise<void> {
     const indent = ctx.indent || 0;
     const codeOffset = ctx.codeOffset || 0;
     for (const token of tokens) {
@@ -1025,18 +1116,27 @@ export class PdfRenderer {
           await this.drawImage(t as Tokens.Image, route);
           break;
         case "text":
-          if (t.tokens) this.drawInline(t.tokens, { currentRoute: route, indent });
+          if (t.tokens)
+            this.drawInline(t.tokens, { currentRoute: route, indent });
           else if (t.text)
-            this.drawInline([{ type: "text", text: t.text }], { currentRoute: route, indent });
+            this.drawInline([{ type: "text", text: t.text }], {
+              currentRoute: route,
+              indent,
+            });
           break;
         default:
-          if (t.tokens) this.drawInline(t.tokens, { currentRoute: route, indent });
+          if (t.tokens)
+            this.drawInline(t.tokens, { currentRoute: route, indent });
       }
     }
   }
 
   // ---------- 渲染一页（一篇 markdown）----------
-  async renderPage(route: string, _title: string, tokens: PdfToken[]): Promise<void> {
+  async renderPage(
+    route: string,
+    _title: string,
+    tokens: PdfToken[],
+  ): Promise<void> {
     if (this.page !== 1 || this.y > MARGIN.top) {
       if (!(this.page === 1 && this.y === MARGIN.top)) this.newPage();
     }
