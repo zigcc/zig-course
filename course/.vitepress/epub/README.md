@@ -13,16 +13,16 @@ bun run epub  # 生成 books/zig-course.epub
 
 ## 特性
 
-| 能力 | 说明 |
-| --- | --- |
-| 章节顺序 | 直接复用 `course/.vitepress/sidebar.ts`，与网站目录保持一致 |
-| 代码高亮 | 使用 [Shiki](https://shiki.style/)，与网站同款主题，支持 Zig |
-| 代码片段导入 | 支持 `<<<@/code/xxx.zig#region` 语法（含 region 提取、行内 label） |
-| 容器语法 | `::: info / tip / warning / danger / details` 与 GitHub 警告块 `> [!TIP]` 均转为带样式的提示框 |
-| 自定义字体 | 与 PDF 同方案：**思源宋体**（中文）+ **Inter**（正文英文，无衬线）+ **JetBrains Mono**（代码）；均取自 Google Fonts 的 glyf 可变字体，按全书字符即时子集 + 钉轴（woff2） |
-| 图片嵌入 | 本地 / 远程图片全部内嵌；SVG、WebP 统一栅格化为 PNG（兼容所有阅读器） |
-| 站内跳转 | md 间链接重写为电子书内部章节跳转，页内/跨章锚点自动校验，**不会跳到网页** |
-| 规范校验 | 通过官方 EPUBCheck 5.1.0：0 错误 / 0 警告 |
+| 能力         | 说明                                                                                                                                                                     |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 章节顺序     | 直接复用 `course/.vitepress/sidebar.ts`，与网站目录保持一致                                                                                                              |
+| 代码高亮     | 使用 [Shiki](https://shiki.style/)，与网站同款主题，支持 Zig                                                                                                             |
+| 代码片段导入 | 支持 `<<<@/code/xxx.zig#region` 语法（含 region 提取、行内 label）                                                                                                       |
+| 容器语法     | `::: info / tip / warning / danger / details` 与 GitHub 警告块 `> [!TIP]` 均转为带样式的提示框                                                                           |
+| 自定义字体   | 与 PDF 同方案：**思源宋体**（中文）+ **Inter**（正文英文，无衬线）+ **JetBrains Mono**（代码）；均取自 Google Fonts 的 glyf 可变字体，按全书字符即时子集 + 钉轴（woff2） |
+| 图片嵌入     | 本地 / 远程图片全部内嵌；SVG、WebP 统一栅格化为 PNG（兼容所有阅读器）                                                                                                    |
+| 站内跳转     | md 间链接重写为电子书内部章节跳转，页内/跨章锚点自动校验，**不会跳到网页**                                                                                               |
+| 规范校验     | 通过官方 EPUBCheck 5.1.0：0 错误 / 0 警告                                                                                                                                |
 
 ## 目录结构
 
@@ -54,11 +54,11 @@ course/.vitepress/epub/
 
 ## 依赖
 
-| 包 | 用途 |
-| --- | --- |
-| `markdown-it` | Markdown 渲染 |
-| `shiki` | 代码高亮 |
-| `jszip` | EPUB 打包 |
-| `subset-font` | 字体子集化 + 钉轴 |
-| `@resvg/resvg-js` | SVG 栅格化为 PNG |
-| `sharp` | 位图（WebP/JPG/GIF）转 PNG |
+| 包                | 用途                       |
+| ----------------- | -------------------------- |
+| `markdown-it`     | Markdown 渲染              |
+| `shiki`           | 代码高亮                   |
+| `jszip`           | EPUB 打包                  |
+| `subset-font`     | 字体子集化 + 钉轴          |
+| `@resvg/resvg-js` | SVG 栅格化为 PNG           |
+| `sharp`           | 位图（WebP/JPG/GIF）转 PNG |

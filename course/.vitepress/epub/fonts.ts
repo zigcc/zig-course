@@ -58,7 +58,11 @@ export async function prepareFonts(
   // 先串行预热下载（填充磁盘缓存），避免 normal/bold 共享同一 fileName 时并发写缓存的竞态。
   // 由于同一字体文件的下载被 download() 缓存，这里只会实际下载三个原始可变字体。
   const cjk = await buildOne(config.fonts.cjk, usedText, config.cacheDir);
-  const cjkBold = await buildOne(config.fonts.cjkBold, usedText, config.cacheDir);
+  const cjkBold = await buildOne(
+    config.fonts.cjkBold,
+    usedText,
+    config.cacheDir,
+  );
   const sans = await buildOne(config.fonts.sans, usedText, config.cacheDir);
   const sansBold = await buildOne(
     config.fonts.sansBold,

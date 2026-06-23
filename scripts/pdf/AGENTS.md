@@ -37,16 +37,16 @@ node_modules/.bin/tsc --noEmit -p scripts/pdf/tsconfig.json
 
 ## 2. 目录与模块职责
 
-| 文件              | 职责                                                                                       |
-| ----------------- | ------------------------------------------------------------------------------------------ |
-| `main.ts`         | 入口：`import sidebar`，扁平化为有序节点，逐页渲染，创建 PDF 书签（outline），写出文件      |
-| `parse.ts`        | Markdown **预处理 + 分词**：展开代码引用、转换 GitHub alert、解析 VitePress 容器，产出 token |
-| `renderer.ts`     | **核心布局引擎**：标题/段落/列表/表格/代码块/图片/提示框/引用块绘制，链接坐标收集与最终绑定 |
-| `highlight.ts`    | 用 Shiki 把代码着色为 `{content, color}` 片段（只取 token 颜色，不生成 HTML）              |
-| `utils.ts`        | sidebar 扁平化、站内链接归一化、`slugify`、图片路径解析、代码引用 `<<<@/...` 解析 + dedent  |
-| `tsconfig.json`   | 仅供本目录 `tsc --noEmit` 类型检查与编辑器使用，**不参与** VitePress 构建                   |
-| `README.md`       | 面向使用者的简明说明                                                                        |
-| `AGENTS.md`       | 本文件，面向维护者/Agent 的深入说明                                                         |
+| 文件            | 职责                                                                                         |
+| --------------- | -------------------------------------------------------------------------------------------- |
+| `main.ts`       | 入口：`import sidebar`，扁平化为有序节点，逐页渲染，创建 PDF 书签（outline），写出文件       |
+| `parse.ts`      | Markdown **预处理 + 分词**：展开代码引用、转换 GitHub alert、解析 VitePress 容器，产出 token |
+| `renderer.ts`   | **核心布局引擎**：标题/段落/列表/表格/代码块/图片/提示框/引用块绘制，链接坐标收集与最终绑定  |
+| `highlight.ts`  | 用 Shiki 把代码着色为 `{content, color}` 片段（只取 token 颜色，不生成 HTML）                |
+| `utils.ts`      | sidebar 扁平化、站内链接归一化、`slugify`、图片路径解析、代码引用 `<<<@/...` 解析 + dedent   |
+| `tsconfig.json` | 仅供本目录 `tsc --noEmit` 类型检查与编辑器使用，**不参与** VitePress 构建                    |
+| `README.md`     | 面向使用者的简明说明                                                                         |
+| `AGENTS.md`     | 本文件，面向维护者/Agent 的深入说明                                                          |
 
 > 模块依赖方向（无环）：`main → {parse, renderer, highlight, utils}`；
 > `parse → utils`；`renderer → {utils, highlight, parse(类型)}`。
@@ -164,19 +164,19 @@ routeStart / pendingLink.page"的代码，一律用 `curPage()`，不要用 `thi
 
 ### 5.6 token 分发表（`renderTokens`）
 
-| token.type   | 处理方法           | 说明                                            |
-| ------------ | ------------------ | ----------------------------------------------- |
-| `heading`    | `drawHeading`      | 登记 anchor；支持标题内含行内链接/代码          |
-| `paragraph`  | `drawParagraph`    | 行内混排；返回其中的图片交由 `drawImage`        |
-| `code`       | `drawCode`         | Shiki 着色 + 自动换行 + 续行缩进 + 灰底圆角框   |
-| `list`       | `drawList`         | 有序/无序/嵌套，矢量圆点或数字编号              |
-| `blockquote` | `drawBlockquote`   | 两遍渲染，淡灰底 + 左竖条                        |
-| `admonition` | `drawAdmonition`   | 两遍渲染，按类型配色（tip/info/warning/...）    |
-| `table`      | `drawTable`        | 单元格内容扁平化后按列宽换行渲染                |
-| `hr`         | `hr`               | 分隔线                                          |
-| `space`      | —                  | 纵向间距                                        |
-| `image`      | `drawImage`        | sharp 栅格化为 PNG（SVG/远程图均支持）          |
-| `text`       | `drawInline`       | 兜底行内                                        |
+| token.type   | 处理方法         | 说明                                          |
+| ------------ | ---------------- | --------------------------------------------- |
+| `heading`    | `drawHeading`    | 登记 anchor；支持标题内含行内链接/代码        |
+| `paragraph`  | `drawParagraph`  | 行内混排；返回其中的图片交由 `drawImage`      |
+| `code`       | `drawCode`       | Shiki 着色 + 自动换行 + 续行缩进 + 灰底圆角框 |
+| `list`       | `drawList`       | 有序/无序/嵌套，矢量圆点或数字编号            |
+| `blockquote` | `drawBlockquote` | 两遍渲染，淡灰底 + 左竖条                     |
+| `admonition` | `drawAdmonition` | 两遍渲染，按类型配色（tip/info/warning/...）  |
+| `table`      | `drawTable`      | 单元格内容扁平化后按列宽换行渲染              |
+| `hr`         | `hr`             | 分隔线                                        |
+| `space`      | —                | 纵向间距                                      |
+| `image`      | `drawImage`      | sharp 栅格化为 PNG（SVG/远程图均支持）        |
+| `text`       | `drawInline`     | 兜底行内                                      |
 
 ---
 
@@ -279,13 +279,13 @@ bun pdf
 
 ## 10. 已知陷阱速查
 
-| 现象                                   | 根因 / 修复                                                        |
-| -------------------------------------- | ----------------------------------------------------------------- |
-| 站内跳转整体错 1 页                     | 用 `this.page` 而非 `curPage()` 登记锚点；改用 `curPage()`         |
-| 代码块整体右移                          | 代码片段缺 `dedent`；在导入返回前 `dedent(trimBlankEdges(...))`    |
-| 代码块缺少闭合 `}`                      | 把 `} // #endregion x` 整行当跳过；需保留标记前代码               |
-| 提示框只剩半截竖条 / 无底框             | 未用两遍渲染测高，或 dry 期间误绘制                                |
-| 列表圆点偏上/偏下                       | pt 当 mm 直接相加；`dotCy` 需 `size * k * 0.3528` 换算            |
-| 提示框标题出现缺字形方块                | 标题含 emoji；`cleanAdmonitionTitle` 未生效或字体不含该字形        |
-| 中文/英文整页空白、字体不显示           | 字体是 CFF/OTF，jsPDF 静默拒绝；换 glyf 型来源（见 §5.2）          |
-| 新加字符渲染为缺字形方块                | 子集未含该字形；改完课程文本后重跑 `bun pdf:fonts`               |
+| 现象                          | 根因 / 修复                                                     |
+| ----------------------------- | --------------------------------------------------------------- |
+| 站内跳转整体错 1 页           | 用 `this.page` 而非 `curPage()` 登记锚点；改用 `curPage()`      |
+| 代码块整体右移                | 代码片段缺 `dedent`；在导入返回前 `dedent(trimBlankEdges(...))` |
+| 代码块缺少闭合 `}`            | 把 `} // #endregion x` 整行当跳过；需保留标记前代码             |
+| 提示框只剩半截竖条 / 无底框   | 未用两遍渲染测高，或 dry 期间误绘制                             |
+| 列表圆点偏上/偏下             | pt 当 mm 直接相加；`dotCy` 需 `size * k * 0.3528` 换算          |
+| 提示框标题出现缺字形方块      | 标题含 emoji；`cleanAdmonitionTitle` 未生效或字体不含该字形     |
+| 中文/英文整页空白、字体不显示 | 字体是 CFF/OTF，jsPDF 静默拒绝；换 glyf 型来源（见 §5.2）       |
+| 新加字符渲染为缺字形方块      | 子集未含该字形；改完课程文本后重跑 `bun pdf:fonts`              |

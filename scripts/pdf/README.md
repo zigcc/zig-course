@@ -17,22 +17,21 @@ bun pdf:sample   # 仅渲染几篇代表页 -> books/zig_course_sample.pdf（快
 
 ## 设计概览
 
-| 文件            | 职责                                                                       |
-| --------------- | -------------------------------------------------------------------------- |
+| 文件            | 职责                                                                         |
+| --------------- | ---------------------------------------------------------------------------- |
 | `main.ts`       | 入口：`import sidebar`，按目录顺序逐页渲染，写 PDF 书签（outline），输出文件 |
-| `parse.ts`      | Markdown 预处理与分词：展开代码引用、GitHub alert、VitePress 容器，转 token |
+| `parse.ts`      | Markdown 预处理与分词：展开代码引用、GitHub alert、VitePress 容器，转 token  |
 | `renderer.ts`   | 核心布局引擎：标题/段落/列表/表格/代码块/图片/提示框绘制，链接坐标收集与绑定 |
-| `highlight.ts`  | 用 Shiki（VitePress 同款引擎）将代码着色为 `{content, color}` 片段          |
-| `utils.ts`      | sidebar 扁平化、站内链接归一化、图片路径解析、代码引用 `<<<@/...` 解析      |
-| `tsconfig.json` | 仅用于本目录的类型检查（`tsc --noEmit`），不参与 VitePress 构建            |
+| `highlight.ts`  | 用 Shiki（VitePress 同款引擎）将代码着色为 `{content, color}` 片段           |
+| `utils.ts`      | sidebar 扁平化、站内链接归一化、图片路径解析、代码引用 `<<<@/...` 解析       |
+| `tsconfig.json` | 仅用于本目录的类型检查（`tsc --noEmit`），不参与 VitePress 构建              |
 
 ### 与项目的集成点
 
 1. **同源 sidebar**：`main.ts` 直接 `import sidebar from "../../course/.vitepress/sidebar.js"`，
    PDF 目录与网页侧边栏始终一致，无需维护第二份顺序表。
 2. **排除路由**：`main.ts` 的 `EXCLUDE` 当前**仅排除 `/code/**`**（纯代码片段目录，
-   由正文以 `<<<@` 引用导入，本身非正文页面）。`appendix / update / about / epilogue`
-   等章节均收入 PDF。调整收录范围改 `EXCLUDE` 即可。
+由正文以 `<<<@` 引用导入，本身非正文页面）。`appendix / update / about / epilogue`等章节均收入 PDF。调整收录范围改`EXCLUDE` 即可。
 3. **字体**：三套——`zigcourse-cjk.ttf`（Noto Serif SC，即思源宋体同源设计，中文）、
    `zigcourse-sans.ttf`（Inter，正文英文/数字，无衬线）、`zigcourse-mono.ttf`
    （JetBrains Mono，代码/行内代码）。CJK / 正文拉丁 / 代码三路分流绘制。三个 TTF 均为子集

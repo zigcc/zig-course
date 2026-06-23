@@ -57,8 +57,14 @@ export async function initHighlighter(): Promise<void> {
 export function highlightToLines(code: string, lang: string): HlLine[] {
   const hl = _hl;
   const normLang = LANG_ALIAS[lang] ?? lang ?? "text";
-  if (!hl || normLang === "text" || !hl.getLoadedLanguages().includes(normLang)) {
-    return code.split("\n").map((line) => [{ content: line, color: "#24292E" }]);
+  if (
+    !hl ||
+    normLang === "text" ||
+    !hl.getLoadedLanguages().includes(normLang)
+  ) {
+    return code
+      .split("\n")
+      .map((line) => [{ content: line, color: "#24292E" }]);
   }
   try {
     const { tokens } = hl.codeToTokens(code, {
@@ -69,7 +75,9 @@ export function highlightToLines(code: string, lang: string): HlLine[] {
       line.map((t) => ({ content: t.content, color: t.color || "#24292E" })),
     );
   } catch {
-    return code.split("\n").map((line) => [{ content: line, color: "#24292E" }]);
+    return code
+      .split("\n")
+      .map((line) => [{ content: line, color: "#24292E" }]);
   }
 }
 
