@@ -190,18 +190,24 @@ export function stripImageAttrs(md: string): string {
  */
 export function fixCjkStrong(md: string): string {
   let inFence = false;
-  let fenceMark = "";
+  let fenceChar = "";
+  let fenceLen = 0;
   return md
     .split(/\r?\n/)
     .map((ln) => {
       const fence = ln.match(/^\s*(```+|~~~+)/);
       if (fence) {
+        const char = fence[1][0];
+        const len = fence[1].length;
+        // CommonMark：围栏只能被同字符、且不短于开栏的围栏闭合
         if (!inFence) {
           inFence = true;
-          fenceMark = fence[1][0];
-        } else if (fence[1][0] === fenceMark) {
+          fenceChar = char;
+          fenceLen = len;
+        } else if (char === fenceChar && len >= fenceLen) {
           inFence = false;
-          fenceMark = "";
+          fenceChar = "";
+          fenceLen = 0;
         }
         return ln;
       }
@@ -211,7 +217,11 @@ export function fixCjkStrong(md: string): string {
         codeSpans.push(m);
         return `\u0000${codeSpans.length - 1}\u0000`;
       });
-      s = s.replace(/\*\*(?!\s)([^*\n]+?)(?<!\s)\*\*/g, "<strong>$1</strong>");
+      // 允许内部出现单个 *（如 Zig 指针 *T / *p），但不吞掉作定界的 **
+      s = s.replace(
+        /\*\*(?!\s)((?:[^*\n]|\*(?!\*))+?)(?<!\s)\*\*/g,
+        "<strong>$1</strong>",
+      );
       s = s.replace(/\u0000(\d+)\u0000/g, (_m, i) => codeSpans[Number(i)]);
       return s;
     })

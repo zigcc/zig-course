@@ -159,16 +159,22 @@ function transformContainers(lines: string[]): string[] {
 // 为避免误伤代码块（如其他语言里的 **），逐行扫描并跳过 ``` / ~~~ 围栏内部。
 export function fixCjkStrong(lines: string[]): string[] {
   let inFence = false;
-  let fenceMark = "";
+  let fenceChar = "";
+  let fenceLen = 0;
   return lines.map((ln) => {
     const fence = ln.match(/^\s*(```+|~~~+)/);
     if (fence) {
+      const char = fence[1][0];
+      const len = fence[1].length;
+      // CommonMark：围栏只能被同字符、且不短于开栏的围栏闭合
       if (!inFence) {
         inFence = true;
-        fenceMark = fence[1][0];
-      } else if (fence[1][0] === fenceMark) {
+        fenceChar = char;
+        fenceLen = len;
+      } else if (char === fenceChar && len >= fenceLen) {
         inFence = false;
-        fenceMark = "";
+        fenceChar = "";
+        fenceLen = 0;
       }
       return ln;
     }
@@ -179,9 +185,9 @@ export function fixCjkStrong(lines: string[]): string[] {
       codeSpans.push(m);
       return `\u0000${codeSpans.length - 1}\u0000`;
     });
-    // 成对、非贪婪、内部不含 ** 的加粗 -> <strong>
+    // 成对、非贪婪的加粗 -> <strong>；允许内部出现单个 *（如 Zig 指针 *T / *p）
     protectedLine = protectedLine.replace(
-      /\*\*(?!\s)([^*\n]+?)(?<!\s)\*\*/g,
+      /\*\*(?!\s)((?:[^*\n]|\*(?!\*))+?)(?<!\s)\*\*/g,
       "<strong>$1</strong>",
     );
     // 还原行内代码

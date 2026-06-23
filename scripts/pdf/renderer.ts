@@ -584,13 +584,9 @@ export class PdfRenderer {
       drawW = drawH / ratio;
     }
 
-    // 若当前页剩余空间不足以完整放下图片，强制换页并从顶部起绘，
-    // 避免图片顶部/底部被物理裁切（drawH 已被限制不超过单页内容区高度）。
-    if (this.y + drawH + 4 > A4.h - MARGIN.bottom) {
-      this.newPage();
-    } else {
-      this.ensureSpace(drawH + 4);
-    }
+    // 剩余空间放不下整图就换页，避免顶部/底部被裁切
+    // （drawH 已被限制不超过单页内容区高度）。
+    this.ensureSpace(drawH + 4);
     const x = MARGIN.left + (CONTENT_W - drawW) / 2;
     if (!this._dry) this.doc.addImage(png, "PNG", x, this.y, drawW, drawH);
     this.y += drawH + 4;
