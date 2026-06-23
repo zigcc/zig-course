@@ -67,7 +67,7 @@ async function main() {
   const usedText = collectUsedText(rendered);
   const fonts = await prepareFonts(config, usedText);
   console.log(
-    `[epub] 字体子集化完成：中文 ${(fonts.cjk.length / 1024) | 0}KB，英文 ${(fonts.sans.length / 1024) | 0}KB，等宽 ${(fonts.mono.length / 1024) | 0}KB`,
+    `[epub] 字体子集化完成：中文 ${(fonts.cjk.length / 1024) | 0}KB（粗体 ${(fonts.cjkBold.length / 1024) | 0}KB），英文 ${(fonts.sans.length / 1024) | 0}KB（粗体 ${(fonts.sansBold.length / 1024) | 0}KB），等宽 ${(fonts.mono.length / 1024) | 0}KB`,
   );
 
   // 7. 封面

@@ -227,24 +227,54 @@ export class PdfRenderer {
     const startX = MARGIN.left + indent;
     const maxW = CONTENT_W - indent;
 
-    // 把 inline tokens 拍平为 [{text, link?, code?}] 片段
+    // 把 inline tokens 拍平为 [{text, link?, code?, bold?}] 片段
     interface Seg {
       text: string;
       code?: boolean;
       link?: string;
+      bold?: boolean;
     }
     const segs: Seg[] = [];
-    const flatten = (toks: InlineToken[], link?: string): void => {
+    // boldDepth 用计数器跟踪嵌套的加粗/斜体（含 html <strong>/<em> 标签），
+    // 兼容 marked 正常解析出的 strong/em，以及预处理转写出的 html 标签。
+    const flatten = (
+      toks: InlineToken[],
+      link?: string,
+      boldDepth = 0,
+    ): void => {
       for (const t of toks) {
         const tt = t as any;
         if (tt.type === "link") {
-          flatten(tt.tokens || [{ type: "text", text: tt.text }], tt.href);
+          flatten(
+            tt.tokens || [{ type: "text", text: tt.text }],
+            tt.href,
+            boldDepth,
+          );
+        } else if (tt.type === "strong" || tt.type === "em") {
+          flatten(
+            tt.tokens || [{ type: "text", text: tt.text }],
+            link,
+            boldDepth + 1,
+          );
+        } else if (tt.type === "html") {
+          // 处理预处理转写出的 <strong>/<em> 标签（成对出现），标签本身不输出文本
+          const raw = (tt.text ?? tt.raw ?? "").trim().toLowerCase();
+          if (/^<(strong|b|em|i)>$/.test(raw)) {
+            boldDepth++;
+          } else if (/^<\/(strong|b|em|i)>$/.test(raw)) {
+            boldDepth = Math.max(0, boldDepth - 1);
+          }
+          // 其他 html 原样忽略（与原行为一致：不输出标签文本）
         } else if (tt.type === "codespan") {
-          segs.push({ text: tt.text, code: true, link });
+          segs.push({ text: tt.text, code: true, link, bold: boldDepth > 0 });
         } else if (tt.tokens) {
-          flatten(tt.tokens, link);
+          flatten(tt.tokens, link, boldDepth);
         } else {
-          segs.push({ text: tt.text ?? tt.raw ?? "", link });
+          segs.push({
+            text: tt.text ?? tt.raw ?? "",
+            link,
+            bold: boldDepth > 0,
+          });
         }
       }
     };
@@ -255,7 +285,12 @@ export class PdfRenderer {
     let curY = this.y;
     const cjkFont = fontName;
 
-    const placeChar = (s: string, isCode: boolean | undefined, link?: string): void => {
+    const placeChar = (
+      s: string,
+      isCode: boolean | undefined,
+      link?: string,
+      bold?: boolean,
+    ): void => {
       const units: string[] = [];
       let buf2 = "";
       for (const ch of s) {
@@ -307,13 +342,23 @@ export class PdfRenderer {
           }
           this.doc.setTextColor(20, 90, 200);
         }
-        if (!this._dry) this.doc.text(piece, x, curY);
+        if (!this._dry) {
+          if (bold) {
+            // 伪粗体：用填充+描边模式加粗笔画（无需额外 bold 字体）
+            const dc = link ? [20, 90, 200] : [30, 30, 30];
+            this.doc.setDrawColor(dc[0], dc[1], dc[2]);
+            this.doc.setLineWidth(0.25);
+            this.doc.text(piece, x, curY, { renderingMode: "fillThenStroke" });
+          } else {
+            this.doc.text(piece, x, curY);
+          }
+        }
         if (link && !this._dry) this.doc.setTextColor(30, 30, 30);
         x += w;
       }
     };
 
-    for (const seg of segs) placeChar(seg.text, seg.code, seg.link);
+    for (const seg of segs) placeChar(seg.text, seg.code, seg.link, seg.bold);
     this.y = curY + lineH;
     return this.y;
   }
@@ -396,6 +441,19 @@ export class PdfRenderer {
     }
 
     this.y += 2.5;
+
+    // 孤行/寡行保护所需的常量：
+    // - MIN_TAIL_ROWS：避免一个代码块在下一页只留下极少的尾行（如仅 `}`）。
+    // - 整块下移阈值：体量不大的代码块（不超过半个内容区高度）若当前页放不下，整体移到下一页，避免拦腰断开。
+    const MIN_TAIL_ROWS = 3;
+    const contentH = A4.h - MARGIN.top - MARGIN.bottom;
+    const totalBlockH = drawRows.length * lineH + padY * 2;
+    const availSpace = A4.h - MARGIN.bottom - this.y;
+    if (totalBlockH <= contentH * 0.5 && totalBlockH > availSpace) {
+      // 小代码块整体下移到下一页，保持完整
+      this.newPage();
+    }
+
     let idx = 0;
     while (idx < drawRows.length) {
       this.ensureSpace(lineH + padY * 2);
@@ -406,6 +464,20 @@ export class PdfRenderer {
         rowsThisPage.push({ row: drawRows[idx], yy });
         yy += lineH;
         idx++;
+      }
+      // 孤行保护：若本页放下后，剩余行数过少（如只剩闭合括号），
+      // 则从本页回收若干行留给下一页，使断点更自然（仅当本页放得下足够多行时才回收）。
+      const remaining = drawRows.length - idx;
+      if (
+        remaining > 0 &&
+        remaining < MIN_TAIL_ROWS &&
+        rowsThisPage.length > MIN_TAIL_ROWS
+      ) {
+        const giveBack = MIN_TAIL_ROWS - remaining;
+        for (let k = 0; k < giveBack; k++) {
+          rowsThisPage.pop();
+          idx--;
+        }
       }
       const blockH = rowsThisPage.length * lineH + padY * 2;
       if (!this._dry) {
@@ -468,7 +540,13 @@ export class PdfRenderer {
       drawW = drawH / ratio;
     }
 
-    this.ensureSpace(drawH + 4);
+    // 若当前页剩余空间不足以完整放下图片，强制换页并从顶部起绘，
+    // 避免图片顶部/底部被物理裁切（drawH 已被限制不超过单页内容区高度）。
+    if (this.y + drawH + 4 > A4.h - MARGIN.bottom) {
+      this.newPage();
+    } else {
+      this.ensureSpace(drawH + 4);
+    }
     const x = MARGIN.left + (CONTENT_W - drawW) / 2;
     if (!this._dry) this.doc.addImage(png, "PNG", x, this.y, drawW, drawH);
     this.y += drawH + 4;

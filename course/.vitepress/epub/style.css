@@ -6,9 +6,21 @@
   font-style: normal;
 }
 @font-face {
+  font-family: "Noto Serif SC";
+  src: url("../fonts/cjk-bold.woff2");
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
   font-family: "Inter";
   src: url("../fonts/sans.woff2");
   font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("../fonts/sans-bold.woff2");
+  font-weight: 700;
   font-style: normal;
 }
 @font-face {
@@ -59,6 +71,19 @@ h3 {
 
 p {
   margin: 0.8em 0;
+}
+
+/* 加粗：显式使用 700 字重，配合上方 @font-face 的真粗体，避免阅读器伪粗体 */
+strong,
+b {
+  font-weight: 700;
+}
+
+/* 删除线 */
+del,
+s {
+  text-decoration: line-through;
+  color: #888;
 }
 
 a {

@@ -27,8 +27,12 @@ export interface EpubConfig {
   fonts: {
     /** 中文正文字体 */
     cjk: FontSpec;
-    /** 正文英文/数字字体（无衬线） */
+    /** 中文粗体（wght:700，用于标题/加粗，避免依赖阅读器伪粗体） */
+    cjkBold: FontSpec;
+    /** 正文英文/数字字体（无衡线） */
     sans: FontSpec;
+    /** 英文粗体（wght:700） */
+    sansBold: FontSpec;
     /** 代码等宽字体 */
     mono: FontSpec;
   };
@@ -81,11 +85,23 @@ export const config: EpubConfig = {
       fileName: "NotoSerifSC.ttf",
       axes: { wght: 400 },
     },
+    cjkBold: {
+      family: "Noto Serif SC",
+      url: "https://github.com/google/fonts/raw/main/ofl/notoserifsc/NotoSerifSC%5Bwght%5D.ttf",
+      fileName: "NotoSerifSC.ttf",
+      axes: { wght: 700 },
+    },
     sans: {
       family: "Inter",
       url: "https://github.com/google/fonts/raw/main/ofl/inter/Inter%5Bopsz,wght%5D.ttf",
       fileName: "Inter.ttf",
       axes: { wght: 400, opsz: 14 },
+    },
+    sansBold: {
+      family: "Inter",
+      url: "https://github.com/google/fonts/raw/main/ofl/inter/Inter%5Bopsz,wght%5D.ttf",
+      fileName: "Inter.ttf",
+      axes: { wght: 700, opsz: 14 },
     },
     mono: {
       family: "JetBrains Mono",
