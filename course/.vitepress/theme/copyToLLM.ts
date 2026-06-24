@@ -1,65 +1,38 @@
-import { computed, defineComponent, h, ref } from "vue";
+import { computed, defineComponent, h, onMounted, onUnmounted, ref } from "vue";
 import { useData, withBase } from "vitepress";
-
-const actionRowStyle = {
-  display: "flex",
-  alignItems: "center",
-  gap: "18px",
-  margin: "12px 0 24px",
-} as const;
-
-const triggerStyle = {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: "8px",
-  padding: "0",
-  border: "0",
-  background: "transparent",
-  color: "var(--vp-c-text-2)",
-  fontSize: "14px",
-  fontWeight: "500",
-  lineHeight: "24px",
-  cursor: "pointer",
-} as const;
-
-const menuStyle = {
-  position: "absolute",
-  left: "0",
-  top: "calc(100% + 8px)",
-  zIndex: "10",
-  minWidth: "210px",
-  padding: "6px",
-  border: "1px solid var(--vp-c-divider)",
-  borderRadius: "8px",
-  background: "var(--vp-c-bg-elv)",
-  boxShadow: "var(--vp-shadow-3)",
-} as const;
-
-const itemStyle = {
-  display: "block",
-  width: "100%",
-  padding: "8px 10px",
-  border: "0",
-  borderRadius: "6px",
-  background: "transparent",
-  color: "var(--vp-c-text-1)",
-  textAlign: "left",
-  cursor: "pointer",
-  fontSize: "13px",
-  lineHeight: "18px",
-} as const;
 
 export default defineComponent({
   setup() {
     const { frontmatter, page } = useData();
     const open = ref(false);
     const copied = ref<"link" | "markdown" | "error" | null>(null);
+    const rootRef = ref<HTMLElement | null>(null);
     const llmPath = computed(() => withBase(`/llms/${page.value.filePath}`));
     const llmUrl = computed(() =>
       typeof window === "undefined"
         ? ""
         : new URL(llmPath.value, window.location.origin).href,
     );
+
+    function onDocumentClick(event: MouseEvent): void {
+      if (open.value && !rootRef.value?.contains(event.target as Node)) {
+        open.value = false;
+      }
+    }
+
+    function onKeydown(event: KeyboardEvent): void {
+      if (open.value && event.key === "Escape") open.value = false;
+    }
+
+    onMounted(() => {
+      document.addEventListener("click", onDocumentClick);
+      document.addEventListener("keydown", onKeydown);
+    });
+
+    onUnmounted(() => {
+      document.removeEventListener("click", onDocumentClick);
+      document.removeEventListener("keydown", onKeydown);
+    });
 
     async function copyText(text: string): Promise<void> {
       if (navigator.clipboard) {
@@ -121,13 +94,15 @@ export default defineComponent({
         return null;
       }
 
-      return h("div", { class: "copy_llm", style: actionRowStyle }, [
-        h("div", { style: { position: "relative", display: "inline-block" } }, [
+      return h("div", { class: "copy_llm", ref: rootRef }, [
+        h("div", { class: "copy_llm-wrapper" }, [
           h(
             "button",
             {
               type: "button",
-              style: triggerStyle,
+              class: "copy_llm-trigger",
+              "aria-haspopup": "menu",
+              "aria-expanded": open.value ? "true" : "false",
               onClick: () => {
                 open.value = !open.value;
               },
@@ -183,12 +158,13 @@ export default defineComponent({
             ],
           ),
           open.value
-            ? h("div", { style: menuStyle }, [
+            ? h("div", { class: "copy_llm-menu", role: "menu" }, [
                 h(
                   "button",
                   {
                     type: "button",
-                    style: itemStyle,
+                    class: "copy_llm-item",
+                    role: "menuitem",
                     onClick: () => copy("link"),
                   },
                   "复制 Markdown 链接",
@@ -197,7 +173,8 @@ export default defineComponent({
                   "button",
                   {
                     type: "button",
-                    style: itemStyle,
+                    class: "copy_llm-item",
+                    role: "menuitem",
                     onClick: () => copy("markdown"),
                   },
                   "复制 Markdown 正文",
