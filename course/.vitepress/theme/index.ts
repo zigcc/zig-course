@@ -6,6 +6,7 @@ import giscus from "./giscus.js";
 import version from "./version.js";
 import copyToLLM from "./copyToLLM.js";
 import "./style/print.css";
+import "./style/copyToLLM.css";
 
 import { h } from "vue";
 
