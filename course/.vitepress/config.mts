@@ -6,11 +6,14 @@ import { fileURLToPath } from "node:url";
 import themeConfig from "./themeConfig.js";
 import { llmMarkdownPlugin } from "./llmMarkdown.js";
 
+const title = "Zig 语言圣经";
+const description = "简单、快速地学习 Zig，ziglang中文教程，zig中文教程";
+
 export default withPwa(
   defineConfig({
     lang: "zh-CN",
-    title: "Zig 语言圣经",
-    description: "简单、快速地学习 Zig，ziglang中文教程，zig中文教程",
+    title,
+    description,
     sitemap: {
       hostname: "https://course.ziglang.cc/",
     },
@@ -18,12 +21,20 @@ export default withPwa(
     lastUpdated: true,
     themeConfig: themeConfig,
     cleanUrls: true,
+    vue: {
+      template: {
+        compilerOptions: {
+          // <llm-only> 是自定义元素：网页端由 CSS 隐藏，正文只进入 /llms 输出
+          isCustomElement: (tag) => tag === "llm-only",
+        },
+      },
+    },
     pwa: {
       registerType: "autoUpdate",
       manifest: {
-        name: "Zig 语言圣经",
+        name: title,
         short_name: "Zig 圣经",
-        description: "简单、快速地学习 Zig，ziglang中文教程，zig中文教程",
+        description,
         lang: "zh-CN",
         theme_color: "#ffffff",
         background_color: "#ffffff",
@@ -60,6 +71,8 @@ export default withPwa(
             path.dirname(fileURLToPath(import.meta.url)),
             "dist",
           ),
+          title,
+          description,
         }),
       ],
     },

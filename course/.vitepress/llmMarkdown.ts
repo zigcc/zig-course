@@ -8,6 +8,8 @@ const SNIPPET_RE = /^<<<\s*(.+)$/gm;
 interface Options {
   srcDir: string;
   outDir?: string;
+  title?: string;
+  description?: string;
 }
 
 export function llmMarkdownPlugin(options: Options): Plugin {
@@ -45,25 +47,74 @@ export function llmMarkdownPlugin(options: Options): Plugin {
     },
     async closeBundle() {
       if (!outDir) return;
-      await generateLlmMarkdown(options.srcDir, path.join(outDir, "llms"));
+      await generateLlmMarkdown(options.srcDir, outDir, {
+        title: options.title ?? "",
+        description: options.description ?? "",
+      });
     },
   };
 }
 
 export async function generateLlmMarkdown(
   srcDir: string,
-  outDir: string,
+  distDir: string,
+  meta: { title: string; description: string } = { title: "", description: "" },
 ): Promise<void> {
-  const files = await collectMarkdownFiles(srcDir);
-  await fs.rm(outDir, { recursive: true, force: true });
+  // ponytail: 按路径排序，编号目录即正确顺序；要严格 sidebar 顺序再读 themeConfig
+  const files = (await collectMarkdownFiles(srcDir)).sort();
+  const llmsDir = path.join(distDir, "llms");
+  await fs.rm(llmsDir, { recursive: true, force: true });
 
-  await Promise.all(
+  const pages = await Promise.all(
     files.map(async (file) => {
       const relativePath = normalizePath(path.relative(srcDir, file));
-      const output = path.join(outDir, relativePath);
+      const markdown = await renderLlmMarkdown(file, srcDir);
+      const output = path.join(llmsDir, relativePath);
       await fs.mkdir(path.dirname(output), { recursive: true });
-      await fs.writeFile(output, await renderLlmMarkdown(file, srcDir), "utf8");
+      await fs.writeFile(output, markdown, "utf8");
+      return { relativePath, markdown };
     }),
+  );
+
+  await writeLlmsIndex(distDir, pages, meta);
+}
+
+async function writeLlmsIndex(
+  distDir: string,
+  pages: { relativePath: string; markdown: string }[],
+  meta: { title: string; description: string },
+): Promise<void> {
+  const header = `# ${meta.title}\n${meta.description ? `\n> ${meta.description}\n` : ""}`;
+
+  // llms.txt：llmstxt.org 标准索引，逐页链接指向 .md 原文
+  const links = pages
+    .map((page) => {
+      const title = firstHeading(page.markdown) ?? page.relativePath;
+      return `- [${title}](${ORIGIN}/llms/${page.relativePath})`;
+    })
+    .join("\n");
+  await fs.writeFile(
+    path.join(distDir, "llms.txt"),
+    `${header}\n## 文档\n\n${links}\n`,
+    "utf8",
+  );
+
+  // llms-full.txt：全站正文拼接成单文件
+  const body = pages.map((page) => page.markdown.trim()).join("\n\n---\n\n");
+  await fs.writeFile(
+    path.join(distDir, "llms-full.txt"),
+    `${header}\n${body}\n`,
+    "utf8",
+  );
+}
+
+function firstHeading(markdown: string): string | null {
+  // 去掉 VitePress 自定义锚点 {#id}，标题更干净
+  return (
+    markdown
+      .match(/^#\s+(.+)$/m)?.[1]
+      .replace(/\s*\{#[\w-]+\}\s*$/, "")
+      .trim() ?? null
   );
 }
 
@@ -76,6 +127,7 @@ export async function renderLlmMarkdown(
   let markdown = await fs.readFile(file, "utf8");
 
   markdown = stripFrontmatter(markdown);
+  markdown = unwrapLlmOnly(markdown);
   markdown = await expandSnippets(markdown, srcDir);
   markdown = flattenVitePressContainers(markdown);
   markdown = absolutizeLinks(markdown, relativePath, origin);
@@ -237,6 +289,11 @@ function cleanRoute(route: string): string {
 
 function stripFrontmatter(markdown: string): string {
   return markdown.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, "");
+}
+
+// 去掉 <llm-only> 标记，保留其中内容（网页端由 CSS 隐藏，这里让正文进入 LLM 输出）
+function unwrapLlmOnly(markdown: string): string {
+  return markdown.replace(/<\/?llm-only(?:\s+[^>]*)?>/gi, "");
 }
 
 function languageFromFile(filePath: string): string {

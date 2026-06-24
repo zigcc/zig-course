@@ -1,0 +1,75 @@
+/* 只给 LLM 看：<llm-only> 的内容网页隐藏，仅进入 /llms、llms.txt、llms-full.txt */
+llm-only {
+  display: none;
+}
+
+.copy_llm {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 12px 0 24px;
+}
+
+.copy_llm-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.copy_llm-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--vp-c-text-2);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 24px;
+  cursor: pointer;
+  transition: color 0.25s;
+}
+
+.copy_llm-trigger:hover {
+  color: var(--vp-c-text-1);
+}
+
+.copy_llm-trigger:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.copy_llm-menu {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  z-index: 10;
+  min-width: 210px;
+  padding: 6px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg-elv);
+  box-shadow: var(--vp-shadow-3);
+}
+
+.copy_llm-item {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--vp-c-text-1);
+  text-align: left;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 18px;
+  transition: background-color 0.25s;
+}
+
+.copy_llm-item:hover,
+.copy_llm-item:focus-visible {
+  background: var(--vp-c-default-soft);
+  outline: none;
+}
