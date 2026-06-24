@@ -109,7 +109,13 @@ async function writeLlmsIndex(
 }
 
 function firstHeading(markdown: string): string | null {
-  return markdown.match(/^#\s+(.+)$/m)?.[1].trim() ?? null;
+  // 去掉 VitePress 自定义锚点 {#id}，标题更干净
+  return (
+    markdown
+      .match(/^#\s+(.+)$/m)?.[1]
+      .replace(/\s*\{#[\w-]+\}\s*$/, "")
+      .trim() ?? null
+  );
 }
 
 export async function renderLlmMarkdown(
@@ -287,7 +293,7 @@ function stripFrontmatter(markdown: string): string {
 
 // 去掉 <llm-only> 标记，保留其中内容（网页端由 CSS 隐藏，这里让正文进入 LLM 输出）
 function unwrapLlmOnly(markdown: string): string {
-  return markdown.replace(/<\/?llm-only\s*>/gi, "");
+  return markdown.replace(/<\/?llm-only(?:\s+[^>]*)?>/gi, "");
 }
 
 function languageFromFile(filePath: string): string {
