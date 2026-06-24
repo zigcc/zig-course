@@ -43,21 +43,19 @@ async function main(): Promise<void> {
   await mkdir(OUT_DIR, { recursive: true });
   await initHighlighter();
 
-  const fontCjk = (
-    await readFile(path.join(ROOT, "assets/fonts/zigcourse-cjk.ttf"))
-  ).toString("base64");
-  const fontSans = (
-    await readFile(path.join(ROOT, "assets/fonts/zigcourse-sans.ttf"))
-  ).toString("base64");
-  const fontMono = (
-    await readFile(path.join(ROOT, "assets/fonts/zigcourse-mono.ttf"))
-  ).toString("base64");
-  const fontCjkBold = (
-    await readFile(path.join(ROOT, "assets/fonts/zigcourse-cjk-bold.ttf"))
-  ).toString("base64");
-  const fontSansBold = (
-    await readFile(path.join(ROOT, "assets/fonts/zigcourse-sans-bold.ttf"))
-  ).toString("base64");
+  // 五份字体相互独立，并行读取并转 base64（顺手去掉 5 段重复的 readFile 样板）。
+  const readFontB64 = (name: string): Promise<string> =>
+    readFile(path.join(ROOT, `assets/fonts/${name}.ttf`)).then((b) =>
+      b.toString("base64"),
+    );
+  const [fontCjk, fontSans, fontMono, fontCjkBold, fontSansBold] =
+    await Promise.all([
+      readFontB64("zigcourse-cjk"),
+      readFontB64("zigcourse-sans"),
+      readFontB64("zigcourse-mono"),
+      readFontB64("zigcourse-cjk-bold"),
+      readFontB64("zigcourse-sans-bold"),
+    ]);
 
   let nodes: FlatNode[] = flattenSidebar(sidebar as DefaultTheme.SidebarItem[]);
   // 仅对页面节点应用排除；分组节点保留（其下无页面会被自动跳过）。
