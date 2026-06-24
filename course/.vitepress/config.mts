@@ -28,6 +28,13 @@ export default defineConfig({
     },
   },
   vite: {
+    // 该插件以未编译的 .vue 形式发布，SSR 构建需交给 Vite 处理
+    ssr: {
+      noExternal: [
+        "@nolebase/vitepress-plugin-enhanced-readabilities",
+        "@nolebase/ui",
+      ],
+    },
     plugins: [
       llmMarkdownPlugin({
         srcDir: path.resolve(

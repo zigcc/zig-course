@@ -12,6 +12,7 @@
     "epub": "bun run course/.vitepress/epub/build.ts"
   },
   "devDependencies": {
+    "@nolebase/vitepress-plugin-enhanced-readabilities": "^2.18.2",
     "@resvg/resvg-js": "^2.6.2",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^26.0.0",
