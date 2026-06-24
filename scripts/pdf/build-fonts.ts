@@ -1,5 +1,5 @@
 // scripts/pdf/build-fonts.ts
-// 生成内嵌 PDF 用的子集字体：assets/fonts/zigcourse-{cjk,sans,mono}.ttf
+// 生成内嵌 PDF 用的子集字体：assets/fonts/zigcourse-{cjk,sans,mono,cjk-bold,sans-bold}.ttf
 //
 // 纯 Bun/JS：用 subset-font(harfbuzz) 从 Google Fonts 的 glyf 型「可变字体」
 // 做「子集 + 钉轴」，输出只含课程用到字形的静态 glyf TrueType。
@@ -49,6 +49,21 @@ const FONTS = [
     file: "JetBrainsMono.ttf",
     url: `${GF}/jetbrainsmono/JetBrainsMono%5Bwght%5D.ttf`,
     axes: { wght: 400 },
+  },
+  // 粗体子集（wght:700）：用于 **加粗** 富文本，采用真粗体字形而非描边伪粗体，
+  // 从根本上避免“描边外扩吃掉中文字间距/行距导致字符重叠/挤压”的问题，与 EPUB 端一致。
+  // 复用同一份可变字体源文件（串行循环里 fetchFont 命中缓存，不会重复下载），只是把 wght 轴钉到 700。
+  {
+    name: "cjk-bold",
+    file: "NotoSerifSC.ttf",
+    url: `${GF}/notoserifsc/NotoSerifSC%5Bwght%5D.ttf`,
+    axes: { wght: 700 },
+  },
+  {
+    name: "sans-bold",
+    file: "Inter.ttf",
+    url: `${GF}/inter/Inter%5Bopsz,wght%5D.ttf`,
+    axes: { wght: 700, opsz: 14 },
   },
 ] as const;
 

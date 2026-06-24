@@ -65,6 +65,8 @@ export interface RendererOptions {
   fontCjk: string; // base64 — 思源宋体（中文正文）
   fontSans: string; // base64 — Inter（正文英文/数字，无衬线比例字体）
   fontMono: string; // base64 — JetBrains Mono（代码/行内代码，等宽）
+  fontCjkBold: string; // base64 — 思源宋体 700（中文加粗）
+  fontSansBold: string; // base64 — Inter 700（英文/数字加粗）
   courseDir: string;
 }
 
@@ -85,7 +87,14 @@ export class PdfRenderer {
   /** 单元格默认字色（标题渲染时临时覆盖）。 */
   private _cellDefaultColor: [number, number, number] | null = null;
 
-  constructor({ fontCjk, fontSans, fontMono, courseDir }: RendererOptions) {
+  constructor({
+    fontCjk,
+    fontSans,
+    fontMono,
+    fontCjkBold,
+    fontSansBold,
+    courseDir,
+  }: RendererOptions) {
     this.courseDir = courseDir;
     this.doc = new jsPDF({ unit: "mm", format: "a4" });
     // 三字体（均为 glyf TrueType，jsPDF 可解析）：
@@ -98,6 +107,13 @@ export class PdfRenderer {
     this.doc.addFont("Sans.ttf", "Sans", "normal");
     this.doc.addFileToVFS("Mono.ttf", fontMono);
     this.doc.addFont("Mono.ttf", "Mono", "normal");
+    // 真粗体字型（wght:700）：注册为同名字体族的 "bold" 风格，setFont(name, "bold") 即可切换。
+    // 关键：用真粗体字形后 getTextWidth 返回粗体自身的 advance 宽度，排版按真实宽度推进，
+    // 从根本上消除描边伪粗体导致的中文字符重叠/行距挤压（与 EPUB 端真粗体方案一致）。
+    this.doc.addFileToVFS("CJK-Bold.ttf", fontCjkBold);
+    this.doc.addFont("CJK-Bold.ttf", "CJK", "bold");
+    this.doc.addFileToVFS("Sans-Bold.ttf", fontSansBold);
+    this.doc.addFont("Sans-Bold.ttf", "Sans", "bold");
     this.doc.setFont("CJK", "normal");
 
     this.y = MARGIN.top;
@@ -323,7 +339,10 @@ export class PdfRenderer {
         // CJK 走 CJK 字体；正文英文走无衬线 Sans；行内代码走等宽 Mono
         const isCjkPiece = this.isCjk(piece[0] || "");
         const fn = isCode ? "Mono" : isCjkPiece ? cjkFont : "Sans";
-        this.doc.setFont(fn, "normal");
+        // 加粗用真粗体字型（仅 CJK/Sans 有 bold 变体；Mono 行内代码保持 normal）。
+        // 用 bold 字体测宽，getTextWidth 返回粗体真实 advance，排版按真实宽度推进。
+        const style = bold && fn !== "Mono" ? "bold" : "normal";
+        this.doc.setFont(fn, style);
         const w = this.doc.getTextWidth(piece);
         if (x + w > startX + maxW && piece !== " ") {
           x = startX;
@@ -349,17 +368,8 @@ export class PdfRenderer {
           }
           this.doc.setTextColor(20, 90, 200);
         }
-        if (!this._dry) {
-          if (bold) {
-            // 伪粗体：用填充 + 描边模式加粗笔画（无需额外 bold 字体）
-            const dc = link ? [20, 90, 200] : [30, 30, 30];
-            this.doc.setDrawColor(dc[0], dc[1], dc[2]);
-            this.doc.setLineWidth(0.25);
-            this.doc.text(piece, x, curY, { renderingMode: "fillThenStroke" });
-          } else {
-            this.doc.text(piece, x, curY);
-          }
-        }
+        // 用真粗体字形绘制（style 已按 bold 设好），不再使用描边伪粗体。
+        if (!this._dry) this.doc.text(piece, x, curY);
         if (link && !this._dry) this.doc.setTextColor(30, 30, 30);
         x += w;
       }

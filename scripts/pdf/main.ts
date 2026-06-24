@@ -52,6 +52,12 @@ async function main(): Promise<void> {
   const fontMono = (
     await readFile(path.join(ROOT, "assets/fonts/zigcourse-mono.ttf"))
   ).toString("base64");
+  const fontCjkBold = (
+    await readFile(path.join(ROOT, "assets/fonts/zigcourse-cjk-bold.ttf"))
+  ).toString("base64");
+  const fontSansBold = (
+    await readFile(path.join(ROOT, "assets/fonts/zigcourse-sans-bold.ttf"))
+  ).toString("base64");
 
   let nodes: FlatNode[] = flattenSidebar(sidebar as DefaultTheme.SidebarItem[]);
   // 仅对页面节点应用排除；分组节点保留（其下无页面会被自动跳过）。
@@ -68,6 +74,8 @@ async function main(): Promise<void> {
     fontCjk,
     fontSans,
     fontMono,
+    fontCjkBold,
+    fontSansBold,
     courseDir: COURSE,
   });
 
