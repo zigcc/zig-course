@@ -13,6 +13,7 @@
         "@types/node": "^26.0.0",
         "jspdf": "^4.2.1",
         "jszip": "^3.10.1",
+        "less": "^4.4.0",
         "markdown-it": "^14.2.0",
         "marked": "^18.0.5",
         "prettier": "^3.8.4",
