@@ -271,11 +271,11 @@ export default [
         link: "/appendix/contributor-covenant",
       },
       {
-        text: "社区",
+        text: "社区与资源",
         link: "/appendix/community",
       },
       {
-        text: "第三方库",
+        text: "第三方项目",
         link: "/appendix/well-known-lib",
       },
     ],
