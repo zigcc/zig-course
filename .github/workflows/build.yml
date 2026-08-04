@@ -28,10 +28,13 @@ jobs:
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
+      # checkout 必须在 setup-zig 之前：checkout 的 clean 会清掉 setup-zig
+      # 恢复的本地 .zig-cache
+      - uses: actions/checkout@v4
       - name: Setup Zig
-        uses: goto-bus-stop/setup-zig@v2
+        uses: mlugg/setup-zig@v2
         with:
           version: ${{ matrix.version }}
-      - uses: actions/checkout@v4
+          cache-key: ${{ matrix.version }}
       - name: Build test
         run: zig build
