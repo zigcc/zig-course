@@ -1,7 +1,7 @@
 // scripts/pdf/build-fonts.ts
 // 生成内嵌 PDF 用的子集字体：assets/fonts/zigcourse-{cjk,sans,mono,cjk-bold,sans-bold}.ttf
 //
-// 纯 Bun/JS：用 subset-font(harfbuzz) 从 Google Fonts 的 glyf 型「可变字体」
+// 纯 JS：用 subset-font(harfbuzz) 从 Google Fonts 的 glyf 型「可变字体」
 // 做「子集 + 钉轴」，输出只含课程用到字形的静态 glyf TrueType。
 //   - jsPDF 只能内嵌 glyf 型 TrueType；三个源都是 glyf 可变字体，无需任何 CFF->glyf 转换。
 //   - 课程文本 / 侧边栏标题变化后重跑本脚本并提交产物即可。CI 只消费已提交的 TTF。
@@ -11,7 +11,7 @@
 //   sans = Inter                                              → 正文英文/数字（无衬线）
 //   mono = JetBrains Mono                                     → 代码/行内代码（等宽）
 //
-// 运行：bun run scripts/pdf/build-fonts.ts（或 bun pdf:fonts）
+// 运行：node scripts/pdf/build-fonts.ts（或 pnpm pdf:fonts）
 import subsetFont from "subset-font";
 import {
   readFileSync,

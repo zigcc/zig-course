@@ -22,11 +22,11 @@ VitePress 同款的 [Shiki](https://shiki.style/) 引擎。
 ### 运行方式
 
 ```bash
-bun pdf          # 全量构建 -> books/zig_course.pdf
-bun pdf:sample   # 仅渲染几篇代表页 -> books/zig_course_sample.pdf（快速验证，秒级）
+pnpm pdf          # 全量构建 -> books/zig_course.pdf
+pnpm pdf:sample   # 仅渲染几篇代表页 -> books/zig_course_sample.pdf（快速验证，秒级）
 ```
 
-两个脚本都通过 [Bun](https://bun.sh) **直接执行 TypeScript**（`bun run scripts/pdf/main.ts`），
+两个脚本都由 Node.js **直接执行 TypeScript**（`node scripts/pdf/main.ts`，依赖 Node >= 23.6 的原生类型擦除），
 无需预编译或 tsx。类型检查（不产出文件）：
 
 ```bash
@@ -122,7 +122,7 @@ renderer.output()  ->  books/zig_course.pdf
 `codespan` 行内代码）走 `Mono`；其余正文拉丁走 `Sans`。字体子集**不含 emoji**，因此提示框
 标题会先经 `cleanAdmonitionTitle` 去除 emoji，否则会出现缺字形并把文字推偏。
 
-> 字体由 `build-fonts.ts`（纯 Bun/JS，`subset-font`/harfbuzz）从 Google Fonts 的 glyf 型
+> 字体由 `build-fonts.ts`（纯 JS，`subset-font`/harfbuzz）从 Google Fonts 的 glyf 型
 > **可变字体**「子集 + 钉轴（wght=400 等）」生成静态 TTF。**jsPDF 只能内嵌 glyf 型 TrueType**，
 > 三个源（Noto Serif SC / Inter / JetBrains Mono）都是 glyf，无需任何 CFF→glyf 转换。
 > 换字体务必选 glyf 型来源（CFF/OTF 会被 jsPDF 静默拒绝、渲染空白）。
@@ -194,7 +194,7 @@ routeStart / pendingLink.page"的代码，一律用 `curPage()`，不要用 `thi
 - **`trimBlankEdges`**：去首尾空行、保留中间空行（维持代码逻辑分组）。
 
 > 历史 bug 提醒：早期缺 `dedent` → 作用域内的代码片段在 PDF 里整体偏右；早期把整行
-> region 结束标记当作跳过 → 丢失闭合 `}`。改这块时请用 `bun pdf:sample` 渲染 hello-world /
+> region 结束标记当作跳过 → 丢失闭合 `}`。改这块时请用 `pnpm pdf:sample` 渲染 hello-world /
 > error_handle 页核对闭合括号与左对齐。
 
 ---
@@ -209,9 +209,9 @@ routeStart / pendingLink.page"的代码，一律用 `curPage()`，不要用 `thi
 3. **字体**：读取 `zigcourse-cjk.ttf`（Noto Serif SC=思源宋体同源）、`zigcourse-sans.ttf`（Inter）、
    `zigcourse-mono.ttf`（JetBrains Mono），均为子集化的静态 glyf TrueType，由 `build-fonts.ts`
    生成（见 §5.2）。更换字体需同为可被 jsPDF 解析的 glyf TrueType。
-4. **npm 脚本**：`package.json` 已注册 `pdf` / `pdf:sample`（`bun run scripts/pdf/main.ts`）
+4. **npm 脚本**：`package.json` 已注册 `pdf` / `pdf:sample`（`node scripts/pdf/main.ts`）
    与 `pdf:fonts`（重新生成子集字体）。
-5. **运行时依赖**：`shiki`、`jspdf`、`marked`、`sharp`（均在 `devDependencies`）；用 Bun 直接跑 TS。
+5. **运行时依赖**：`shiki`、`jspdf`、`marked`、`sharp`（均在 `devDependencies`）；用 Node 直接跑 TS。
    字体子集脚本 `build-fonts.ts` 另需 `subset-font`（纯 JS，已在 `devDependencies`），仅在重新生成字体时使用。
 
 ---
@@ -222,7 +222,7 @@ routeStart / pendingLink.page"的代码，一律用 `curPage()`，不要用 `thi
 
 1. `parse.ts`：在 `ALERT_MAP`（GitHub alert）或 `transformContainers` 的 `TYPE_RE` 中登记新类型。
 2. `renderer.ts`：在 `drawAdmonition` 的 `styles` / `defaultTitles` 增加配色与默认标题。
-3. 用 `bun pdf:sample` 渲染含该容器的页面核对。
+3. 用 `pnpm pdf:sample` 渲染含该容器的页面核对。
 
 ### 8.2 支持一种新的行内/块级 Markdown 语法
 
@@ -245,7 +245,7 @@ routeStart / pendingLink.page"的代码，一律用 `curPage()`，不要用 `thi
 - **两遍渲染**的回滚用 `snap.realPage` 精确 `setPage`（见 §5.5）。
 - dry-run 期间**不得**绘制、写 anchor 或入 pendingLinks（用 `if (!this._dry)` 守卫）。
 - 保持模块依赖无环；新增工具函数优先放 `utils.ts`。
-- 改完必须通过 `tsc --noEmit` 与 `prettier --check`，并用 `bun pdf:sample` 做视觉回归。
+- 改完必须通过 `tsc --noEmit` 与 `prettier --check`，并用 `pnpm pdf:sample` 做视觉回归。
 
 ---
 
@@ -259,9 +259,9 @@ node_modules/.bin/tsc --noEmit -p scripts/pdf/tsconfig.json
 # 2) 代码风格
 node_modules/.bin/prettier --check "scripts/pdf/*.ts"
 # 3) 快速视觉回归（秒级）
-bun pdf:sample
+pnpm pdf:sample
 # 4) 全量构建
-bun pdf
+pnpm pdf
 ```
 
 **视觉回归关注点**（用 `pdftoppm` 渲染对应页人工核对）：
@@ -288,4 +288,4 @@ bun pdf
 | 列表圆点偏上/偏下             | pt 当 mm 直接相加；`dotCy` 需 `size * k * 0.3528` 换算          |
 | 提示框标题出现缺字形方块      | 标题含 emoji；`cleanAdmonitionTitle` 未生效或字体不含该字形     |
 | 中文/英文整页空白、字体不显示 | 字体是 CFF/OTF，jsPDF 静默拒绝；换 glyf 型来源（见 §5.2）       |
-| 新加字符渲染为缺字形方块      | 子集未含该字形；改完课程文本后重跑 `bun pdf:fonts`              |
+| 新加字符渲染为缺字形方块      | 子集未含该字形；改完课程文本后重跑 `pnpm pdf:fonts`             |

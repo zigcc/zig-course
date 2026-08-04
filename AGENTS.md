@@ -68,8 +68,8 @@ zig-course/
 │       ├── autocorrect.yml     # 中文文本格式检查
 │       └── pdf.yml             # PDF 导出流程
 │
-├── package.json                # Node.js 依赖（Bun）
-├── bun.lock                    # Bun 锁文件
+├── package.json                # Node.js 依赖（pnpm）
+├── pnpm-lock.yaml              # pnpm 锁文件
 └── flake.nix                   # Nix 开发环境
 ```
 
@@ -93,26 +93,26 @@ zig build
 
 ```bash
 # 启动带热重载的开发服务器
-bun dev
+pnpm dev
 
 # 构建生产站点
-bun build
+pnpm build
 
 # 预览构建后的站点
-bun preview
+pnpm preview
 
 # 导出 PDF 版本
-bun export-pdf
+pnpm pdf
 ```
 
 ### 代码格式化
 
 ```bash
 # 格式化所有代码（Markdown、Zig、中文文本）
-bun format
+pnpm format
 
 # 检查格式但不修改文件
-bun check
+pnpm check
 ```
 
 这会运行：
@@ -387,13 +387,13 @@ zig build
 zig build test
 
 # 3. 格式化所有文件
-bun format
+pnpm format
 
 # 4. 检查格式
-bun check
+pnpm check
 
 # 5. 本地预览文档
-bun dev
+pnpm dev
 ```
 
 ### 代码片段标记详解
@@ -499,6 +499,6 @@ pub fn main() void {
 
 4. 验证
    zig build          # 编译验证
-   bun format         # 格式化
-   bun dev            # 本地预览
+   pnpm format         # 格式化
+   pnpm dev            # 本地预览
 ```

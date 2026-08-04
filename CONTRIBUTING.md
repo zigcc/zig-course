@@ -8,4 +8,4 @@
 - 等待 review
 - 合并到上游仓库，并由 github action 自动构建
 
-注意：本文档所使用的构建工具为 [bunjs](https://bun.sh/)，在提交时请勿将其他 nodejs 的包管理工具的额外配置文件添加到仓库中。
+注意：本文档所使用的包管理器为 [pnpm](https://pnpm.io/)，在提交时请勿将其他包管理工具的额外配置文件（如 `package-lock.json`、`yarn.lock`）添加到仓库中。

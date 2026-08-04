@@ -15,9 +15,9 @@ import {
   normalizeInternalLink,
   resolveImagePath,
   type InternalTarget,
-} from "./utils.js";
-import { highlightToLines, hexToRgb, type HlLine } from "./highlight.js";
-import type { PdfToken, AdmonitionToken } from "./parse.js";
+} from "./utils.ts";
+import { highlightToLines, hexToRgb, type HlLine } from "./highlight.ts";
+import type { PdfToken, AdmonitionToken } from "./parse.ts";
 
 const A4 = { w: 210, h: 297 } as const;
 const MARGIN = { top: 20, bottom: 20, left: 18, right: 18 } as const;
@@ -57,8 +57,7 @@ interface RenderCtx {
 
 /** 任意带 tokens 字段的 inline token 兼容形态。 */
 type InlineToken =
-  | Token
-  | { type: string; text?: string; tokens?: Token[]; href?: string };
+  Token | { type: string; text?: string; tokens?: Token[]; href?: string };
 
 /** 构造参数。 */
 export interface RendererOptions {

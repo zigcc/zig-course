@@ -83,7 +83,7 @@ zig-course/
 
 ### 环境要求
 
-- **Node.js**: 推荐使用 [Bun](https://bun.sh/) 作为包管理器
+- **Node.js**: 需要 Node.js >= 23.6（脚本依赖原生 TypeScript 支持），包管理器使用 [pnpm](https://pnpm.io/)
 - **Zig**: 支持 0.11-0.16 版本
 - **autocorrect**: 用于中英文排版优化（可选）
 
@@ -95,10 +95,10 @@ git clone https://github.com/zigcc/zig-course.git
 cd zig-course
 
 # 安装依赖
-bun install
+pnpm install
 
 # 启动开发服务器
-bun dev
+pnpm dev
 
 # 在浏览器中访问 http://localhost:5173
 ```
@@ -106,14 +106,14 @@ bun dev
 ### 可用命令
 
 ```sh
-bun run dev          # 启动开发服务器（热重载）
-bun run build        # 构建生产版本
-bun run preview      # 预览构建结果
-bun run format       # 格式化代码（prettier + zig fmt + autocorrect）
-bun run check        # 检查代码格式
-bun run pdf          # 导出 PDF 版本（jsPDF 离线生成 -> books/zig_course.pdf）
-bun run pdf:sample   # 仅渲染几篇代表页快速验证 -> books/zig_course_sample.pdf
-bun run epub         # 导出 EPUB3 电子书 -> books/zig-course.epub
+pnpm run dev          # 启动开发服务器（热重载）
+pnpm run build        # 构建生产版本
+pnpm run preview      # 预览构建结果
+pnpm run format       # 格式化代码（prettier + zig fmt + autocorrect）
+pnpm run check        # 检查代码格式
+pnpm run pdf          # 导出 PDF 版本（jsPDF 离线生成 -> books/zig_course.pdf）
+pnpm run pdf:sample   # 仅渲染几篇代表页快速验证 -> books/zig_course_sample.pdf
+pnpm run epub         # 导出 EPUB3 电子书 -> books/zig-course.epub
 ```
 
 ## 🤝 参与贡献
@@ -159,13 +159,13 @@ bun run epub         # 导出 EPUB3 电子书 -> books/zig-course.epub
 3. **进行修改**
    - 遵循现有的代码风格和文档格式
    - 确保所有代码示例都能正常运行
-   - 运行 `bun format` 格式化代码
+   - 运行 `pnpm format` 格式化代码
 
 4. **测试修改**
 
    ```sh
-   bun dev    # 本地测试
-   bun build  # 确保构建成功
+   pnpm dev    # 本地测试
+   pnpm build  # 确保构建成功
    ```
 
 5. **提交更改**
@@ -186,7 +186,7 @@ bun run epub         # 导出 EPUB3 电子书 -> books/zig-course.epub
 ### 贡献规范
 
 - **提交信息**: 使用 [约定式提交](https://www.conventionalcommits.org/zh-hans/) 格式
-- **代码风格**: 运行 `bun format` 确保代码格式一致
+- **代码风格**: 运行 `pnpm format` 确保代码格式一致
 - **文档规范**:
   - 中英文之间添加空格
   - 使用中文标点符号
@@ -223,10 +223,10 @@ bun run epub         # 导出 EPUB3 电子书 -> books/zig-course.epub
 
 ## 📋 开发注意事项
 
-- **包管理器**: 本项目使用 [Bun](https://bun.sh/)，请勿提交其他包管理器的配置文件
-- **依赖更新**: 更新依赖前请参考 [Bun Lockfile 文档](https://bun.sh/docs/install/lockfile)
-- **格式化**: 提交前务必运行 `bun format` 进行代码格式化
-- **构建测试**: 确保 `bun build` 能成功构建
+- **包管理器**: 本项目使用 [pnpm](https://pnpm.io/)，请勿提交其他包管理器的配置文件
+- **依赖更新**: 更新依赖后请一并提交 `pnpm-lock.yaml`
+- **格式化**: 提交前务必运行 `pnpm format` 进行代码格式化
+- **构建测试**: 确保 `pnpm build` 能成功构建
 
 ## 📄 许可证
 

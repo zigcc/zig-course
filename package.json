@@ -6,10 +6,14 @@
     "build": "vitepress build course",
     "preview": "vitepress preview course",
     "check": "prettier --check .",
-    "pdf": "bun run scripts/pdf/main.ts",
-    "pdf:sample": "bun run scripts/pdf/main.ts --sample",
-    "pdf:fonts": "bun run scripts/pdf/build-fonts.ts",
-    "epub": "bun run course/.vitepress/epub/build.ts"
+    "pdf": "node scripts/pdf/main.ts",
+    "pdf:sample": "node scripts/pdf/main.ts --sample",
+    "pdf:fonts": "node scripts/pdf/build-fonts.ts",
+    "epub": "node course/.vitepress/epub/build.ts"
+  },
+  "packageManager": "pnpm@11.3.0",
+  "engines": {
+    "node": ">=23.6"
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.2",
@@ -31,8 +35,5 @@
   },
   "dependencies": {
     "@giscus/vue": "^3.1.1"
-  },
-  "trustedDependencies": [
-    "core-js"
-  ]
+  }
 }

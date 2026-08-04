@@ -1,11 +1,11 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 /**
  * 将 zig-course（VitePress）转换为 EPUB3 电子书。
  *
  * 用法：
- *   bun run course/.vitepress/epub/build.ts
+ *   node course/.vitepress/epub/build.ts
  * 或经由 package.json 脚本：
- *   bun run export-epub
+ *   pnpm epub
  *
  * 纯 TypeScript 实现，零 Python 依赖。字体在构建时下载并即时子集化。
  */

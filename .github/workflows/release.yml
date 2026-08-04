@@ -17,19 +17,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: 24
+          cache: pnpm
 
-      - name: Install dependencies with Bun
-        run: bun install
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Export PDF with Bun
-        run: bun pdf
+      - name: Export PDF
+        run: pnpm pdf
 
-      - name: Export EPUB with Bun
-        run: bun epub
+      - name: Export EPUB
+        run: pnpm epub
 
       - name: Create and Upload Release
         uses: softprops/action-gh-release@v2
