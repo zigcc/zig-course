@@ -14,9 +14,6 @@ importers:
       "@resvg/resvg-js":
         specifier: ^2.6.2
         version: 2.6.2
-      "@types/markdown-it":
-        specifier: ^14.1.2
-        version: 14.1.2
       "@types/node":
         specifier: ^26.1.1
         version: 26.1.2
