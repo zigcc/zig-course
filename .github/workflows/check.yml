@@ -5,25 +5,44 @@ on:
   pull_request:
     branches: [main]
 
+# 本工作流会安装依赖并执行 PR 中的代码，权限收到最小
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0 # Not needed if lastUpdated is not enabled
-      - uses: oven-sh/setup-bun@v2
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: 24
+          cache: pnpm
       - name: Install dependencies
-        run: bun i
+        run: pnpm install --frozen-lockfile
       - name: check
-        run: bun check
+        run: pnpm check
   lint:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Setup Zig
-        uses: goto-bus-stop/setup-zig@v2
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.16.0
+      # 0.12 / 0.14 的 assembly.zig 使用旧的内联汇编 clobbers 语法，
+      # 新版 zig 无法解析，只能排除
       - name: Verify formatting
-        run: zig fmt .
+        run: |
+          zig fmt --check \
+            --exclude course/code/12/assembly.zig \
+            --exclude course/code/14/assembly.zig \
+            .

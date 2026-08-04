@@ -1,7 +1,5 @@
 import MarkdownIt from "markdown-it";
-import type { Options as MarkdownItOptions } from "markdown-it";
-import type Renderer from "markdown-it/lib/renderer.mjs";
-import type Token from "markdown-it/lib/token.mjs";
+import type { MarkdownIt as MarkdownItInstance } from "markdown-it";
 import { createHighlighter, type Highlighter } from "shiki";
 import type { EpubConfig } from "./config.ts";
 import { slugify } from "./links.ts";
@@ -46,13 +44,15 @@ ${bodyInner}
 }
 
 /** 创建已配置好 Shiki 高亮与中文锚点的 markdown-it 实例 */
-export async function createRenderer(config: EpubConfig): Promise<MarkdownIt> {
+export async function createRenderer(
+  config: EpubConfig,
+): Promise<MarkdownItInstance> {
   const highlighter: Highlighter = await createHighlighter({
     themes: [config.shikiTheme],
     langs: config.shikiLangs,
   });
 
-  const md: MarkdownIt = new MarkdownIt({
+  const md: MarkdownItInstance = new MarkdownIt({
     html: true,
     linkify: true,
     breaks: false,
@@ -71,19 +71,19 @@ export async function createRenderer(config: EpubConfig): Promise<MarkdownIt> {
   });
 
   // 标题加 id（中文 slug），并做每文档去重，避免同页重复 ID（与 VitePress 行为一致）
-  md.renderer.rules.heading_open = function (
-    tokens: Token[],
-    idx: number,
-    options: MarkdownItOptions,
-    env: { slugCounts?: Record<string, number> },
-    self: Renderer,
-  ) {
+  // 参数类型由 markdown-it 的 RendererRule 上下文推断，不要手写标注
+  md.renderer.rules.heading_open = function (tokens, idx, options, env, self) {
     const token = tokens[idx]!;
     const inline = tokens[idx + 1];
     const text = inline && inline.type === "inline" ? inline.content : "";
     let id = slugify(text);
     if (id) {
-      const counts: Record<string, number> = (env.slugCounts ??= {});
+      // env 由 build.ts 逐章传入 slugCounts，用于同页标题 ID 去重。
+      // 必须是无原型对象：标题可 slug 成 constructor / __proto__ 等，
+      // 普通对象会从原型链继承这些名字，导致首次出现即被判为重复
+      const scoped = (env ?? {}) as { slugCounts?: Record<string, number> };
+      const counts: Record<string, number> = (scoped.slugCounts ??=
+        Object.create(null));
       if (counts[id] === undefined) counts[id] = 0;
       else id = `${id}-${++counts[id]}`;
       token.attrSet("id", id);

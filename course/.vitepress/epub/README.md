@@ -1,12 +1,12 @@
 # EPub 导出工具
 
-将本仓库（VitePress 教程）一键导出为符合 **EPUB 3.3** 规范的电子书。纯 TypeScript 实现，运行于 Bun，**无 Python 等外部运行时依赖**。
+将本仓库（VitePress 教程）一键导出为符合 **EPUB 3.3** 规范的电子书。纯 TypeScript 实现，由 Node.js 直接执行，**无 Python 等外部运行时依赖**。
 
 ## 使用
 
 ```bash
-bun install   # 安装依赖（首次）
-bun run epub  # 生成 books/zig-course.epub
+pnpm install   # 安装依赖（首次）
+pnpm run epub  # 生成 books/zig-course.epub
 ```
 
 构建产物默认写入仓库根目录的 `books/zig-course.epub`，可在 `config.ts` 中调整。

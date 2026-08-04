@@ -2,19 +2,19 @@
 // 主入口：读取项目 sidebar -> 逐页解析 markdown -> jsPDF 渲染 -> 绑定链接 -> 写书签 -> 输出。
 //
 // 运行方式（已在 package.json 注册）：
-//   bun pdf            # 全量构建 -> books/zig_course.pdf
-//   bun pdf:sample     # 仅渲染几篇代表性页面，快速验证
+//   pnpm pdf            # 全量构建 -> books/zig_course.pdf
+//   pnpm pdf:sample     # 仅渲染几篇代表性页面，快速验证
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { DefaultTheme } from "vitepress";
-import { flattenSidebar, type FlatNode } from "./utils.js";
-import { parseMarkdown } from "./parse.js";
-import { PdfRenderer } from "./renderer.js";
-import { initHighlighter } from "./highlight.js";
+import { flattenSidebar, type FlatNode } from "./utils.ts";
+import { parseMarkdown } from "./parse.ts";
+import { PdfRenderer } from "./renderer.ts";
+import { initHighlighter } from "./highlight.ts";
 // 直接复用项目同一份 sidebar 数据源（与网页目录完全一致），不再 eval TS。
-import sidebar from "../../course/.vitepress/sidebar.js";
+import sidebar from "../../course/.vitepress/sidebar.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "../..");

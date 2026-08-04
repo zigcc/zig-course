@@ -8,11 +8,11 @@
 ## 使用
 
 ```bash
-bun pdf          # 全量构建 -> books/zig_course.pdf
-bun pdf:sample   # 仅渲染几篇代表页 -> books/zig_course_sample.pdf（快速验证）
+pnpm pdf          # 全量构建 -> books/zig_course.pdf
+pnpm pdf:sample   # 仅渲染几篇代表页 -> books/zig_course_sample.pdf（快速验证）
 ```
 
-本项目用 [Bun](https://bun.sh) 直接执行 TypeScript，无需预编译或 tsx。运行依赖：
+本项目用 Node.js（>= 24，原生类型擦除）直接执行 TypeScript，无需预编译或 tsx。运行依赖：
 `shiki`、`jspdf`、`marked`、`sharp`（均在 `devDependencies` 中）。
 
 ## 设计概览
@@ -31,11 +31,11 @@ bun pdf:sample   # 仅渲染几篇代表页 -> books/zig_course_sample.pdf（快
 1. **同源 sidebar**：`main.ts` 直接 `import sidebar from "../../course/.vitepress/sidebar.js"`，
    PDF 目录与网页侧边栏始终一致，无需维护第二份顺序表。
 2. **排除路由**：`main.ts` 的 `EXCLUDE` 当前**仅排除 `/code/**`**（纯代码片段目录，
-由正文以 `<<<@` 引用导入，本身非正文页面）。`appendix / update / about / epilogue`等章节均收入 PDF。调整收录范围改`EXCLUDE` 即可。
+   由正文以 `<<<@` 引用导入，本身非正文页面）。`appendix / update / about / epilogue`等章节均收入 PDF。调整收录范围改`EXCLUDE` 即可。
 3. **字体**：三套——`zigcourse-cjk.ttf`（Noto Serif SC，即思源宋体同源设计，中文）、
    `zigcourse-sans.ttf`（Inter，正文英文/数字，无衬线）、`zigcourse-mono.ttf`
    （JetBrains Mono，代码/行内代码）。CJK / 正文拉丁 / 代码三路分流绘制。三个 TTF 均为子集
-   （只含课程用到的字形）。课程文本变化后用 `bun pdf:fonts` 重新生成并提交。
+   （只含课程用到的字形）。课程文本变化后用 `pnpm pdf:fonts` 重新生成并提交。
 
 ### 处理的 VitePress 语法
 
@@ -54,6 +54,6 @@ bun pdf:sample   # 仅渲染几篇代表页 -> books/zig_course_sample.pdf（快
 
 ## 备注
 
-字体子集脚本 `build-fonts.ts` 是**纯 Bun/JS**：用 `subset-font`（harfbuzz）从 Google Fonts
+字体子集脚本 `build-fonts.ts` 是**纯 JS**：用 `subset-font`（harfbuzz）从 Google Fonts
 的 glyf 型可变字体「子集 + 钉轴」生成静态 TTF，无需 Python 或任何 CFF→glyf 转换。仅在重新
-生成字体时运行；CI 与日常 `bun pdf` 只消费已提交的子集 TTF。
+生成字体时运行；CI 与日常 `pnpm pdf` 只消费已提交的子集 TTF。

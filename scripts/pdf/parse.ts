@@ -8,7 +8,7 @@
 //           容器渲染为：标记行 [[ADMONITION:type:title]] + 内部原样内容 + [[/ADMONITION]]
 //   step D: 剥离图片/链接后的 {data-zoomable} 等 VitePress 属性指令
 import { marked, type Token, type Tokens } from "marked";
-import { resolveCodeImport } from "./utils.js";
+import { resolveCodeImport } from "./utils.ts";
 
 /** 自定义的提示框 token：收拢容器/alert 内部内容。 */
 export interface AdmonitionToken {
