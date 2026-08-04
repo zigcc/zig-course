@@ -25,7 +25,17 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Setup Zig
         uses: goto-bus-stop/setup-zig@v2
+        with:
+          version: 0.16.0
+      # 0.12 / 0.14 的 assembly.zig 使用旧的内联汇编 clobbers 语法，
+      # 新版 zig 无法解析，只能排除
       - name: Verify formatting
-        run: zig fmt .
+        run: |
+          zig fmt --check \
+            --exclude course/code/12/assembly.zig \
+            --exclude course/code/14/assembly.zig \
+            .
