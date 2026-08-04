@@ -17,6 +17,10 @@ on:
 
   workflow_call:
 
+# zig build 会执行 PR 中的构建代码，权限收到最小
+permissions:
+  contents: read
+
 jobs:
   build:
     strategy:
@@ -30,7 +34,10 @@ jobs:
     steps:
       # checkout 必须在 setup-zig 之前：checkout 的 clean 会清掉 setup-zig
       # 恢复的本地 .zig-cache
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          # 不把 github.token 写进 .git/config，避免被 PR 中的构建代码读走
+          persist-credentials: false
       - name: Setup Zig
         uses: mlugg/setup-zig@v2
         with:
