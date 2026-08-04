@@ -12,7 +12,7 @@ pnpm pdf          # 全量构建 -> books/zig_course.pdf
 pnpm pdf:sample   # 仅渲染几篇代表页 -> books/zig_course_sample.pdf（快速验证）
 ```
 
-本项目用 Node.js（>= 23.6，原生类型擦除）直接执行 TypeScript，无需预编译或 tsx。运行依赖：
+本项目用 Node.js（>= 24，原生类型擦除）直接执行 TypeScript，无需预编译或 tsx。运行依赖：
 `shiki`、`jspdf`、`marked`、`sharp`（均在 `devDependencies` 中）。
 
 ## 设计概览

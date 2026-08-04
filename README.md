@@ -83,7 +83,7 @@ zig-course/
 
 ### 环境要求
 
-- **Node.js**: 需要 Node.js >= 23.6（脚本依赖原生 TypeScript 支持），包管理器使用 [pnpm](https://pnpm.io/)
+- **Node.js**: 需要 Node.js >= 24（脚本依赖原生 TypeScript 支持），包管理器使用 [pnpm](https://pnpm.io/)
 - **Zig**: 支持 0.11-0.16 版本
 - **autocorrect**: 用于中英文排版优化（可选）
 
@@ -109,7 +109,7 @@ pnpm dev
 pnpm run dev          # 启动开发服务器（热重载）
 pnpm run build        # 构建生产版本
 pnpm run preview      # 预览构建结果
-pnpm run format       # 格式化代码（prettier + zig fmt + autocorrect）
+pnpm run format       # 格式化代码（prettier + autocorrect，Zig 代码用 zig fmt 单独格式化）
 pnpm run check        # 检查代码格式
 pnpm run pdf          # 导出 PDF 版本（jsPDF 离线生成 -> books/zig_course.pdf）
 pnpm run pdf:sample   # 仅渲染几篇代表页快速验证 -> books/zig_course_sample.pdf

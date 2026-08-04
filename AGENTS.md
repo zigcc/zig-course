@@ -108,7 +108,7 @@ pnpm pdf
 ### 代码格式化
 
 ```bash
-# 格式化所有代码（Markdown、Zig、中文文本）
+# 格式化 Markdown / TypeScript 与中文文本
 pnpm format
 
 # 检查格式但不修改文件
@@ -118,8 +118,9 @@ pnpm check
 这会运行：
 
 - Prettier 处理 Markdown/TypeScript/JavaScript
-- `zig fmt` 处理 Zig 源文件
 - AutoCorrect 处理中文文本格式
+
+Zig 源文件不在 `pnpm format` 范围内，需单独运行 `zig fmt .`。
 
 ## 版本兼容性维护
 

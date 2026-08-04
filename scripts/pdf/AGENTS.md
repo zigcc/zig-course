@@ -26,7 +26,7 @@ pnpm pdf          # 全量构建 -> books/zig_course.pdf
 pnpm pdf:sample   # 仅渲染几篇代表页 -> books/zig_course_sample.pdf（快速验证，秒级）
 ```
 
-两个脚本都由 Node.js **直接执行 TypeScript**（`node scripts/pdf/main.ts`，依赖 Node >= 23.6 的原生类型擦除），
+两个脚本都由 Node.js **直接执行 TypeScript**（`node scripts/pdf/main.ts`，依赖 Node >= 24 的原生类型擦除），
 无需预编译或 tsx。类型检查（不产出文件）：
 
 ```bash
