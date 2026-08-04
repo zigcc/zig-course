@@ -21,7 +21,7 @@
     "less": "^4.7.0",
     "markdown-it": "^15.0.0",
     "marked": "^18.0.6",
-    "prettier": "^3.9.5",
+    "prettier": "^3.9.6",
     "sharp": "^0.35.3",
     "shiki": "4.4.1",
     "subset-font": "^2.5.0",
