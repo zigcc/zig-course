@@ -40,7 +40,8 @@ async function main() {
   for (const ch of chapters) {
     const raw = readFileSync(ch.mdPath, "utf8");
     const processed = preprocess(raw, config.courseDir);
-    let html = md.render(processed, { slugCounts: {} });
+    // slugCounts 必须无原型，理由见 render.ts 的 heading_open 规则
+    let html = md.render(processed, { slugCounts: Object.create(null) });
     html = rewriteLinksAndImages(
       html,
       ch.route,

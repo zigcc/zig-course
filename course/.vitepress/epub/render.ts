@@ -78,9 +78,12 @@ export async function createRenderer(
     const text = inline && inline.type === "inline" ? inline.content : "";
     let id = slugify(text);
     if (id) {
-      // env 由 build.ts 逐章传入 { slugCounts: {} }，用于同页标题 ID 去重
+      // env 由 build.ts 逐章传入 slugCounts，用于同页标题 ID 去重。
+      // 必须是无原型对象：标题可 slug 成 constructor / __proto__ 等，
+      // 普通对象会从原型链继承这些名字，导致首次出现即被判为重复
       const scoped = (env ?? {}) as { slugCounts?: Record<string, number> };
-      const counts: Record<string, number> = (scoped.slugCounts ??= {});
+      const counts: Record<string, number> = (scoped.slugCounts ??=
+        Object.create(null));
       if (counts[id] === undefined) counts[id] = 0;
       else id = `${id}-${++counts[id]}`;
       token.attrSet("id", id);
