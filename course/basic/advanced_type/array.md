@@ -94,4 +94,4 @@ outline: deep
 
 <<<@/code/release/array.zig#comptime_init_array
 
-在这个示例中，我们利用编译期执行的特性来初始化数组，并结合了 `blocks` 和 `break` 的用法。关于这些，我们将在[循环](/basic/process_control/loop)章节中详细讲解。
+在这个示例中，我们利用编译期执行的特性来初始化数组，并结合了 `blocks` 和 `break` 的用法。关于这些，我们将在[循环](/basic/process_control/loop)章节中详细讲解。你也可以通过 [Compiler Explorer](https://godbolt.org/z/oWdjqajPa) 在线运行该示例查看结果。
