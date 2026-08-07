@@ -145,7 +145,7 @@ const ComptimeInitArray = struct {
     const print = @import("std").debug.print;
 
     pub fn main() void {
-        const fancy_array = init: {
+        const fancy_array = comptime init: {
             var initial_value: [10]usize = undefined;
             for (&initial_value, 0..) |*pt, i| {
                 pt.* = i;
