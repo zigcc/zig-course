@@ -99,6 +99,7 @@ const FuncInitArray = struct {
 const ComptimeInitArray = struct {
     // #region comptime_init_array
     const print = @import("std").debug.print;
+    const assert = @import("std").debug.assert;
 
     pub fn main() void {
         const fancy_array = comptime init: {
@@ -108,6 +109,7 @@ const ComptimeInitArray = struct {
             }
             break :init initial_value;
         };
+        comptime assert(fancy_array[9] == 9);
         print("{any}\n", .{fancy_array});
     }
     // #endregion comptime_init_array
