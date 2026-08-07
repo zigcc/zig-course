@@ -143,15 +143,17 @@ const FuncInitArray = struct {
 const ComptimeInitArray = struct {
     // #region comptime_init_array
     const print = @import("std").debug.print;
+    const assert = @import("std").debug.assert;
 
     pub fn main() void {
-        const fancy_array = init: {
+        const fancy_array = comptime init: {
             var initial_value: [10]usize = undefined;
             for (&initial_value, 0..) |*pt, i| {
                 pt.* = i;
             }
             break :init initial_value;
         };
+        comptime assert(fancy_array[9] == 9);
         print("{any}\n", .{fancy_array});
     }
     // #endregion comptime_init_array
