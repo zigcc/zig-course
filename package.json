@@ -25,7 +25,7 @@
     "markdown-it": "^15.0.0",
     "marked": "^18.0.9",
     "prettier": "^3.9.5",
-    "sharp": "^0.35.3",
+    "sharp": "^0.35.4",
     "shiki": "4.4.2",
     "subset-font": "^2.5.0",
     "typescript": "^7.0.2",
