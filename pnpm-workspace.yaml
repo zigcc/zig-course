@@ -1,3 +1,7 @@
 allowBuilds:
   core-js: true
   esbuild: true
+
+overrides:
+  # VitePress 1.x 仍依赖 Vite 5；使用 Vue 插件支持的 Vite 6 修复开发服务器漏洞。
+  "vitepress>vite": "^6.4.3"
