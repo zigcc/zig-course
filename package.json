@@ -20,7 +20,7 @@
     "@types/node": "^26.1.1",
     "@vite-pwa/vitepress": "^1.1.0",
     "jspdf": "^4.2.1",
-    "jszip": "^3.10.1",
+    "jszip": "^3.10.2",
     "less": "^4.9.0",
     "markdown-it": "^15.0.0",
     "marked": "^18.0.9",
