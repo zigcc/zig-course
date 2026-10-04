@@ -1,0 +1,157 @@
+# PR 预览第二阶段：把 Preview Build 产出的静态站点部署到 Cloudflare Pages，并在 PR 中回帖
+#
+# workflow_run 始终使用默认分支上的工作流定义，在主仓库上下文中运行，可以读取 secrets，
+# 因此即使是来自 fork 的 PR 也能获得预览。这里绝不检出或执行 PR 中的代码：
+# - 构建产物只作为静态文件上传
+# - 元数据（PR 编号、提交）先做格式校验，再通过 GitHub API 交叉验证
+#
+# 需要的配置（仓库 Settings → Secrets and variables → Actions）：
+# - secrets.CLOUDFLARE_API_TOKEN：权限为 Account → Cloudflare Pages → Edit
+# - secrets.CLOUDFLARE_ACCOUNT_ID
+# - vars.CLOUDFLARE_PAGES_PROJECT（可选，默认 zig-course）
+# 未配置 secrets 时只输出提示并跳过，不会让 CI 失败。
+name: Preview Deploy
+on:
+  workflow_run:
+    workflows: ["Preview Build"]
+    types: [completed]
+permissions:
+  actions: read # 下载其他运行的产物
+  pull-requests: write # 在 PR 中创建 / 更新预览评论
+  statuses: write # 在 PR 提交上显示 Preview 状态与链接
+concurrency:
+  group: preview-deploy-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
+jobs:
+  deploy:
+    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT || 'zig-course' }}
+    steps:
+      - name: Download metadata
+        uses: actions/download-artifact@v4
+        with:
+          name: preview-meta
+          path: preview-meta
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Validate metadata
+        id: meta
+        env:
+          RUN_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          pr="$(head -c 32 preview-meta/pr-number)"
+          sha="$(head -c 64 preview-meta/head-sha)"
+          if ! [[ "$pr" =~ ^[0-9]+$ ]] || ! [[ "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::预览元数据格式不正确"
+            exit 1
+          fi
+          if [ "$sha" != "$RUN_HEAD_SHA" ]; then
+            echo "::error::元数据中的提交与触发本次运行的提交不一致"
+            exit 1
+          fi
+          # 交叉验证：PR 当前的 head 必须正是这次构建的提交，防止冒用其他 PR 的编号
+          info="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$pr" --jq '[.head.sha, .state] | @tsv')"
+          read -r pr_sha pr_state <<< "$info"
+          if [ "$pr_state" != "open" ] || [ "$pr_sha" != "$sha" ]; then
+            echo "::notice::PR #$pr 已关闭或已有更新的提交，跳过本次过期的预览部署"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          {
+            echo "skip=false"
+            echo "pr=$pr"
+            echo "sha=$sha"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Check Cloudflare credentials
+        id: cf
+        if: steps.meta.outputs.skip == 'false'
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -n "$CF_TOKEN" ] && [ -n "$CF_ACCOUNT" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::未配置 CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID，跳过预览部署"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download site
+        if: steps.cf.outputs.ok == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: preview-site
+          path: dist
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Deploy to Cloudflare Pages
+        id: deploy
+        if: steps.cf.outputs.ok == 'true'
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
+          command: pages deploy dist --project-name=${{ env.PAGES_PROJECT }} --branch=pr-${{ steps.meta.outputs.pr }} --commit-hash=${{ steps.meta.outputs.sha }} --commit-dirty=true
+
+      - name: Comment on PR
+        if: steps.cf.outputs.ok == 'true'
+        env:
+          PR: ${{ steps.meta.outputs.pr }}
+          SHA: ${{ steps.meta.outputs.sha }}
+          ALIAS_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
+          DEPLOY_URL: ${{ steps.deploy.outputs.deployment-url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          preview_url="${ALIAS_URL:-$DEPLOY_URL}"
+          if [ -z "$preview_url" ]; then
+            echo "::error::未能从 wrangler 输出中获取预览地址"
+            exit 1
+          fi
+          marker='<!-- zig-course-preview -->'
+          {
+            echo "$marker"
+            echo "### 文档预览已部署"
+            echo
+            echo "| 项目 | 链接 |"
+            echo "| --- | --- |"
+            echo "| 预览地址（随 PR 更新） | $preview_url |"
+            echo "| 本次部署（固定版本） | ${DEPLOY_URL:-$preview_url} |"
+            echo "| 对应提交 | $SHA |"
+            echo
+            echo "由 [Preview Deploy]($RUN_URL) 自动生成，PR 每次更新后会刷新这条评论。"
+          } > "$RUNNER_TEMP/preview-comment.md"
+          ids="$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --paginate \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("<!-- zig-course-preview -->"))) | .id')"
+          cid="${ids%%$'\n'*}"
+          if [ -n "$cid" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$cid" -F body=@"$RUNNER_TEMP/preview-comment.md" > /dev/null
+          else
+            gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" -F body=@"$RUNNER_TEMP/preview-comment.md" > /dev/null
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$SHA" \
+            -f state=success -f context=Preview \
+            -f description="文档预览已部署" -f target_url="$preview_url" > /dev/null
+          {
+            echo "### 文档预览"
+            echo
+            echo "- PR：#$PR"
+            echo "- 预览地址：$preview_url"
+            echo "- 本次部署：${DEPLOY_URL:-$preview_url}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Report failure
+        if: failure() && steps.meta.outputs.sha != ''
+        env:
+          SHA: ${{ steps.meta.outputs.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$SHA" \
+            -f state=failure -f context=Preview \
+            -f description="文档预览部署失败" -f target_url="$RUN_URL" > /dev/null
