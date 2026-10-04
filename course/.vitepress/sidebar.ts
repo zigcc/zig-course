@@ -221,6 +221,14 @@ export default [
     collapsed: true,
     items: [
       {
+        text: "0.17.0 升级指南",
+        link: "/update/upgrade-0.17.0",
+      },
+      {
+        text: "0.17.0 版本说明",
+        link: "/update/0.17.0-description",
+      },
+      {
         text: "0.16.0 升级指南",
         link: "/update/upgrade-0.16.0",
       },
