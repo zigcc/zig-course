@@ -295,9 +295,9 @@ const array_ptr: *const [3]u16 = slice;
 
 `std.builtin` 被标记为 deprecated，改为 `std.lang`。像 `std.builtin.Type`、`std.builtin.CallingConvention`、`std.builtin.Endian` 这样的写法，都可以直接替换为 `std.lang.Type`、`std.lang.CallingConvention`、`std.lang.Endian`。
 
-### `OptimizeMode` 改为 `Optimize`，标签名去掉 “release”
+### `OptimizeMode` 改为 `Optimize`，标签名去掉“release”
 
-`std.lang.OptimizeMode` 更名为 `std.lang.Optimize`，枚举标签也改成了小写且去掉了 “release”：
+`std.lang.OptimizeMode` 更名为 `std.lang.Optimize`，枚举标签也改成了小写且去掉了“release”：
 
 | 0.16.0         | 0.17.0  |
 | :------------- | :------ |
@@ -514,7 +514,7 @@ const result = std.zon.fromSlice(MyZonType, .{
 };
 ```
 
-另外请留意方法名的变化：原来的 `fromSliceAlloc` 改名为 `fromSlice`，而原来**不分配内存**的 `fromSlice` 改名为 `fromSliceNoAlloc`，其他 “from” 系列方法也按同样的规则改名。
+另外请留意方法名的变化：原来的 `fromSliceAlloc` 改名为 `fromSlice`，而原来**不分配内存**的 `fromSlice` 改名为 `fromSliceNoAlloc`，其他“from”系列方法也按同样的规则改名。
 
 ### `bit_set` 类型与 `initEmpty` / `initFull`
 
