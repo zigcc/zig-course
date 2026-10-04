@@ -46,3 +46,23 @@ jobs:
             --exclude course/code/12/assembly.zig \
             --exclude course/code/14/assembly.zig \
             .
+  # 0.17 的 zig fmt 无法解析旧版本示例中已移除的语法（如数组乘法 `**`、
+  # `errdefer |err|`），因此只用它检查 0.17 相关的代码
+  lint-0_17:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Setup Zig
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.17.0
+      - name: Verify formatting
+        run: |
+          zig fmt --check \
+            build.zig \
+            build/0.17.zig \
+            course/code/17 \
+            course/code/release

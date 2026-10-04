@@ -27,8 +27,9 @@ jobs:
       matrix:
         # macos 固定 15：macos-latest 已迁移到 macOS 26，Zig 在其上链接不到系统
         # libSystem（所有 libc 符号 undefined），0.11-0.15 全部受影响
+        # 另外 0.17 要求 macOS 15.0+，macos-15 恰好满足
         os: [ubuntu-latest, macos-15, windows-latest]
-        version: [0.11.0, 0.12.1, 0.13.0, 0.14.0, 0.15.1]
+        version: [0.11.0, 0.12.1, 0.13.0, 0.14.0, 0.15.1, 0.17.0]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
