@@ -153,7 +153,7 @@ pub fn main() void {
 
 ## 无效枚举转换
 
-当使用 [`@enumFromInt`](https://ziglang.org/documentation/master/#enumFromInt) 来获取枚举时，如果没有对应整数的枚举，那么会导致程序或者编译器报告错误！
+当使用 [`@fromBackingInt`](https://ziglang.org/documentation/master/#fromBackingInt)（Zig 0.17 之前为 `@enumFromInt`）来获取枚举时，如果没有对应整数的枚举，那么会导致程序或者编译器报告错误！
 
 ## 无效错误集合转换
 

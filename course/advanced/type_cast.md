@@ -110,13 +110,13 @@ undefined 是一个神奇的值，它可以赋值给所有类型，代表这个�
 
 - [`@bitCast`](https://ziglang.org/documentation/master/#bitCast) 更改类型但保持位不变
 - [`@alignCast`](https://ziglang.org/documentation/master/#alignCast) 显式强制转换对齐
-- [`@enumFromInt`](https://ziglang.org/documentation/master/#enumFromInt) 根据整数值获取对应的枚举值
+- [`@fromBackingInt`](https://ziglang.org/documentation/master/#fromBackingInt) 根据底层整数值获取对应的枚举值（或带显式底层整数类型的 `packed struct`），Zig 0.17 起取代已弃用的 `@enumFromInt`
 - [`@errCast`](https://ziglang.org/documentation/master/#errorCast) 显式强制转换为错误的子集
 - [`@floatCast`](https://ziglang.org/documentation/master/#floatCast) 将大浮点数转为小浮点数
 - [`@floatFromInt`](https://ziglang.org/documentation/master/#floatFromInt) 将整数显式强制转换为浮点数
 - [`@intCast`](https://ziglang.org/documentation/master/#intCast) 在不同的整数类型中显式强制转换
 - [`@intFromBool`](https://ziglang.org/documentation/master/#intFromBool) 将 `true` 转换为 `1`，`false` 转换为 `0`
-- [`@intFromEnum`](https://ziglang.org/documentation/master/#intFromEnum) 获取枚举值或联合标记对应的整数值
+- [`@backingInt`](https://ziglang.org/documentation/master/#backingInt) 获取枚举值、联合标记或带显式底层整数类型的 `packed struct` 对应的底层整数值，Zig 0.17 起取代已弃用的 `@intFromEnum`
 - [`@intFromError`](https://ziglang.org/documentation/master/#intFromError) 获取对应错误的整数值
 - [`@trunc`](https://ziglang.org/documentation/master/#trunc) 将浮点数向零取整；结果类型由上下文决定，可以直接得到整数类型。需要其他舍入方式时使用 `@floor`、`@ceil` 或 `@round`
 - [`@intFromPtr`](https://ziglang.org/documentation/master/#intFromPtr) 获取指针指向的地址（整数 `usize`），这在嵌入式开发和内核开发时很常用

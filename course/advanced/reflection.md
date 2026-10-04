@@ -54,19 +54,21 @@ main.T.Y
 
 [`@typeInfo`](https://ziglang.org/documentation/master/#typeInfo)，该内建函数用于获取类型的信息。
 
-该函数返回一个 [`std.builtin.Type`](https://ziglang.org/documentation/master/std/#std.builtin.Type)，它包含了此类型的所有信息。
+该函数返回一个 [`std.lang.Type`](https://ziglang.org/documentation/master/std/#std.lang.Type)（Zig 0.17 起 `std.builtin` 更名为 `std.lang`，旧名称仍可使用但已被标记为 deprecated），它包含了此类型的所有信息。
 
 它是一个联合类型，使用小写的联合标签来表示具体类型信息；遇到 Zig 关键字时需要使用转义字段名，例如 `@"struct"`、`@"union"`、`@"enum"`，整数类型则是 `.int`。要判断类型的种类，可以使用 `switch` 或直接访问相应标签来断言之。
 
 对结构、联合、枚举和错误集合，它保证信息中字段的顺序与源码中出现的顺序相同。
 
-对结构、联合、枚举和透明类型，它保证信息中声明的顺序与源码中出现的顺序相同。
+对结构、联合、枚举和透明类型，它保证信息中声明的顺序与源码中出现的顺序相同（`decl_names` 中只包含 `pub` 声明）。
+
+从 Zig 0.17 开始，结构体、联合、枚举等类型信息采用了**数组结构体（Struct-Of-Arrays）**风格：不再提供由 `StructField` 组成的 `fields` 数组，而是把字段名、字段类型和字段属性分别存放在 `field_names`、`field_types`、`field_attrs`（枚举则是 `field_names` 与 `field_values`）中，这与 `@Struct` 等内建函数的参数形式保持一致。
 
 如以下示例中，首先使用 `@typeInfo` 来获取类型 `T` 的信息，然后将其断言为一个 `@"struct"` 类型，最后用 `inline for` 输出其字段值。
 
 <<<@/code/release/reflection.zig#typeInfo
 
-需要注意的是，示例必须使用 `inline for` 才能编译通过，这是因为我们读取了每个字段的 `type`。在 Zig 0.16 中，`std.builtin.Type.StructField` 本身可以作为运行时大小的字段信息读取；只有像字段类型这样的 comptime-only 信息，才需要在编译期用 `inline for` 处理。
+需要注意的是，示例必须使用 `inline for` 才能编译通过，这是因为我们读取了每个字段的类型（`field_types`），它是 comptime-only 的信息；而 `field_names` 只是字符串切片，可以在运行时读取。
 
 ::: warning
 
@@ -78,7 +80,7 @@ main.T.Y
 
 <<<@/code/release/reflection.zig#TypeInfo2
 
-在以下示例中，使用 `@typeInfo` 获得一个结构体的信息，并使用 `@Struct` 构造一个新的类型。构造的新结构体类型和原结构体的字段名和顺序相同，但结构体的内存布局被改为 extern，且每个字段的对齐被改为 1。
+在以下示例中，使用 `@typeInfo` 获得一个结构体的信息，并使用 `@Struct` 构造一个新的类型。构造的新结构体类型和原结构体的字段名和顺序相同，但结构体的内存布局被改为 extern，且每个字段的对齐被改为 1。由于 0.17 的类型信息与 `@Struct` 的参数形式一致，字段名与字段类型可以直接复用，只需要重新准备字段属性。
 
 <<<@/code/release/reflection.zig#TypeInfo3
 
@@ -88,7 +90,7 @@ main.T.Y
 
 [`@hasDecl`](https://ziglang.org/documentation/master/#hasDecl) 用于返回一个容器中是否包含指定名字的声明。
 
-完全是编译期计算的，故值也是编译期已知的。
+完全是编译期计算的，故值也是编译期已知的。注意，从 Zig 0.17 开始，`@hasDecl` 只会对 `pub` 声明返回 `true`；在此之前，与 `@hasDecl` 处于同一文件中的非 `pub` 声明也会返回 `true`。
 
 <<<@/code/release/reflection.zig#hasDecl
 

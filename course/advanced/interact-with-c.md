@@ -36,15 +36,31 @@ Zig 定义了几个对应 C ABI 的基本类型：
 
 ## C Header 导入
 
-C 语言共享类型通常通过引入头文件实现。Zig 0.16 起推荐把头文件翻译放到 `build.zig` 中：先用 `addTranslateC` 生成模块，再在 Zig 代码里像普通模块一样 `@import("c")`。
+C 语言共享类型通常通过引入头文件实现。`@cImport` 在 Zig 0.16 中被标记为 deprecated，并已在 Zig 0.17 中**彻底移除**，因此头文件翻译必须放到 `build.zig` 中完成：先把 C 头文件翻译为一个 Zig 模块，再在 Zig 代码里像普通模块一样 `@import("c")`。
 
-`build.zig` 中的核心写法如下：
+Zig 0.17 官方推荐使用 ZSF 维护的 [translate-c](https://codeberg.org/ziglang/translate-c) 包来完成翻译，它与构建系统内置的 `addTranslateC` 是同一套实现，但提供了更多配置项，并且拥有独立于 Zig 工具链的发布节奏。首先添加依赖：
+
+```sh
+zig fetch --save git+https://codeberg.org/ziglang/translate-c#2.0.0
+```
+
+::: warning 注意版本
+
+translate-c 的 `main` 分支跟踪的是 Zig 的 master 分支（当前已是 0.18 开发版），使用 Zig 0.17 时请固定到 `2.0.0` 标签（或 `zig-0.17.x` 分支），否则可能拉取到不兼容的版本。
+
+:::
+
+然后在 `build.zig` 中这样使用：
 
 ```zig
-const translate_c = b.addTranslateC(.{
-    .root_source_file = b.path("src/c.h"),
+const Translator = @import("translate_c").Translator;
+
+const translate_c = b.dependency("translate_c", .{});
+const c: Translator = .init(translate_c, .{
+    .c_source_file = b.path("src/c.h"),
     .target = target,
     .optimize = optimize,
+    // 默认 link_libc = true，翻译出的模块会自动链接 libc
 });
 
 const exe = b.addExecutable(.{
@@ -54,11 +70,10 @@ const exe = b.addExecutable(.{
         .target = target,
         .optimize = optimize,
         .imports = &.{
-            .{ .name = "c", .module = translate_c.createModule() },
+            .{ .name = "c", .module = c.mod },
         },
     }),
 });
-exe.root_module.linkSystemLibrary("c", .{});
 ```
 
 `src/c.h` 中放需要翻译的 C 头文件：
@@ -74,13 +89,13 @@ exe.root_module.linkSystemLibrary("c", .{});
 
 ::: info 🅿️ 提示
 
-注意：为了构建这个，我们需要引入 `libc`。在 Zig 0.16 的构建脚本中，可以让对应模块链接 C 标准库，例如 `exe.root_module.linkSystemLibrary("c", .{})`。
+注意：为了构建这个，我们需要引入 `libc`。translate-c 包的 `Translator` 默认会让翻译出的模块链接 libc（`link_libc = true`）；如果使用内置的 `addTranslateC`，则需要手动让对应模块链接 C 标准库，例如 `exe.root_module.linkSystemLibrary("c", .{})`。
 
-因此通常通过 `zig build` 驱动这个例子；旧的 `@cImport` 单文件代码才适合手动 `zig build-exe source.zig -lc`。
+构建系统内置的 `b.addTranslateC` 在 0.17 中仍然可用，但已被标记为 deprecated。本教程仓库的根构建脚本为了保持零外部依赖，暂时仍使用它来构建这个例子。
 
 :::
 
-`@cImport` 仍然保留，但在 Zig 0.16 已进入 deprecated 迁移期；它只适合维护旧的单文件示例或历史代码。新代码不要再把它作为 C 头文件入口，应优先使用上面的 `build.zig` + `@import("c")` 路径。
+如果你还在维护使用 `@cImport` 的旧代码，可以参考 [0.17.0 升级指南](../update/upgrade-0.17.0#c-翻译迁移到独立的-translate-c-包) 进行迁移。
 
 ## vcpkg C Lib 导入
 
@@ -95,9 +110,13 @@ exe.root_module.linkSystemLibrary("c", .{});
 
 那么在 `build.zig` 文件中，
 
+<<<@/code/release/import_vcpkg/build.zig#translate_c
+
+并为可执行文件添加 lib 搜索目录与需要链接的库：
+
 <<<@/code/release/import_vcpkg/build.zig#c_import
 
-假设你想要借用 `gsl` 库来对数值进行傅里叶变换，Zig 0.16 新代码应沿用上面的 `addTranslateC` + `@import("c")` 路径。下面这个历史片段仍使用旧的 `@cImport`，仅用于说明要导入的 GSL 头文件，不作为新项目推荐写法：
+假设你想要借用 `gsl` 库来对数值进行傅里叶变换，那么在 Zig 代码中直接导入上面翻译得到的 `gsl` 模块即可：
 
 <<<@/code/release/import_vcpkg/src/main.zig#import_gsl
 
@@ -132,17 +151,15 @@ Zig 提供了一个命令行工具 `zig translate-c` 供我们使用，它可以
 
 ### 构建系统 `translate-c` 与命令行 `translate-c`
 
-构建系统里的 `addTranslateC` 是 Zig 0.16 推荐的头文件导入路径；命令行 `zig translate-c` 更适合一次性查看或手动修改翻译后的代码，例如：将 `anytype` 修改为更加精确的类型、将 `[*c]T` 指针修改为 `[*]T` 或者 `*T` 来提高类型安全性、启动或者禁用某些运行时的安全性功能。
+在构建系统中使用 translate-c 包（或已弃用的内置 `addTranslateC`）是 Zig 0.17 推荐的头文件导入路径；命令行 `zig translate-c` 更适合一次性查看或手动修改翻译后的代码，例如：将 `anytype` 修改为更加精确的类型、将 `[*c]T` 指针修改为 `[*]T` 或者 `*T` 来提高类型安全性、启动或者禁用某些运行时的安全性功能。
 
 ## C 翻译缓存
 
-C 翻译功能（通过 `build.zig` 的 `addTranslateC` 或 `zig translate-c` 使用）与 Zig 缓存系统集成。使用相同源文件、目标和 `cflags` 的后续构建将使用缓存，而不是重复翻译相同的代码；构建缓存目录是项目下的 `.zig-cache`。
+C 翻译功能（通过 `build.zig` 中的 translate-c 包、`addTranslateC` 或 `zig translate-c` 使用）与 Zig 缓存系统集成。使用相同源文件、目标和 `cflags` 的后续构建将使用缓存，而不是重复翻译相同的代码；构建缓存目录是项目下的 `.zig-cache`。
 
-下面这个 Zig 文件片段是 `addTranslateC` 生成模块后的调用侧：
+下面这个 Zig 文件片段是在构建脚本中生成名为 `c` 的模块后的调用侧：
 
 <<<@/code/release/interact_with_c.zig#cTranslate
-
-如果你还在维护旧的 `@cImport` 代码，`--verbose-cimport` 可以临时用于查看旧导入缓存位置，便于迁移或排查。
 
 ## C 翻译错误
 

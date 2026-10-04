@@ -48,9 +48,8 @@ pub fn build(b: *std.Build) void {
     run_cmd.step.dependOn(b.getInstallStep());
 
     // 运行时参数传递
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
+    // 0.17 移除了 b.args，改为声明一个“透传参数”占位，make 阶段会替换为 `--` 之后的参数
+    run_cmd.addPassthruArgs();
 
     // 运行的 step
     const run_step = b.step("run", "Run the app");

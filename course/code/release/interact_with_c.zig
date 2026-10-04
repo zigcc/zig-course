@@ -30,7 +30,7 @@ const external = struct {
 
     // #region external
     // 使用 callconv 声明函数调用约定为 C
-    fn add(count: c_int, ...) callconv(.C) c_int {
+    fn add(count: c_int, ...) callconv(.c) c_int {
         // 对应 C 的宏 va_start
         var ap = @cVaStart();
         // 对应 C 的宏 va_end

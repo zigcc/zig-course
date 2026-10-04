@@ -32,9 +32,8 @@ pub fn build(b: *std.Build) void {
     // 注意：此步骤可选
     // 此操作允许用户通过构建系统的命令传递参数，例如 zig build  -- arg1 arg2
     // 当前是将参数传递给运行构建结果
-    if (b.args) |args| {
-        run_exe.addArgs(args);
-    }
+    // 0.17 移除了 b.args，改为声明一个“透传参数”占位，make 阶段会替换为 `--` 之后的参数
+    run_exe.addPassthruArgs();
 
     // 指定一个 step 为 run
     const run_step = b.step("run", "Run the application");

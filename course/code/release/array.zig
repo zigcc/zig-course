@@ -82,8 +82,14 @@ const Multiply = struct {
     const print = @import("std").debug.print;
 
     pub fn main() void {
+        // 0.17 移除了数组乘法语法 `**`
+        // 用同一个值填充整个数组，使用 @splat
+        const zeros: [5]i8 = @splat(0);
+        print("{any}\n", .{zeros}); // [5]i8{ 0, 0, 0, 0, 0 }
+
+        // 重复一个数组，可以在编译期用 ++ 串联
         const small = [3]i8{ 1, 2, 3 };
-        const big: [9]i8 = small ** 3;
+        const big: [9]i8 = small ++ small ++ small;
         print("{any}\n", .{big}); // [9]i8{ 1, 2, 3, 1, 2, 3, 1, 2, 3 }
     }
     // #endregion multiply
@@ -108,7 +114,8 @@ const FuncInitArray = struct {
     const print = @import("std").debug.print;
 
     pub fn main() void {
-        const array = [_]i32{make(3)} ** 10;
+        // 0.17 起使用 @splat 代替 `[_]i32{make(3)} ** 10`
+        const array: [10]i32 = @splat(make(3));
         print("{any}\n", .{array});
     }
 
@@ -136,3 +143,19 @@ const ComptimeInitArray = struct {
     }
     // #endregion comptime_init_array
 };
+
+test "multiply" {
+    const std = @import("std");
+    const zeros: [5]i8 = @splat(0);
+    try std.testing.expectEqualSlices(i8, &.{ 0, 0, 0, 0, 0 }, &zeros);
+
+    const small = [3]i8{ 1, 2, 3 };
+    const big: [9]i8 = small ++ small ++ small;
+    try std.testing.expectEqualSlices(i8, &.{ 1, 2, 3, 1, 2, 3, 1, 2, 3 }, &big);
+}
+
+test "func init array" {
+    const std = @import("std");
+    const array: [10]i32 = @splat(FuncInitArray.make(3));
+    for (array) |item| try std.testing.expectEqual(4, item);
+}

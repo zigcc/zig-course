@@ -48,7 +48,7 @@ zig 当前并没有一个中心化存储库，包可以来自任何来源，无�
 
 目前 zig 已支持通过 [`zig fetch`](../environment/zig-command#zig-fetch) 来获取 hash 并写入到 `.zon` 中！
 
-Zig 0.16 会把抓取到的依赖放在项目根目录旁的 `zig-pkg` 目录，通常不需要提交进仓库。
+Zig 0.16 起会把抓取到的依赖放在项目根目录旁的 `zig-pkg` 目录，通常不需要提交进仓库。Zig 0.17 中，`zig fetch` 默认只抓取到全局缓存；只有带上 `--save` 时才会同时抓取到项目本地的 `zig-pkg` 目录，而 `zig build` 总是会抓取到本地。
 
 :::
 

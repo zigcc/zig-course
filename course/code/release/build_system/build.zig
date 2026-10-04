@@ -1,5 +1,4 @@
 const std = @import("std");
-const args = [_][]const u8{ "zig", "build" };
 
 pub fn build(b: *std.Build) !void {
     const optimize = b.standardOptimizeOption(.{});
@@ -35,54 +34,24 @@ pub fn build(b: *std.Build) !void {
 
     b.installArtifact(exe);
 
-    const full_path = try std.process.currentPathAlloc(io, b.allocator);
-    defer b.allocator.free(full_path);
+    // 0.17 起 configure 阶段的结果会被缓存，遍历目录前需要声明对目录内容的依赖
+    b.dependOnDirectoryContents(b.path("."));
 
-    var dir = std.Io.Dir.openDirAbsolute(io, full_path, .{ .iterate = true }) catch |err| {
-        std.log.err("open path failed {s}, err is {}", .{ full_path, err });
-        std.process.exit(1);
-    };
+    // `b.root` 是当前构建根目录（Cache.Path），取代了旧的 `b.build_root`
+    var dir = try b.root.openDir(io, ".", .{ .iterate = true });
     defer dir.close(io);
 
     var iterate = dir.iterate();
+    while (try iterate.next(io)) |entry| {
+        if (entry.kind != .directory) continue;
+        if (entry.name[0] == '.' or std.mem.eql(u8, entry.name, "zig-out")) continue;
 
-    while (iterate.next(io) catch |err| {
-        std.log.err("iterate examples_path failed, err is {}", .{err});
-        std.process.exit(1);
-    }) |entry| {
-        // get the entry name, entry can be file or directory
-        const name = entry.name;
-        if (entry.kind == .directory) {
-            if (eqlu8(name, ".zig-cache") or eqlu8(name, "zig-out") or eqlu8(name, "zig-cache"))
-                continue;
-
-            // build cwd
-            const cwd = std.fs.path.join(b.allocator, &[_][]const u8{
-                full_path,
-                name,
-            }) catch |err| {
-                std.log.err("fmt path failed, err is {}", .{err});
-                std.process.exit(1);
-            };
-
-            // open entry dir
-            const entry_dir = std.Io.Dir.openDirAbsolute(io, cwd, .{}) catch unreachable;
-            defer entry_dir.close(io);
-
-            entry_dir.access(io, "build.zig", .{}) catch {
-                std.log.err("not found build.zig in path {s}", .{cwd});
-                std.process.exit(1);
-            };
-
-            var child = std.process.spawn(io, .{
-                .argv = &args,
-                .cwd = .{ .path = cwd },
-            }) catch unreachable;
-            _ = child.wait(io) catch unreachable;
-        }
+        // 0.17 将 configure 与 make 拆成了两个进程，不能再在 build 函数中直接 spawn 子进程，
+        // 而是把子项目的 `zig build` 声明为 Run 步骤，交给 make 阶段执行
+        const sub_build = b.addSystemCommand(&.{ b.graph.zig_exe, "build" });
+        sub_build.setName(b.fmt("zig build ({s})", .{entry.name}));
+        sub_build.setCwd(b.path(entry.name));
+        sub_build.stdio = .inherit;
+        b.getInstallStep().dependOn(&sub_build.step);
     }
-}
-
-fn eqlu8(a: []const u8, b: []const u8) bool {
-    return std.mem.eql(u8, a, b);
 }

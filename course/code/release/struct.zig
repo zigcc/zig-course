@@ -140,7 +140,8 @@ const SelfReference3 = struct {
     // #region more_self_reference3
     const std = @import("std");
 
-    var gpa = std.heap.DebugAllocator(.{}){};
+    // 0.17 使用 SafeAllocator 取代了 DebugAllocator
+    var safe: std.heap.SafeAllocator = .init(std.heap.page_allocator, .{});
 
     // #region deault_self_reference3
     const User = struct {
@@ -183,10 +184,11 @@ const SelfReference3 = struct {
 
     pub fn main() !void {
         // 我们在这里使用了内存分配器的知识，如果你需要的话，可以提前跳到内存管理进行学习！
-        const allocator = gpa.allocator();
+        const allocator = safe.allocator();
         defer {
-            const deinit_status = gpa.deinit();
-            if (deinit_status == .leak) std.testing.expect(false) catch @panic("TEST FAIL");
+            // deinit 返回泄漏的内存块数量
+            const leaks = safe.deinit();
+            if (leaks != 0) std.testing.expect(false) catch @panic("TEST FAIL");
         }
 
         const username = try allocator.alloc(u8, 20);
@@ -430,16 +432,22 @@ const PackedCast = struct {
         try expect(divided.quarter3 == 0x2);
         try expect(divided.quarter4 == 0x1);
 
+        // 0.17 起 @bitCast 只关心“逻辑位”，与目标架构的端序无关：
+        // 数组的第一个元素对应最低有效位，因此在任何架构上结果都一样
         const ordered: [2]u8 = @bitCast(full);
+        try expect(ordered[0] == 0x34);
+        try expect(ordered[1] == 0x12);
 
+        // 如果需要观察内存中真实的字节排列（与端序相关），可以使用 std.mem.toBytes
+        const in_memory = std.mem.toBytes(full);
         switch (native_endian) {
             .big => {
-                try expect(ordered[0] == 0x12);
-                try expect(ordered[1] == 0x34);
+                try expect(in_memory[0] == 0x12);
+                try expect(in_memory[1] == 0x34);
             },
             .little => {
-                try expect(ordered[0] == 0x34);
-                try expect(ordered[1] == 0x12);
+                try expect(in_memory[0] == 0x34);
+                try expect(in_memory[1] == 0x12);
             },
         }
     }
@@ -487,3 +495,7 @@ const reorder_struct = struct {
     }
     // #endregion reorder_struct
 };
+
+test "packed cast" {
+    try PackedCast.main();
+}
