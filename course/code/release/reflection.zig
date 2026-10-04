@@ -65,11 +65,13 @@ const typeInfo = struct {
         // 断言它为 struct
         const struct_info = type_info.@"struct";
 
-        // inline for 打印该结构体内部字段的信息
-        inline for (struct_info.fields) |field| {
+        // 0.17 起类型信息采用“数组结构体”（Struct-Of-Arrays）风格：
+        // 字段名、字段类型、字段属性分别存放在 field_names、field_types、field_attrs 中
+        // inline for 同时遍历字段名与字段类型
+        inline for (struct_info.field_names, struct_info.field_types) |field_name, field_type| {
             std.debug.print("field name is {s}, field type is {}\n", .{
-                field.name,
-                field.type,
+                field_name,
+                field_type,
             });
         }
     }
@@ -107,22 +109,25 @@ const TypeInfo3 = struct {
     fn ExternAlignOne(comptime T: type) type {
         // 获得类型信息，并断言为Struct.
         const struct_info = @typeInfo(T).@"struct";
-        // 准备字段名称
-        comptime var field_names: [struct_info.fields.len][]const u8 = undefined;
-        comptime var field_types: [struct_info.fields.len]type = undefined;
-        comptime var field_attrs: [struct_info.fields.len]std.builtin.Type.StructField.Attributes = undefined;
+        const fields_len = struct_info.field_names.len;
 
-        inline for (struct_info.fields, 0..) |field, i| {
-            field_names[i] = field.name;
-            field_types[i] = field.type;
-            // 设置对齐为 1，其他属性使用默认值
-            field_attrs[i] = .{
-                .@"align" = 1,
-            };
+        // 0.17 的类型信息与 @Struct 的参数形式一致，字段名和字段类型可以直接复用，
+        // 这里只需要准备新的字段属性
+        comptime var field_attrs: [fields_len]std.lang.Type.Struct.FieldAttributes = undefined;
+        inline for (&field_attrs, struct_info.field_attrs) |*new_attrs, old_attrs| {
+            // 保留原有属性（例如默认值），仅把对齐改为 1
+            new_attrs.* = old_attrs;
+            new_attrs.@"align" = 1;
         }
 
         // 使用 @Struct 构造新类型（extern 布局，对齐为 1）
-        return @Struct(.@"extern", null, &field_names, &field_types, &field_attrs);
+        return @Struct(
+            .@"extern",
+            null,
+            struct_info.field_names,
+            struct_info.field_types[0..fields_len],
+            &field_attrs,
+        );
     }
 
     const MyStruct = struct {
@@ -152,9 +157,8 @@ const hasDecl = struct {
     pub fn main() void {
         // true
         std.debug.print("blah:{}\n", .{@hasDecl(Foo, "blah")});
-        // true
-        // hi 此声明可以被检测到是因为类型和代码处于同一个文件中，这导致他们之间可以互相访问
-        // 换另一个文件就不行了
+        // false
+        // 0.17 起 @hasDecl 只对 pub 声明返回 true，即便类型和代码处于同一个文件中也是如此
         std.debug.print("hi:{}\n", .{@hasDecl(Foo, "hi")});
         // false 不检查字段
         std.debug.print("nope:{}\n", .{@hasDecl(Foo, "nope")});
@@ -250,7 +254,7 @@ const Type = struct {
     // #region Type
     const std = @import("std");
 
-    // Zig 0.16 使用 @Struct 替代 @Type
+    // Zig 0.16 起使用 @Struct 替代 @Type
     const T = @Struct(
         .auto, // layout
         null, // BackingInt
@@ -268,3 +272,19 @@ const Type = struct {
     }
     // #endregion Type
 };
+
+test "typeInfo field names" {
+    const std = @import("std");
+    const info = @typeInfo(typeInfo.T).@"struct";
+    try std.testing.expectEqual(2, info.field_names.len);
+    try std.testing.expectEqualStrings("a", info.field_names[0]);
+    try std.testing.expectEqual(u8, info.field_types[1]);
+}
+
+test "hasDecl" {
+    const std = @import("std");
+    try std.testing.expect(@hasDecl(hasDecl.Foo, "blah"));
+    try std.testing.expect(!@hasDecl(hasDecl.Foo, "hi"));
+    try std.testing.expect(!@hasDecl(hasDecl.Foo, "nope"));
+    try std.testing.expect(!@hasDecl(hasDecl.Foo, "nope1234"));
+}

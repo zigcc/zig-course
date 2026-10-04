@@ -11,6 +11,7 @@ pub fn main() !void {
     ComptimePointer.main();
     ptr2int.main();
     try compPointer.main();
+    try ptrCast.main();
 }
 
 const SinglePointer = struct {
@@ -139,12 +140,19 @@ const Align = struct {
         const align_of_i32 = @alignOf(@TypeOf(x));
         // 尝试比较类型
         try expect(@TypeOf(&x) == *i32);
-        // 尝试在设置内存对齐后再进行类型比较
-        try expect(*i32 == *align(align_of_i32) i32);
+        // 0.16 起，即便对齐值相同，显式写出 align 的指针类型与省略 align 的指针类型
+        // 也不再是同一个类型，但二者可以相互隐式转换
+        try expect(*i32 != *align(align_of_i32) i32);
+        const aligned_ptr: *align(align_of_i32) i32 = &x;
+        const natural_ptr: *i32 = aligned_ptr;
+        try expect(natural_ptr.* == 1234);
+        // 0.17 起指针属性统一放在 attrs 中，未显式指定对齐时 attrs.@"align" 为 null
+        try expect(@typeInfo(*i32).pointer.attrs.@"align" == null);
+        try expect(@typeInfo(*align(8) i32).pointer.attrs.@"align" == 8);
 
         if (builtin.target.cpu.arch == .x86_64) {
-            // 获取了 x86_64 架构的指针对齐大小
-            try expect(@typeInfo(*i32).pointer.alignment == 4);
+            // 获取了 x86_64 架构下 i32 的对齐大小
+            try expect(@alignOf(i32) == 4);
         }
     }
     // #endregion align
@@ -167,7 +175,7 @@ const AlignCast = struct {
 
     pub fn main() !void {
         // 全局变量对齐
-        try expect(@typeInfo(@TypeOf(&foo)).pointer.alignment == 4);
+        try expect(@typeInfo(@TypeOf(&foo)).pointer.attrs.@"align" == 4);
         try expect(@TypeOf(&foo) == *align(4) u8);
         const as_pointer_to_array: *align(4) [1]u8 = &foo;
         const as_slice: []align(4) u8 = as_pointer_to_array;
@@ -258,9 +266,25 @@ const ptrCast = struct {
         }
 
         // 通过内置函数转换
+        // 0.17 起 @bitCast 与目标端序无关：数组第一个元素对应结果的最低有效位
         if (@as(u32, @bitCast(bytes)) == 0x12121212) {
             std.debug.print("success\n", .{});
         }
         // #endregion ptr_cast
     }
 };
+
+test "pointer" {
+    try MultiPointer.main();
+    try ArrayAndSlice.main();
+    try Volatile.main();
+    try Align.main();
+    try AlignCast.main();
+    try ZeroPointer.main();
+    ComptimePointer.main();
+    try compPointer.main();
+    try ptrCast.main();
+
+    const bytes = [4]u8{ 0x01, 0x02, 0x03, 0x04 };
+    try @import("std").testing.expectEqual(0x04030201, @as(u32, @bitCast(bytes)));
+}

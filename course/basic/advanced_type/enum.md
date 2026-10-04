@@ -56,9 +56,11 @@ Zig 允许我们定义非详尽枚举，即在定义时无需列出所有可能�
 
 :::info 🅿️ 提示
 
-`@enumFromInt` 能够将整数转换为枚举值。但需要注意，如果所选枚举类型中没有表示该整数的值，就会导致[未定义行为](../../advanced/undefined_behavior#无效枚举转换)。
+Zig 0.17 新增了 `@fromBackingInt` 和 `@backingInt`，分别取代了已被标记为 deprecated 的 `@enumFromInt` 与 `@intFromEnum`（`zig fmt` 会自动完成这一替换）。
 
-如果目标枚举类型是非详尽枚举，那么除了涉及 `@intCast` 相关的安全检查之外，`@enumFromInt` 始终能够得到有效的枚举值。
+`@fromBackingInt` 能够将整数转换为枚举值，它的结果类型通过结果位置推断，参数必须**恰好**是该枚举的标记类型（例如 `u4`），因此其他整数类型需要先用 `@intCast` 转换。需要注意，如果所选枚举类型中没有表示该整数的值，就会导致[未定义行为](../../advanced/undefined_behavior#无效枚举转换)。
+
+如果目标枚举类型是非详尽枚举，那么 `@fromBackingInt` 始终能够得到有效的枚举值。反过来，`@backingInt` 返回值的类型就是枚举的标记类型。
 
 :::
 

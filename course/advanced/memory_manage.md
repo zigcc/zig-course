@@ -10,13 +10,13 @@ outline: deep
 
 事实上，Zig 本身的标准库为我们提供了多种内存分配模型：
 
-1. [`DebugAllocator`](https://ziglang.org/documentation/master/std/#std.heap.debug_allocator.DebugAllocator)
+1. [`SafeAllocator`](https://ziglang.org/documentation/master/std/#std.heap.SafeAllocator)
 2. [`SmpAllocator`](https://ziglang.org/documentation/master/std/#std.heap.SmpAllocator)
 3. [`FixedBufferAllocator`](https://ziglang.org/documentation/master/std/#std.heap.FixedBufferAllocator)
 4. [`ArenaAllocator`](https://ziglang.org/documentation/master/std/#std.heap.arena_allocator.ArenaAllocator)
 5. [`c_allocator`](https://ziglang.org/documentation/master/std/#std.heap.c_allocator)
 6. [`page_allocator`](https://ziglang.org/documentation/master/std/#std.heap.page_allocator)
-7. [`StackFallbackAllocator`](https://ziglang.org/documentation/master/std/#std.heap.StackFallbackAllocator)
+7. [`BufferFirstAllocator`](https://ziglang.org/documentation/master/std/#std.heap.BufferFirstAllocator)
 
 除了这七种内存分配模型外，还提供了内存池的功能 [`MemoryPool`](https://ziglang.org/documentation/master/std/#std.heap.memory_pool.MemoryPool)
 
@@ -38,13 +38,18 @@ outline: deep
 
 :::
 
-## `DebugAllocator`
+## `SafeAllocator`
 
-这是一个用于调试的分配器，现阶段适用于在调试模式下使用该分配器，它的性能并不高！
+这是一个以安全为目标的分配器，适合在调试模式下使用，它的性能并不高！
 
-这个分配器的目的不是为了性能，而是为了安全。默认配置下它支持线程安全、安全检查、泄漏检测等能力，并且这些特性都可以按需配置。
+Zig 0.17 用 `SafeAllocator` 取代了原来的 `DebugAllocator`（旧名称仍可使用但已被标记为 deprecated）。它不再是一个需要传入配置的泛型类型，而是一个普通结构体：
 
-<<<@/code/release/memory_manager.zig#DebugAllocator
+- 通过 `.init(backing_allocator, options)` 初始化，需要显式提供一个后备分配器（backing allocator），例如 `std.heap.page_allocator`；
+- 始终是线程安全的；
+- `deinit` 会报告并释放所有泄漏的内存，返回值为泄漏的数量（`usize`），不再是 `.ok` / `.leak` 枚举；
+- 能够检测重复释放、分配大小不匹配、跨实例释放等问题，在调试模式下默认还会检测释放后写入（write after free）。
+
+<<<@/code/release/memory_manager.zig#SafeAllocator
 
 ## `SmpAllocator`
 
@@ -66,9 +71,13 @@ outline: deep
 
 ## `FixedBufferAllocator`
 
-这个分配器是固定大小的内存缓冲区，无法扩容，常常在你需要缓冲某些东西时使用。注意默认情况下它不是线程安全的；而在 Zig 0.16 中，旧的线程安全包装分配器已被移除。如果只是需要线程安全分配，优先使用更适合并发场景的 `SmpAllocator`；如果必须跨线程共享同一个 `FixedBufferAllocator`，应在调用方使用与执行模型匹配的锁（例如 `std.Io.Mutex`）保护临界区。
+这个分配器是固定大小的内存缓冲区，无法扩容，常常在你需要缓冲某些东西时使用。注意 `allocator()` 返回的接口不是线程安全的。
 
 <<<@/code/release/memory_manager.zig#FixedBufferAllocator
+
+通用的 `ThreadSafeAllocator` 包装器在 Zig 0.16 中已被移除，如果需要跨线程共享同一个 `FixedBufferAllocator`，可以改用它自带的 `threadSafeAllocator()`，它提供了一个无锁的线程安全接口。注意不要同时混用 `allocator()` 和 `threadSafeAllocator()` 返回的接口。
+
+<<<@/code/release/memory_manager.zig#ThreadSafeFixedBufferAllocator
 
 ## `ArenaAllocator`
 
@@ -100,13 +109,15 @@ outline: deep
 
 <<<@/code/release/memory_manager.zig#page_allocator
 
-## `StackFallbackAllocator`
+## `BufferFirstAllocator`
 
-该分配器比较特殊，它会尽量在使用栈上的内存，如果请求的内存量超过了可用的栈空间，那么它将回退到事先制定的分配器，即使用堆内存。
+该分配器比较特殊，它会优先从给定的缓冲区（通常位于栈上）中分配内存，如果缓冲区剩余空间不足，那么它将回退到事先指定的分配器，即使用堆内存。
 
 该分配器的目的和内存池类似，都是尽量避免使用堆内存（堆内存相对于栈上分配过慢）。
 
-<<<@/code/release/memory_manager.zig#stack_fallback_allocator
+Zig 0.17 将原来的 `std.heap.stackFallback` / `StackFallbackAllocator` 重做为 `BufferFirstAllocator`：缓冲区不再作为类型参数内置在分配器中，而是由调用者自行准备后传入 `.init(buffer, fallback_allocator)`。
+
+<<<@/code/release/memory_manager.zig#buffer_first_allocator
 
 ## `MemoryPool`
 
@@ -129,4 +140,4 @@ outline: deep
 
 待添加，当前你可以通过实现 `Allocator` 接口来实现自己的分配器。为了做到这一点，必须仔细阅读 [`std/mem.zig`](https://github.com/ziglang/zig/blob/master/lib/std/mem.zig) 中的文档注释，然后提供 `allocFn` 和 `resizeFn`。
 
-有许多分配器示例可供查看以获取灵感。查看 [`std/heap.zig`](https://github.com/ziglang/zig/blob/master/lib/std/heap.zig) 和 [`std.heap.DebugAllocator`](https://github.com/ziglang/zig/blob/master/lib/std/heap/debug_allocator.zig)
+有许多分配器示例可供查看以获取灵感。查看 [`std/heap.zig`](https://github.com/ziglang/zig/blob/master/lib/std/heap.zig) 和 [`std.heap.SafeAllocator`](https://github.com/ziglang/zig/blob/master/lib/std/heap/SafeAllocator.zig)

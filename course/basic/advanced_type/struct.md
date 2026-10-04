@@ -226,7 +226,7 @@
 
 :::
 
-2. 可以使用位转换 [`@bitCast`](https://ziglang.org/documentation/master/#bitCast) 和指针转换 [`@ptrCast`](https://ziglang.org/documentation/master/#ptrCast) 来强制对 `packed` 结构体进行类型转换：
+2. 可以使用位转换 [`@bitCast`](https://ziglang.org/documentation/master/#bitCast) 和指针转换 [`@ptrCast`](https://ziglang.org/documentation/master/#ptrCast) 来强制对 `packed` 结构体进行类型转换。注意从 Zig 0.17 开始，`@bitCast` 的结果与目标架构的端序无关（数组的第一个元素对应最低有效位）；如果需要观察内存中真实的字节排列，可以使用 `std.mem.toBytes`：
 
 :::details 示例
 

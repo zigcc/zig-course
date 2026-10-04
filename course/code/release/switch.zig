@@ -147,11 +147,12 @@ const AutoRefer = struct {
 // 这段函数用来判断一个结构体的字段是否是 optional，同时它也是 comptime 的
 // 故我们可以在下面使用inline 来要求编译器帮我们展开这个switch
 fn isFieldOptional(comptime T: type, field_index: usize) !bool {
-    const fields = @typeInfo(T).Struct.fields;
+    // 0.17 起结构体的字段类型单独存放在 field_types 中
+    const field_types = @typeInfo(T).@"struct".field_types;
     return switch (field_index) {
         // 这里每次都是不同的值
-        inline 0...fields.len - 1 => |idx| {
-            return @typeInfo(fields[idx].type) == .Optional;
+        inline 0...field_types.len - 1 => |idx| {
+            return @typeInfo(field_types[idx]) == .optional;
         },
         else => return error.IndexOutOfBounds,
     };
@@ -160,16 +161,16 @@ fn isFieldOptional(comptime T: type, field_index: usize) !bool {
 
 // #region withSwitch
 const AnySlice = union(enum) {
-    a: u8,
-    b: i8,
-    c: bool,
-    d: []u8,
+    a: []const u8,
+    b: []const i8,
+    c: []const bool,
+    d: []const u32,
 };
 
 fn withSwitch(any: AnySlice) usize {
     return switch (any) {
         // 这里的 slice 可以匹配所有的 Anyslice 类型
-        inline else => |slice| _ = slice,
+        inline else => |slice| slice.len,
     };
 }
 // #endregion withSwitch
@@ -186,7 +187,7 @@ fn getNum(u: U) u32 {
         // 而 tag 则是对应的标签名，这是编译期可知的
         inline else => |num, tag| {
             if (tag == .b) {
-                return @trunc(num);
+                return @intFromFloat(num);
             }
             return num;
         },
@@ -259,20 +260,23 @@ const Instruction = enum {
 
 fn evaluate(initial_stack: []const i32, code: []const Instruction) !i32 {
     const std = @import("std");
-    var stack = try std.BoundedArray(i32, 8).fromSlice(initial_stack);
+    // std.BoundedArray 已被移除，这里使用基于固定缓冲区的 ArrayList 代替
+    var buffer: [8]i32 = undefined;
+    var stack: std.ArrayList(i32) = .initBuffer(&buffer);
+    try stack.appendSliceBounded(initial_stack);
     var ip: usize = 0;
 
     return vm: switch (code[ip]) {
         // Because all code after `continue` is unreachable, this branch does
         // not provide a result.
         .add => {
-            try stack.append(stack.pop().? + stack.pop().?);
+            try stack.appendBounded(stack.pop().? + stack.pop().?);
 
             ip += 1;
             continue :vm code[ip];
         },
         .mul => {
-            try stack.append(stack.pop().? * stack.pop().?);
+            try stack.appendBounded(stack.pop().? * stack.pop().?);
 
             ip += 1;
             continue :vm code[ip];
@@ -281,3 +285,33 @@ fn evaluate(initial_stack: []const i32, code: []const Instruction) !i32 {
     };
 }
 // #endregion vm
+
+test "isFieldOptional" {
+    const std = @import("std");
+    const S = struct { a: u8, b: ?u8 };
+    try std.testing.expect(!try isFieldOptional(S, 0));
+    try std.testing.expect(try isFieldOptional(S, 1));
+    try std.testing.expectError(error.IndexOutOfBounds, isFieldOptional(S, 2));
+}
+
+test "withSwitch" {
+    const std = @import("std");
+    try std.testing.expectEqual(3, withSwitch(.{ .a = "abc" }));
+    try std.testing.expectEqual(2, withSwitch(.{ .c = &.{ true, false } }));
+}
+
+test "getNum" {
+    const std = @import("std");
+    try std.testing.expectEqual(42, getNum(.{ .a = 42 }));
+    try std.testing.expectEqual(3, getNum(.{ .b = 3.7 }));
+}
+
+test "vm" {
+    const std = @import("std");
+    // 栈顶在右侧：先计算 3 + 2 = 5，再计算 7 * 5 = 35
+    try std.testing.expectEqual(35, try evaluate(&.{ 7, 2, 3 }, &.{ .add, .mul, .end }));
+}
+
+test "switch main" {
+    try main();
+}

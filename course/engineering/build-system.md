@@ -23,21 +23,29 @@ Zig 使用 `build.zig` 文件来描述一个项目的构建步骤。
 
 <<<@/code/release/build_system/basic/build.zig
 
-`build` 是构建的入口函数，而不是常见的 `main`，真正的 `main` 函数定义在 [`build_runner.zig`](https://github.com/ziglang/zig/blob/master/lib/compiler/build_runner.zig#L15) 中，这是由于 Zig 的构建分为两个阶段：
+`build` 是构建的入口函数，而不是常见的 `main`，真正的 `main` 函数由 Zig 的构建系统提供，这是由于 Zig 的构建分为两个阶段：
 
-1. 生成由 [`std.Build.Step`](https://ziglang.org/documentation/master/std/#std.Build.Step) 构成的有向无环图（DAG，即 Directed Acyclic Graph——一种不包含环路的有向图结构，用于表达步骤之间的依赖关系）
-2. 执行真正的构建逻辑
+1. 配置阶段（configure）：执行 `build.zig`，生成由 [`std.Build.Step`](https://ziglang.org/documentation/master/std/#std.Build.Step) 构成的有向无环图（DAG，即 Directed Acyclic Graph——一种不包含环路的有向图结构，用于表达步骤之间的依赖关系）
+2. 执行阶段（make）：执行真正的构建逻辑
+
+::: info 🅿️ 提示
+
+从 Zig 0.17 开始，这两个阶段被拆分到了两个独立的进程中：负责运行 `build.zig` 的配置进程（configurer），以及负责包管理和执行构建图的执行进程（maker）。配置结果会被序列化并缓存，当配置没有变化时，`zig build` 甚至可以跳过 `build.zig` 的执行。
+
+因此，`build` 函数应当只“描述”构建图，而不要直接产生副作用（例如在 `build` 函数中直接启动子进程）；需要执行的操作应声明为 `Run` 等步骤。如果 `build` 函数的逻辑依赖某个文件或目录的内容，应通过 `b.dependOnFileContents`、`b.dependOnDirectoryContents` 等函数显式声明，以便缓存在其变化时失效。另外，旧的 `b.build_root` 也被替换为 `b.root`。
+
+:::
 
 > [!TIP]
 > 第一次接触 Zig 的构建流程，可能会觉得复杂，尤其是构建 Step 的依赖关系，但这是为了后续并发编译作基础。
 >
-> 如果没有 `build_runner.zig` ，让开发者自己去处理并发编译，将会非常繁琐且容易出错。
+> 如果没有构建系统统一调度，让开发者自己去处理并发编译，将会非常繁琐且容易出错。
 
 `Step` 会在下一小节中会重点讲述，这里介绍一下上面这个构建文件的其他部分：
 
 - `b.standardTargetOptions`: 允许构建器读取来自命令行参数的目标配置，并返回可直接传给模块 `.target` 的 `ResolvedTarget`。
 - `b.standardOptimizeOption`：允许构建器读取来自命令行参数的**构建优化模式**。
-- `b.addExecutable`：创建一个 [`Build.Step.Compile`](https://ziglang.org/documentation/master/std/#std.Build.Step.Compile) 并返回对应的指针，Zig 0.16 中通常通过 `root_module = b.createModule(...)` 指定入口模块。
+- `b.addExecutable`：创建一个 [`Build.Step.Compile`](https://ziglang.org/documentation/master/std/#std.Build.Step.Compile) 并返回对应的指针，Zig 0.16 起通常通过 `root_module = b.createModule(...)` 指定入口模块。
 - `b.path`：该函数会返回相对当前包根目录的 `LazyPath`，常用于模块的 `root_source_file`。
 
 ::: info 🅿️ 提示
@@ -65,6 +73,12 @@ C --> B --> A
 <<<@/code/release/build_system/step/build.zig
 
 以上代码中，我们可以使用 `zig build run -- arg1` 向构建产物传递参数！
+
+::: info 🅿️ 提示
+
+Zig 0.17 移除了 `b.args`。由于构建脚本的配置阶段会被缓存，`--` 之后的参数不再在 `build` 函数中可见，而是通过 `run.addPassthruArgs()` 声明一个占位符，在执行阶段再替换为实际参数。
+
+:::
 
 ::: info 🅿️ 提示
 
@@ -154,7 +168,7 @@ Project-Specific Options:
 
 通常，二进制可执行程序的构建结果会输出在 `zig-out/bin` 下，而链接库的构建结果会输出在 `zig-out/lib` 下。
 
-如果要连接到系统的库，在 Zig 0.16 的模块化构建 API 中通常使用 `exe.root_module.linkSystemLibrary`，Zig 内部借助 pkg-config 实现该功能。类似地，链接其他库或添加 C/C++ 源文件时，也通常是操作 `root_module`。示例：
+如果要连接到系统的库，在 Zig 0.16 起的模块化构建 API 中通常使用 `exe.root_module.linkSystemLibrary`，Zig 内部借助 pkg-config 实现该功能。类似地，链接其他库或添加 C/C++ 源文件时，也通常是操作 `root_module`。示例：
 
 <<<@/code/release/build_system/system_lib/build.zig
 
@@ -204,7 +218,7 @@ zig 本身提供了一个实验性的文档生成器，它支持搜索查询，�
 
 关于所有的 target，可以使用 `zig targets` 查看。
 
-最常用的一个 target 设置可能是 `b.standardTargetOptions`，它会允许读取命令行输入来决定构建目标 target，并返回一个 [`ResolvedTarget`](https://ziglang.org/documentation/master/std/#std.Build.ResolvedTarget)。在 Zig 0.16 的模块化构建 API 中，这个值通常传给模块的 `.target` 字段。
+最常用的一个 target 设置可能是 `b.standardTargetOptions`，它会允许读取命令行输入来决定构建目标 target，并返回一个 [`ResolvedTarget`](https://ziglang.org/documentation/master/std/#std.Build.ResolvedTarget)。在 Zig 0.16 起的模块化构建 API 中，这个值通常传给模块的 `.target` 字段。
 
 如果需要手动指定一个 target，可以先构建一个 `std.Target.Query`，再通过 `b.resolveTargetQuery` 得到 `ResolvedTarget`，并把解析后的结果传给模块，如：
 

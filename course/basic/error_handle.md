@@ -144,7 +144,7 @@ outline: deep
 
 `errdefer` 可以看作是 `defer` 的一个特殊变体，它用于处理错误，仅在函数作用域返回错误时，才会执行 `errdefer`。
 
-还可以使用捕获语法来捕获错误，这对于在清理期间打印错误信息很有用。
+在 Zig 0.17 之前，还可以使用 `errdefer |err| { ... }` 这样的捕获语法来获取错误值。Zig 0.17 已经**移除**了这种捕获语法：如果需要在清理时观察具体的错误，可以把函数拆成两层，在内层继续使用不带捕获的 `errdefer` 做清理，在外层通过 `catch |err|` 获取错误。
 
 <<<@/code/release/error_handle.zig#DeferErrorCapture
 

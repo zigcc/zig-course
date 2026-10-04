@@ -1,6 +1,7 @@
 pub fn main() !void {
     try EnumSize.main();
     try EnumReference.main();
+    try Non_exhaustiveEnum.main();
 }
 
 // #region basic_enum
@@ -67,9 +68,12 @@ const EnumSize = struct {
     };
 
     pub fn main() !void {
-        try expect(@typeInfo(Small).@"enum".tag_type == u2);
-        try expect(@typeInfo(Small).@"enum".fields.len == 4);
-        try expect(mem.eql(u8, @typeInfo(Small).@"enum".fields[1].name, "two"));
+        const info = @typeInfo(Small).@"enum";
+        try expect(info.tag_type == u2);
+        // 0.17 起类型信息采用“数组结构体”风格：字段名与字段值分别存放
+        try expect(info.field_names.len == 4);
+        try expect(mem.eql(u8, info.field_names[1], "two"));
+        try expect(info.field_values[1] == 1);
         try expect(mem.eql(u8, @tagName(Small.three), "three"));
     }
     // #endregion enum_size
@@ -128,16 +132,19 @@ const Non_exhaustiveEnum = struct {
         };
 
         // 明确列出的枚举值
-        const blue: Color = @enumFromInt(2);
+        // 0.17 使用 @fromBackingInt 代替 @enumFromInt
+        const blue: Color = @fromBackingInt(2);
         try expect(blue == .blue);
 
         // 未列出的枚举值：8 在 u4 的范围内（0~15）
-        const yellow: Color = @enumFromInt(8);
+        const yellow: Color = @fromBackingInt(8);
         try expect(@TypeOf(yellow) == Color);
-        try expect(@intFromEnum(yellow) == 8);
+        // 0.17 使用 @backingInt 代替 @intFromEnum，结果类型就是标记类型 u4
+        try expect(@backingInt(yellow) == 8);
+        try expect(@TypeOf(@backingInt(yellow)) == u4);
 
-        // 42 超出了 u4 的范围，会触发未定义行为
-        // const ub: Color = @enumFromInt(42);
+        // @fromBackingInt 的参数必须恰好是标记类型 u4，42 超出了 u4 的范围，无法通过编译
+        // const ub: Color = @fromBackingInt(42);
 
         // #endregion enum_from_int
     }
@@ -148,7 +155,7 @@ const EnumLiteral_ = struct {
     pub fn main() !void {
         // #region enum_literal
         // 使用内建函数 @EnumLiteral 构造出一个 EnumLiteral 类型
-        // Zig 0.16 使用 @EnumLiteral() 替代 @Type(.enum_literal)
+        // Zig 0.16 起使用 @EnumLiteral() 替代 @Type(.enum_literal)
         const EnumLiteralType: type = @EnumLiteral();
 
         // 定义一个常量 enum_literal，它的类型为 EnumLiteral，并赋值为 ".kkk"
@@ -159,3 +166,9 @@ const EnumLiteral_ = struct {
         // #endregion enum_literal
     }
 };
+
+test "enum" {
+    try EnumSize.main();
+    try EnumReference.main();
+    try Non_exhaustiveEnum.main();
+}

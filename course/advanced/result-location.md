@@ -106,9 +106,11 @@ outline: deep
 
 <<<@/code/release/result-location.zig#stdlib_arraylist
 
-### DebugAllocator
+### SafeAllocator
 
-<<<@/code/release/result-location.zig#stdlib_debug_allocator
+Zig 0.17 中取代 `DebugAllocator` 的 `SafeAllocator` 需要传入后备分配器，因此它的 `init` 是一个函数，通过 `.init(...)` 这种调用函数的声明字面量进行初始化：
+
+<<<@/code/release/result-location.zig#stdlib_safe_allocator
 
 ## 字段和声明不可重名
 

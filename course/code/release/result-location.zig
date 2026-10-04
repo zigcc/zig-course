@@ -13,7 +13,7 @@ pub fn main() !void {
     // 以下示例需要 allocator，仅在测试中运行
     // try DeclLiteralErrorUnion.main();
     // try StdLibArrayList.main();
-    try StdLibDebugAllocator.main();
+    try StdLibSafeAllocator.main();
 }
 
 const BasicInference = struct {
@@ -296,31 +296,32 @@ const StdLibArrayList = struct {
     // #endregion stdlib_arraylist
 };
 
-const StdLibDebugAllocator = struct {
-    // #region stdlib_debug_allocator
+const StdLibSafeAllocator = struct {
+    // #region stdlib_safe_allocator
     pub fn main() !void {
-        // DebugAllocator 在 0.16 中提供了 .init 声明
-        var gpa: std.heap.DebugAllocator(.{}) = .init;
-        defer _ = gpa.deinit();
+        // 0.17 中 SafeAllocator 取代了 DebugAllocator，
+        // 它的 init 是一个函数，同样可以通过声明字面量 .init(...) 调用
+        var safe: std.heap.SafeAllocator = .init(std.heap.page_allocator, .{});
+        defer _ = safe.deinit();
 
-        const allocator = gpa.allocator();
+        const allocator = safe.allocator();
         const ptr = try allocator.alloc(u8, 100);
         defer allocator.free(ptr);
 
         std.debug.print("allocated {} bytes\n", .{ptr.len});
     }
 
-    test "debug allocator with decl literal" {
-        var gpa: std.heap.DebugAllocator(.{}) = .init;
-        defer _ = gpa.deinit();
+    test "safe allocator with decl literal" {
+        var safe: std.heap.SafeAllocator = .init(std.heap.page_allocator, .{});
+        defer _ = safe.deinit();
 
-        const allocator = gpa.allocator();
+        const allocator = safe.allocator();
         const ptr = try allocator.alloc(u8, 100);
         defer allocator.free(ptr);
 
         try std.testing.expectEqual(100, ptr.len);
     }
-    // #endregion stdlib_debug_allocator
+    // #endregion stdlib_safe_allocator
 };
 
 const NamingConflict = struct {
@@ -380,10 +381,10 @@ test "stdlib arraylist" {
     try std.testing.expectEqual(1, c.list.items.len);
 }
 
-test "stdlib debug allocator" {
-    var gpa: std.heap.DebugAllocator(.{}) = .init;
-    defer _ = gpa.deinit();
-    const allocator = gpa.allocator();
+test "stdlib safe allocator" {
+    var safe: std.heap.SafeAllocator = .init(std.heap.page_allocator, .{});
+    defer _ = safe.deinit();
+    const allocator = safe.allocator();
     const ptr = try allocator.alloc(u8, 100);
     defer allocator.free(ptr);
     try std.testing.expectEqual(100, ptr.len);

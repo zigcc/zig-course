@@ -183,16 +183,27 @@ const ErrDefer = struct {
     const std = @import("std");
 
     // #region DeferErrorCapture
+    // 0.17 移除了 `errdefer |err| { ... }` 捕获语法
+    // 需要观察错误时，把函数拆成两层，在外层用 catch 捕获
     fn deferErrorCaptureExample() !void {
-        // 捕获错误
-        errdefer |err| {
+        deferErrorCaptureInner() catch |err| {
             std.debug.print("the error is {s}\n", .{@errorName(err)});
-        }
+            return err;
+        };
+    }
+
+    fn deferErrorCaptureInner() !void {
+        // 这里依然可以使用不带捕获的 errdefer 做清理
+        errdefer std.debug.print("cleanup before returning error\n", .{});
 
         return error.DeferError;
     }
     // #endregion DeferErrorCapture
 };
+
+test "errdefer capture migration" {
+    try @import("std").testing.expectError(error.DeferError, ErrDefer.deferErrorCaptureExample());
+}
 
 const DeferErrDefer = struct {
     // #region DeferErrDefer

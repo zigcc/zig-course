@@ -1,5 +1,5 @@
 pub fn main() !void {
-    try DebugAllocator.main();
+    try SafeAllocator.main();
     try SmpAllocator.main();
     try BestAllocator.main();
     try FixedBufferAllocator.main();
@@ -7,27 +7,28 @@ pub fn main() !void {
     try ArenaAllocator.main();
     try c_allocator.main();
     try page_allocator.main();
-    try StackFallbackAllocator.main();
+    try BufferFirstAllocator.main();
     try MemoryPool.main();
 }
 
-const DebugAllocator = struct {
-    // #region DebugAllocator
+const SafeAllocator = struct {
+    // #region SafeAllocator
     const std = @import("std");
 
     pub fn main() !void {
-        // 使用模型，一定要是变量，不能是常量
-        var gpa = std.heap.DebugAllocator(.{}){};
+        // 0.17 使用 SafeAllocator 取代了 DebugAllocator
+        // 它需要一个后备分配器（backing allocator），一定要是变量，不能是常量
+        var safe: std.heap.SafeAllocator = .init(std.heap.page_allocator, .{});
         // 拿到一个allocator
-        const allocator = gpa.allocator();
+        const allocator = safe.allocator();
 
-        // defer 用于执行debug_allocator善后工作
+        // defer 用于执行 SafeAllocator 善后工作
         defer {
-            // 尝试进行 deinit 操作
-            const deinit_status = gpa.deinit();
+            // deinit 会报告并释放所有泄漏的内存，返回值为泄漏的数量
+            const leaks = safe.deinit();
 
             // 检测是否发生内存泄漏
-            if (deinit_status == .leak) @panic("TEST FAIL");
+            if (leaks != 0) @panic("TEST FAIL");
         }
 
         //申请内存
@@ -35,7 +36,7 @@ const DebugAllocator = struct {
         // 延后释放内存
         defer allocator.free(bytes);
     }
-    // #endregion DebugAllocator
+    // #endregion SafeAllocator
 };
 
 const SmpAllocator = struct {
@@ -84,16 +85,10 @@ const ThreadSafeFixedBufferAllocator = struct {
         var fba = std.heap.FixedBufferAllocator.init(&buffer);
 
         // 获取内存allocator
-        const allocator = fba.allocator();
-
-        // Zig 0.16 移除了 ThreadSafeAllocator。
-        // 如果需要在线程间共享 FixedBufferAllocator，需要自行保护临界区。
-        var mutex: std.atomic.Mutex = .unlocked;
-
-        while (!mutex.tryLock()) {
-            std.atomic.spinLoopHint();
-        }
-        defer mutex.unlock();
+        // 通用的 ThreadSafeAllocator 包装器已被移除，
+        // FixedBufferAllocator 自身提供了线程安全的分配器接口
+        // 注意：不要同时混用 allocator() 和 threadSafeAllocator() 返回的接口
+        const allocator = fba.threadSafeAllocator();
 
         // 申请内存
         const memory = try allocator.alloc(u8, 100);
@@ -106,18 +101,19 @@ const ThreadSafeFixedBufferAllocator = struct {
 const BestAllocator = struct {
     const std = @import("std");
     const builtin = @import("builtin");
-    var debug_allocator: std.heap.DebugAllocator(.{}) = .{};
+    var safe_allocator: std.heap.SafeAllocator = .init(std.heap.page_allocator, .{});
 
     pub fn main() !void {
         const allocator, const is_debug = allocator: {
-            if (builtin.os.tag == .wasi) break :allocator .{ std.heap.wasm_allocator, false };
+            if (builtin.target.os.tag == .wasi) break :allocator .{ std.heap.wasm_allocator, false };
+            // 0.17 中优化模式的标签改为 .debug、.safe、.fast、.small
             break :allocator switch (builtin.mode) {
-                .Debug, .ReleaseSafe => .{ debug_allocator.allocator(), true },
-                .ReleaseFast, .ReleaseSmall => .{ std.heap.smp_allocator, false },
+                .debug, .safe => .{ safe_allocator.allocator(), true },
+                .fast, .small => .{ std.heap.smp_allocator, false },
             };
         };
         defer if (is_debug) {
-            _ = debug_allocator.deinit();
+            _ = safe_allocator.deinit();
         };
         //申请内存
         const bytes = try allocator.alloc(u8, 100);
@@ -132,15 +128,13 @@ const ArenaAllocator = struct {
 
     pub fn main() !void {
         // 使用模型，一定要是变量，不能是常量
-        var gpa = std.heap.DebugAllocator(.{}){};
+        var safe: std.heap.SafeAllocator = .init(std.heap.page_allocator, .{});
         // 拿到一个allocator
-        const allocator = gpa.allocator();
+        const allocator = safe.allocator();
 
-        // defer 用于执行 debug allocator 善后工作
+        // defer 用于执行 SafeAllocator 善后工作
         defer {
-            const deinit_status = gpa.deinit();
-
-            if (deinit_status == .leak) @panic("TEST FAIL");
+            if (safe.deinit() != 0) @panic("TEST FAIL");
         }
 
         // 对通用内存分配器进行一层包裹
@@ -184,25 +178,24 @@ const page_allocator = struct {
     // #endregion page_allocator
 };
 
-const StackFallbackAllocator = struct {
-    // #region stack_fallback_allocator
+const BufferFirstAllocator = struct {
+    // #region buffer_first_allocator
     const std = @import("std");
 
     pub fn main() !void {
-        // 初始化一个优先使用栈区的分配器
-        // 栈区大小为256个字节，如果栈区不够用，就会使用page allocator
-        var stack_alloc = std.heap.stackFallback(
-            256 * @sizeOf(u8),
-            std.heap.page_allocator,
-        );
-        // 获取分配器
-        const stack_allocator = stack_alloc.get();
+        // 0.17 中 stackFallback 被重做为 BufferFirstAllocator，缓冲区改为由调用者传入
+        // 先在栈上准备 256 个字节的缓冲区
+        var buffer: [256]u8 = undefined;
+        // 优先从缓冲区分配，如果缓冲区不够用，就会使用 page allocator
+        var bfa: std.heap.BufferFirstAllocator = .init(&buffer, std.heap.page_allocator);
+        // 获取分配器，和其他分配器一样调用 allocator()
+        const allocator = bfa.allocator();
         // 申请内存
-        const memory = try stack_allocator.alloc(u8, 100);
+        const memory = try allocator.alloc(u8, 100);
         // 释放内存
-        defer stack_allocator.free(memory);
+        defer allocator.free(memory);
     }
-    // #endregion stack_fallback_allocator
+    // #endregion buffer_first_allocator
 };
 
 const MemoryPool = struct {
@@ -211,7 +204,7 @@ const MemoryPool = struct {
 
     pub fn main() !void {
         // 此处为了演示，直接使用page allocator
-        // Zig 0.16 中 MemoryPool 使用 .empty 常量初始化
+        // Zig 0.16 起 MemoryPool 使用 .empty 常量初始化
         var pool: std.heap.MemoryPool(u32) = .empty;
         defer pool.deinit(std.heap.page_allocator);
 
@@ -232,3 +225,16 @@ const MemoryPool = struct {
     }
     // #endregion MemoryPool
 };
+
+test "allocators" {
+    try SafeAllocator.main();
+    try SmpAllocator.main();
+    try BestAllocator.main();
+    try FixedBufferAllocator.main();
+    try ThreadSafeFixedBufferAllocator.main();
+    try ArenaAllocator.main();
+    try c_allocator.main();
+    try page_allocator.main();
+    try BufferFirstAllocator.main();
+    try MemoryPool.main();
+}
