@@ -91,7 +91,7 @@ Zig 本身没有内置的 `@print()` 函数，输出功能通常由标准库的 
 
 为了保证线程安全，通常需要在共享 `writer` 的外层自行做同步。
 
-在 Zig 0.16 中，常见做法是使用 `std.Io.Mutex`（需要 `Io` 实例）或基于 `std.atomic.Mutex` 的轻量自旋锁，根据具体场景选择。
+从 Zig 0.16 起，常见做法是使用 `std.Io.Mutex`（需要 `Io` 实例）或基于 `std.atomic.Mutex` 的轻量自旋锁，根据具体场景选择。
 
 我们鼓励你阅读[标准库源码](https://ziglang.org/documentation/master/std/#std.Io.Mutex)来深入了解其工作原理。
 
