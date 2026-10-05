@@ -16,7 +16,7 @@ showVersion: false
 
 ::: tip 🅿️ 推荐的升级顺序
 
-1. 先手动处理**语法层面**的移除项（`**`、`errdefer |err|`、`void{}`、`i0`）。`0.17.0` 的 `zig fmt` 无法解析这些已被移除的语法，不先处理的话 `zig fmt` 会直接报错
+1. 先手动处理**无法再被解析**的语法：数组乘法 `**` 和 `errdefer |err|`。`0.17.0` 的 `zig fmt` 遇到它们会直接报错；`void{}` 与 `i0` 仍然可以被解析，可以留到编译时按错误提示修复
 2. 运行一次 `zig fmt`，它会自动把 `@intFromEnum` / `@enumFromInt` 升级为 `@backingInt` / `@fromBackingInt`
 3. 修复 `build.zig`，确保构建脚本本身能够跑起来
 4. 按编译错误逐个修复标准库与反射相关的 API
@@ -190,7 +190,7 @@ const c = @import("c");
 
 ### `@intFromEnum` / `@enumFromInt` 改为 `@backingInt` / `@fromBackingInt`
 
-`@intFromEnum` 和 `@enumFromInt` 被标记为 deprecated，取而代之的是 `@backingInt` 和 `@fromBackingInt`。**`zig fmt` 会自动完成这一替换**，但有一处需要手动处理：`@fromBackingInt` 的参数必须**恰好**是枚举的底层整数类型，不再接受其他整数类型，因此通常需要补一个 `@intCast`：
+`@intFromEnum` 和 `@enumFromInt` 被标记为 deprecated，取而代之的是 `@backingInt` 和 `@fromBackingInt`。**`zig fmt` 会自动完成这一替换**。由于 `@fromBackingInt` 的参数必须**恰好**是枚举的底层整数类型，不再接受其他整数类型，`zig fmt` 会把 `@enumFromInt(x)` 改写为 `@fromBackingInt(@intCast(x))`；手写新代码时同样需要注意这一点：
 
 ```zig
 const Color = enum(u4) { red, green, blue = 8 };
@@ -483,21 +483,23 @@ const foo = list.last().?;
 
 ### `std.zon.parse` 重做
 
-`std.zon.parse` 现在接受结构体参数，结果从 arena 中分配，因此也不再需要 `parse.free`：
+`std.zon.parse` 中的解析函数现在接受一个选项结构体作为参数，结果从 arena 中分配，因此 `std.zon.parse.free` 也被移除了：
 
 ```zig
+const Diagnostics = std.zon.parse.Diagnostics;
+
 // 0.16.0
 var diag: Diagnostics = .{};
 defer diag.deinit(gpa);
-const result = std.zon.fromSlice(MyZonType, gpa, source, &diag, .{}) catch |err| switch (err) {
+const result = std.zon.parse.fromSliceAlloc(MyZonType, gpa, source, &diag, .{}) catch |err| switch (err) {
     error.ParseZon => std.process.fatal("input.zon: {f}", .{diag}),
     error.OutOfMemory => |e| return e,
 };
-defer std.zon.parse.free(result);
+defer std.zon.parse.free(gpa, result);
 
 // 0.17.0
 var diag: Diagnostics = undefined;
-const result = std.zon.fromSlice(MyZonType, .{
+const result = std.zon.parse.fromSlice(MyZonType, .{
     .gpa = gpa,
     .arena = arena,
     .source = source,
@@ -508,7 +510,9 @@ const result = std.zon.fromSlice(MyZonType, .{
 };
 ```
 
-另外请留意方法名的变化：原来的 `fromSliceAlloc` 改名为 `fromSlice`，而原来**不分配内存**的 `fromSlice` 改名为 `fromSliceNoAlloc`，其他“from”系列方法也按同样的规则改名。
+另外请留意方法名的变化：原来的 `fromSliceAlloc` 改名为 `fromSlice`，而原来**不分配内存**的 `fromSlice` 改名为 `fromSliceNoAlloc`，`fromZoir` 等其他“from”系列方法也按同样的规则改名。
+
+注意发布说明中把这些函数简写成了 `std.zon.fromSlice`，但 `std.zon` 本身并没有导出它们，实际仍需通过 `std.zon.parse.fromSlice` 调用。
 
 ### `bit_set` 类型与 `initEmpty` / `initFull`
 
