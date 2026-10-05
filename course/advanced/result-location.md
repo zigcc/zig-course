@@ -102,7 +102,9 @@ outline: deep
 
 从 Zig 0.14.0 开始，标准库中的许多类型都采用了声明字面量模式。
 
-### ArrayListUnmanaged
+### ArrayList
+
+Zig 0.15.1 起 `std.ArrayList` 默认不再保存分配器（unmanaged），原来的 `std.ArrayListUnmanaged` 只是它的别名，并已被标记为 deprecated。它的空状态通过 `.empty` 声明字面量获得：
 
 <<<@/code/release/result-location.zig#stdlib_arraylist
 
