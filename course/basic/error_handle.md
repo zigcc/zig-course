@@ -116,7 +116,7 @@ outline: deep
 
 那么如何断言函数不会返回错误呢？
 
-使用 `unreachable`。这会告诉编译器此次函数执行不会返回错误。`unreachable` 在 `Debug` 和 `ReleaseSafe` 模式下会触发恐慌（panic），而在 `ReleaseFast` 和 `ReleaseSmall` 模式下会产生未定义行为。因此，当调试应用程序时，如果函数执行到这里，就会发生 `panic`。
+使用 `unreachable`。这会告诉编译器此次函数执行不会返回错误。`unreachable` 在 `debug` 和 `safe` 模式下会触发恐慌（panic），而在 `fast` 和 `small` 模式下会产生未定义行为。因此，当调试应用程序时，如果函数执行到这里，就会发生 `panic`。
 
 <<<@/code/release/error_handle.zig#AssertNoError
 

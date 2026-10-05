@@ -11,7 +11,7 @@ zig 本身有许多未定义行为，它们可以很方便地帮助开发者找�
 > [!WARNING]
 > 注意：本章节并没有 CI 检查，故可能存在内容过期的情况，具体可参考 [官方手册](https://ziglang.org/documentation/master/#Undefined-Behavior)。
 
-安全检查会在 debug、ReleaseSafe 模式下开启，但可以使用 [`@setRuntimeSafety`](https://ziglang.org/documentation/master/#setRuntimeSafety) 来强制指定在单独的块中是否开启安全检查（这将忽略构建模式）。
+安全检查会在 `debug`、`safe` 模式下开启，但可以使用 [`@setRuntimeSafety`](https://ziglang.org/documentation/master/#setRuntimeSafety) 来强制指定在单独的块中是否开启安全检查（这将忽略构建模式）。
 
 当出现安全检查失败时，zig 会编译失败并触发堆栈跟踪：
 

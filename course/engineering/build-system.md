@@ -96,16 +96,22 @@ Zig 0.17 移除了 `b.args`。由于构建脚本的配置阶段会被缓存，`-
 
 zig 提供了四种构建模式（**Build Mode**）：
 
-- _Debug_
-- _ReleaseFast_
-- _ReleaseSafe_
-- _ReleaseSmall_
+- _debug_
+- _fast_
+- _safe_
+- _small_
 
-如果在 `build.zig` 中使用了 [`standardOptimizeOption`](https://ziglang.org/documentation/master/std/#std.Build.standardOptimizeOption)，则构建系统会接收命令行的参数来决定实际构建模式（缺省时为 Debug），参数类型为 `-Doptimize`，例如 `zig build -Doptimize=Debug` 就是以 Debug 模式构建。
+:::info 🅿️ 提示
+
+Zig 0.17 将这四种模式从 `Debug`、`ReleaseFast`、`ReleaseSafe`、`ReleaseSmall` 更名为 `debug`、`fast`、`safe`、`small`，对应的类型也从 `std.builtin.OptimizeMode` 更名为 `std.lang.Optimize`。命令行参数暂时仍兼容旧名称，但在代码中使用 `==` 或 `!=` 比较时必须使用新名称。
+
+:::
+
+如果在 `build.zig` 中使用了 [`standardOptimizeOption`](https://ziglang.org/documentation/master/std/#std.Build.standardOptimizeOption)，则构建系统会接收命令行的参数来决定实际构建模式（缺省时为 debug），参数类型为 `-Doptimize`，例如 `zig build -Doptimize=fast` 就是以 fast 模式构建。
 
 以下讲述四种构建模式的区别：
 
-| Debug          | ReleaseFast    | ReleaseSafe    | ReleaseSmall   |
+| debug          | fast           | safe           | small          |
 | -------------- | -------------- | -------------- | -------------- |
 | 构建速度很快   | 构建速度慢     | 构建速度慢     | 构建速度慢     |
 | 启用安全检查   | 禁用安全检查   | 启用安全检查   | 禁用安全检查   |
@@ -113,11 +119,11 @@ zig 提供了四种构建模式（**Build Mode**）：
 | 二进制体积大   | 二进制体积大   | 二进制体积大   | 二进制体积小   |
 | 无复现构建     | 可复现构建     | 可复现构建     | 可复现构建     |
 
-:::details 关于 Debug 不可复现的原因
+:::details 关于 debug 不可复现的原因
 
-关于为什么 Debug 是不可复现的，zig 官方手册并未给出具体说明，根据社区的讨论：
+关于为什么 debug 是不可复现的，zig 官方手册并未给出具体说明，根据社区的讨论：
 
-在 Debug 构建模式下，编译器会添加一些随机因素进入到程序中（例如内存结构不同），所以任何没有明确说明内存布局的容器在 Debug 构建下可能会有所不同，这便于我们在 Debug 模式下快速暴露某些错误。
+在 debug 构建模式下，编译器会添加一些随机因素进入到程序中（例如内存结构不同），所以任何没有明确说明内存布局的容器在 debug 构建下可能会有所不同，这便于我们在 debug 模式下快速暴露某些错误。
 
 有意思的是，这并不会影响程序正常运行，除非你的程序逻辑有问题。
 
