@@ -8,8 +8,8 @@ outline: deep
 
 ## 构建模式下的行为
 
-- 在 `Debug` 和 `ReleaseSafe` 模式下，`unreachable` 会触发 `panic`，并报告"不可达代码"错误，帮助开发者发现逻辑漏洞。
-- 在 `ReleaseFast` 和 `ReleaseSmall` 模式下，编译器会**假定**永远不会执行到 `unreachable` 处，从而对代码进行优化（例如消除死代码分支）。如果程序实际运行到此处，则是未定义行为。
+- 在 `debug` 和 `safe` 模式下，`unreachable` 会触发 `panic`，并报告"不可达代码"错误，帮助开发者发现逻辑漏洞。
+- 在 `fast` 和 `small` 模式下，编译器会**假定**永远不会执行到 `unreachable` 处，从而对代码进行优化（例如消除死代码分支）。如果程序实际运行到此处，则是未定义行为。
 
 ## 使用场景
 

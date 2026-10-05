@@ -53,7 +53,7 @@ Zig 0.17 用 `SafeAllocator` 取代了原来的 `DebugAllocator`（旧名称仍�
 
 ## `SmpAllocator`
 
-专为 `ReleaseFast` 优化设计的分配器，启用多线程。
+专为 `fast` 构建模式设计的分配器，支持多线程。
 
 这个分配器是一个单例；它使用全局状态，并且整个过程只应实例化一个。
 
