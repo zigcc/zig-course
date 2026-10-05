@@ -44,7 +44,7 @@ Zig 支持最大 `2^32 - 1` 的向量长度。请注意，过长的向量长度�
 
 ## `@reduce`
 
-`@reduce(comptime op: std.builtin.ReduceOp, value: anytype) E`
+`@reduce(comptime op: std.lang.ReduceOp, value: anytype) E`
 
 使用传入的运算符对向量进行水平归约（_sequential horizontal reduction_），最终得到一个标量。
 

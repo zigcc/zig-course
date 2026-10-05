@@ -22,7 +22,7 @@ var map = std.AutoHashMap(i32, void).init(std.testing.allocator);
 
 ## 整数
 
-[整数](../basic/basic_type/number.md) 声明可以使用 `u0` 和 `i0` 来声明**零大小整数类型**，它们的大小也是 0 bit。
+[整数](../basic/basic_type/number.md) 声明可以使用 `u0` 来声明**零大小整数类型**，它的大小也是 0 bit。Zig 0.17 移除了 `i0`，原来使用 `i0` 的地方基本都可以直接换成 `u0`。
 
 ## 数组和切片
 

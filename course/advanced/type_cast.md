@@ -108,7 +108,7 @@ undefined 是一个神奇的值，它可以赋值给所有类型，代表这个�
 
 显式强制转换是通过内建函数完成的，有些转换是安全的，有些是执行语言级断言，有些转换在运行时无操作。
 
-- [`@bitCast`](https://ziglang.org/documentation/master/#bitCast) 更改类型但保持位不变
+- [`@bitCast`](https://ziglang.org/documentation/master/#bitCast) 更改类型但保持位不变。Zig 0.17 起它重新解释的是值的**逻辑位表示**：涉及数组或向量时，各元素的位按顺序从低位到高位拼接，结果与目标端序无关；同时不再允许对 `extern struct`、`extern union` 使用 `@bitCast`，需要按内存布局重新解释时请改用 `@ptrCast` 或 `extern union`
 - [`@alignCast`](https://ziglang.org/documentation/master/#alignCast) 显式强制转换对齐
 - [`@fromBackingInt`](https://ziglang.org/documentation/master/#fromBackingInt) 根据底层整数值获取对应的枚举值（或带显式底层整数类型的 `packed struct`），Zig 0.17 起取代已弃用的 `@enumFromInt`
 - [`@errCast`](https://ziglang.org/documentation/master/#errorCast) 显式强制转换为错误的子集

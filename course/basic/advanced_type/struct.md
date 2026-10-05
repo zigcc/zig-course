@@ -180,7 +180,7 @@
 
 :::info 🅿️ 提示
 
-元组还有一个与数组相同的 `len` 字段，并且支持 `++` 和 `**` 运算符，以及[内联 for](../process_control/loop.md#内联-inline)。
+元组还有一个与数组相同的 `len` 字段，并且支持 `++` 运算符（Zig 0.17 移除了 `**` 运算符），以及[内联 for](../process_control/loop.md#内联-inline)。
 
 :::
 

@@ -155,7 +155,7 @@ closure()  # 输出：Hello, World!
 
 ### `@branchHint(.cold)`
 
-`@branchHint(comptime hint: std.builtin.BranchHint) void`
+`@branchHint(hint: std.lang.BranchHint) void`
 
 使用 `@branchHint(.cold)` 告诉优化器当前分支或函数很少被调用（或不被调用）。
 
@@ -167,4 +167,4 @@ closure()  # 输出：Hello, World!
 
 <<<@/code/release/function.zig#shiftLeftOne
 
-关于可用的调用约定格式，请参考[`std.builtin.CallingConvention`](https://ziglang.org/documentation/master/std/#std.builtin.CallingConvention)。
+关于可用的调用约定格式，请参考[`std.lang.CallingConvention`](https://ziglang.org/documentation/master/std/#std.lang.CallingConvention)。
