@@ -14,6 +14,8 @@ outline: deep
 
 构建项目。该命令会自动在当前及父目录中查找 `build.zig` 文件并执行构建流程。
 
+从 Zig 0.17 起，构建被拆分为配置和执行两个阶段。可以使用 `zig build --print-configuration` 把配置阶段得到的构建图以 `.zon` 格式输出到标准输出，方便排查构建脚本的问题，更多细节参见 [构建系统](../engineering/build-system)。
+
 ## `zig build-obj`
 
 将指定的 Zig 源文件编译成对象文件（`.o` 文件）。
@@ -26,7 +28,7 @@ outline: deep
 
 初始化一个新的 Zig 项目。此命令会在当前目录下创建 `build.zig`、`build.zig.zon` 和 `src` 目录（包含 `main.zig` 和 `root.zig`）。
 
-> **注意**：在 Zig 0.12+ 版本中，原来的 `zig init-exe` 和 `zig init-lib` 命令已合并为统一的 `zig init` 命令。新的模板同时包含可执行文件和静态库的配置，用户可以根据需要删除不需要的部分。
+> **注意**：在 Zig 0.12+ 版本中，原来的 `zig init-exe` 和 `zig init-lib` 命令已合并为统一的 `zig init` 命令。新的模板同时包含一个可供其他项目导入的模块（`src/root.zig`）和一个可执行文件（`src/main.zig`），用户可以根据需要删除不需要的部分。
 
 ```sh
 .                               # 项目根目录
@@ -34,8 +36,10 @@ outline: deep
 ├── build.zig.zon               # 项目清单文件 (zon 是 Zig Object Notation)：声明项目元数据和依赖项
 └── src                         # 源代码目录
     ├── main.zig                # 程序主入口文件（可执行文件）
-    └── root.zig                # 库的根文件（静态库）
+    └── root.zig                # 包的根模块文件（可被其他项目导入）
 ```
+
+如果只需要最精简的项目骨架，可以使用 `zig init -m`（即 `--minimal`），它只会生成 `build.zig` 和 `build.zig.zon` 两个文件。
 
 ## `zig ast-check`
 
@@ -44,6 +48,8 @@ outline: deep
 ## `zig fmt`
 
 格式化 Zig 源代码文件。支持指定文件路径，也支持从标准输入（`stdin`）读取内容。
+
+Zig 0.17 新增了 `--complexity` 参数，用于统计每个文件的 token 数与 AST 节点数。相比单纯比较行数，它更适合用来衡量一次修改让代码变得更复杂还是更简单。
 
 ## `zig test`
 
@@ -64,6 +70,8 @@ outline: deep
 ## `zig translate-c`
 
 将 C 代码自动转换为 Zig 代码。这是一个强大的功能，可以极大地帮助开发者将现有的 C 代码库迁移到 Zig。
+
+需要注意，Zig 0.17 已经移除了 `@cImport`。在项目中使用 C 头文件时，应在 `build.zig` 中借助官方的 [translate-c](https://codeberg.org/ziglang/translate-c) 包完成翻译，详见 [与 C 交互](../advanced/interact-with-c)。`zig translate-c` 命令本身仍然保留，适合临时查看或转换单个文件。
 
 ## `zig targets`
 
@@ -97,5 +105,9 @@ zig fetch --save git+https://github.com/david-vanderson/dvui.git#main
 ```
 
 当包在其 `build.zig.zon` 中定义了 `name` 字段时，`zig fetch` 会自动使用该名称。你也可以使用 `--save=<custom-name>` 来指定一个自定义的依赖名称，例如 `--save=webuizig`。
+
+如果希望在 `build.zig.zon` 中原样保存传入的 URL，可以改用 `--save-exact`（同样支持 `--save-exact=<custom-name>`）。
+
+从 Zig 0.17 起，不带 `--save` 时 `zig fetch` 只会把包抓取到全局缓存，并且不再要求当前目录存在 `build.zig`；带上 `--save`（或其任意变体）时，才会同时抓取到项目本地的 `zig-pkg` 目录，而 `zig build` 总是会抓取到本地。本地目录的位置可以通过 `--pkg-dir` 参数或 `ZIG_LOCAL_PKG_DIR` 环境变量修改，更多细节参见 [包管理](../engineering/package_management)。
 
 除了以上介绍的命令，`zig` 还提供了许多其他命令和选项。随着 Zig 语言的不断发展，新的功能和命令也会持续加入，建议您定期查阅 [Zig 官方文档](https://ziglang.org/documentation/master/) 以获取最新信息。
