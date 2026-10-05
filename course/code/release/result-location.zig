@@ -225,7 +225,7 @@ const DeclLiteralFunction = struct {
 const DeclLiteralErrorUnion = struct {
     // #region decl_literal_error_union
     const Buffer = struct {
-        data: std.ArrayListUnmanaged(u32),
+        data: std.ArrayList(u32),
 
         fn initCapacity(allocator: std.mem.Allocator, capacity: usize) !Buffer {
             return .{ .data = try .initCapacity(allocator, capacity) };
@@ -281,10 +281,10 @@ const StdLibArrayList = struct {
     // #region stdlib_arraylist
     const Container = struct {
         // 使用 .empty 而不是 .{}
-        list: std.ArrayListUnmanaged(i32) = .empty,
+        list: std.ArrayList(i32) = .empty,
     };
 
-    test "ArrayListUnmanaged with decl literal" {
+    test "ArrayList with decl literal" {
         var c: Container = .{};
         defer c.list.deinit(std.testing.allocator);
 
