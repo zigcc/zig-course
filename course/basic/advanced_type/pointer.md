@@ -112,7 +112,7 @@ Zig 支持指针的加减运算，但建议在进行运算前，将指针转换�
 
 <<<@/code/release/pointer.zig#st_pointer
 
-以上代码编译需要额外链接 `libc`。在 Zig 0.16 的构建脚本中，可以让对应模块链接 C 标准库，例如 `exe.root_module.linkSystemLibrary("c", .{})`。
+以上代码编译需要额外链接 `libc`。从 Zig 0.16 起，可以在构建脚本中让对应模块链接 C 标准库，例如 `exe.root_module.linkSystemLibrary("c", .{})`。
 
 :::
 
