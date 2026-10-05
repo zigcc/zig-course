@@ -53,5 +53,15 @@ pub fn build(b: *std.Build) !void {
         sub_build.setCwd(b.path(entry.name));
         sub_build.stdio = .inherit;
         b.getInstallStep().dependOn(&sub_build.step);
+
+        // 演示单元测试的子项目额外执行一次 `zig build test`，确保示例中的测试代码同样能通过
+        if (std.mem.eql(u8, entry.name, "test")) {
+            const sub_test = b.addSystemCommand(&.{ b.graph.zig_exe, "build", "test" });
+            sub_test.setName(b.fmt("zig build test ({s})", .{entry.name}));
+            sub_test.setCwd(b.path(entry.name));
+            sub_test.stdio = .inherit;
+            sub_test.step.dependOn(&sub_build.step);
+            b.getInstallStep().dependOn(&sub_test.step);
+        }
     }
 }
