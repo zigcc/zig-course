@@ -6,7 +6,8 @@ pub fn main() !void {
     ForAsExpression.main();
     LabelFor.main();
     try InlineFor.main();
-    WhileBasic.main();
+    // WhileBasic 演示的是在 i == 5 时会陷入死循环的写法（文档中会讲解原因），这里不调用它
+    _ = WhileBasic.main;
     WhileContinue.main();
     LabelWhile.main();
     try InlineWhile.main();
