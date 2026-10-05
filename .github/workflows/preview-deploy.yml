@@ -23,7 +23,7 @@ concurrency:
   group: preview-deploy-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}
   cancel-in-progress: true
 jobs:
-  deploy:
+  preview-deploy:
     if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     env:
@@ -31,7 +31,7 @@ jobs:
       PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT || 'zig-course' }}
     steps:
       - name: Download metadata
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: preview-meta
           path: preview-meta
@@ -83,7 +83,7 @@ jobs:
 
       - name: Download site
         if: steps.cf.outputs.ok == 'true'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: preview-site
           path: dist

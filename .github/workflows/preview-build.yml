@@ -18,7 +18,7 @@ concurrency:
   group: preview-build-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 jobs:
-  build:
+  preview-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,8 +26,8 @@ jobs:
         with:
           fetch-depth: 0 # lastUpdated 依赖完整的 git 历史
           persist-credentials: false
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
@@ -44,7 +44,7 @@ jobs:
           printf '%s' "$PR_NUMBER" > preview-meta/pr-number
           printf '%s' "$HEAD_SHA" > preview-meta/head-sha
       - name: Upload site
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: preview-site
           path: course/.vitepress/dist
@@ -52,7 +52,7 @@ jobs:
           retention-days: 3
           if-no-files-found: error
       - name: Upload metadata
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: preview-meta
           path: preview-meta
