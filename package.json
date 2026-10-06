@@ -11,7 +11,7 @@
     "pdf:fonts": "node scripts/pdf/build-fonts.ts",
     "epub": "node course/.vitepress/epub/build.ts"
   },
-  "packageManager": "pnpm@11.3.0",
+  "packageManager": "pnpm@11.28.2",
   "engines": {
     "node": ">=24"
   },
