@@ -1,0 +1,60 @@
+# PR 预览第一阶段：在 PR 上下文中构建文档站点
+#
+# 该工作流会执行 PR 中的代码（包括来自 fork 的 PR），因此：
+# - 只授予只读权限，不接触任何 secrets
+# - 只负责构建并上传产物，部署交给 preview-deploy.yml（workflow_run 触发，在主仓库上下文中运行）
+name: Preview Build
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "course/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/preview-*.yml"
+permissions:
+  contents: read
+concurrency:
+  group: preview-build-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  preview-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # lastUpdated 依赖完整的 git 历史
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build with VitePress
+        run: pnpm run build
+      - name: Save PR metadata
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          mkdir -p preview-meta
+          printf '%s' "$PR_NUMBER" > preview-meta/pr-number
+          printf '%s' "$HEAD_SHA" > preview-meta/head-sha
+      - name: Upload site
+        uses: actions/upload-artifact@v7
+        with:
+          name: preview-site
+          path: course/.vitepress/dist
+          include-hidden-files: true
+          retention-days: 3
+          if-no-files-found: error
+      - name: Upload metadata
+        uses: actions/upload-artifact@v7
+        with:
+          name: preview-meta
+          path: preview-meta
+          retention-days: 3
+          if-no-files-found: error
