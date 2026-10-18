@@ -63,23 +63,33 @@ vtable: *const VTable,
 
 ## `async` 与 `await`
 
-`io.async(function, args)` 会“异步地”调用 `function`，并立即返回一个 `Io.Future(T)`，其中 `T` 是 `function` 的返回类型。之后可以通过 `future.await(io)` 拿到结果：
+`io.async(function, args)` 会“异步地”调用 `function`，并立即返回一个 `Io.Future(T)`，其中 `T` 是 `function` 的返回类型。之后可以通过 `future.await(io)` 拿到结果。
+
+本节以及后面的大部分示例中，`io` 都来自 `main` 的参数 `init: std.process.Init`，也就是运行时默认选择的 `Io.Threaded`。它内部维护一个线程池，`io.async` 发起的任务会交给池中的线程执行：
 
 <<<@/code/release/async.zig#async_await
 
-在 `Io.Threaded` 上运行时，两个 `fetch` 各自睡眠 100ms，但总耗时也只有约 100ms，因为它们被分配到了不同的线程上同时执行。
+两个 `fetch` 各自睡眠 100ms，但总耗时只有约 100ms，因为它们被分配到了不同的线程上同时执行。如果换成别的 `Io` 实现，同样的代码可能会有不同的表现，下一小节就会看到这一点。
 
-需要注意的几点：
+### 用 `defer` 取消任务
 
-- `Future` 的 `await` 和 `cancel` 都是**幂等**的，调用其中一个之后再调用另一个，只会直接返回已有的结果
-- `defer _ = future.cancel(io) catch {};` 是推荐写法。正常路径上 `await` 已经拿到结果，`cancel` 什么也不做；而一旦中途出错提前返回，`cancel` 能保证任务被取消、资源被回收
-- 如果任务返回了需要释放的资源（例如打开的文件），不要简单地丢弃 `cancel` 的结果，而是要在拿到结果后释放它
+上面的代码在每次 `io.async` 之后都紧跟了一句 `defer _ = a.cancel(io) catch {};`，它的作用是：**无论从哪条路径离开作用域，任务都会被结束，任务占用的资源都会被回收**。如果没有这一句，一旦两次 `await` 之间的代码出错提前返回，任务 `b` 就再也不会被等待，它占用的资源也就泄漏了。
+
+你可能会注意到，`catch {}` 把 `cancel` 返回的错误直接丢掉了，什么也没有输出。这是有意为之，标准库自己也是这样写的（例如 `std.Io.net.HostName` 中 DNS 查询的实现）。分两种情况来看：
+
+- **正常路径**：`await` 已经拿到了结果，错误也已经通过 `try` 处理过了。`Future` 的 `await` 和 `cancel` 都是**幂等**的，此时 `cancel` 只是把同一个结果再返回一遍，丢弃它并不会漏掉任何东西
+- **提前返回的路径**：函数已经带着另一个错误在返回了，而 `defer` 中的表达式本身也无法再向上返回错误。此时任务刚刚被要求取消，它的结果多半就是 `error.Canceled`，已经没有人关心了；`cancel` 真正重要的作用是等任务结束并回收资源
+
+但下面两种情况不能简单地丢弃结果：
+
+- **任务返回了需要释放的资源**（例如打开的文件、分配的内存）：要在 `defer` 中把它释放掉，例如 `defer if (f.cancel(io)) |file| file.close(io) else |_| {};`
+- **提前返回时也想知道任务出了什么错**：可以在 `catch` 中把错误记录下来，例如 `catch |err| std.log.warn("task failed: {t}", .{err})`
 
 ### `async` 不等于并发
 
 `async` 表达的是 **异步（asynchrony）**：这次调用与后续代码相互独立，结果可以晚一点再要。它**并不保证**任务会与调用者同时运行。
 
-Io 实现完全可以在 `io.async` 内部就地把函数执行完，再把结果交给 `Future`。下面的代码和上一节完全相同，只是换成了单线程的 `Io` 实现：
+Io 实现完全可以在 `io.async` 内部就地把函数执行完，再把结果交给 `Future`。下面的代码和上一节完全相同，只是 `io` 不再来自 `init.io`，而是我们自己创建的单线程实现 `Io.Threaded.init_single_threaded`：
 
 <<<@/code/release/async.zig#async_not_concurrent
 
