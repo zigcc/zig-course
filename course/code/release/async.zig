@@ -2,16 +2,15 @@ const std = @import("std");
 const Io = std.Io;
 
 pub fn main(init: std.process.Init) !void {
-    const io = init.io;
     try GetIo.main(init);
-    try AsyncAwait.main(io);
+    try AsyncAwait.main(init);
     try AsyncNotConcurrent.main();
-    try Concurrent.main(io);
-    try Cancel.main(io);
-    try GroupExample.main(io);
-    try SelectExample.main(io);
-    try MutexExample.main(io);
-    try SimIoExample.main(io);
+    try Concurrent.main(init);
+    try Cancel.main(init);
+    try GroupExample.main(init);
+    try SelectExample.main(init);
+    try MutexExample.main(init);
+    try SimIoExample.main(init);
 }
 
 const GetIo = struct {
@@ -46,12 +45,17 @@ const AsyncAwait = struct {
         return id * 10;
     }
 
-    pub fn main(io: Io) !void {
+    pub fn main(init: std.process.Init) !void {
+        // init.io 是运行时为 main 准备的默认 Io 实现，即基于线程池的 Io.Threaded，
+        // 因此下面的两个任务会被分配到不同的线程上同时执行
+        const io = init.io;
+
         const start = Io.Clock.awake.now(io);
 
         // 发起两个异步任务，它们返回 `Io.Future(T)`
         var a = io.async(fetch, .{ io, 1, 100 });
-        // 如果后续代码提前返回（例如 try 失败），要确保任务被取消并回收资源
+        // 无论从哪条路径离开作用域，都要确保任务被取消、资源被回收；
+        // 这里有意丢弃 cancel 返回的结果，原因见正文
         defer _ = a.cancel(io) catch {};
 
         var b = io.async(fetch, .{ io, 2, 100 });
@@ -120,7 +124,9 @@ const Concurrent = struct {
         }
     }
 
-    pub fn main(io: Io) !void {
+    pub fn main(init: std.process.Init) !void {
+        const io = init.io; // 默认的 Io.Threaded，支持真正的并发
+
         // 队列容量只有 2，生产者和消费者必须“同时”运行才能完成任务
         var buffer: [2]u32 = undefined;
         var queue: Io.Queue(u32) = .init(&buffer);
@@ -161,7 +167,8 @@ const Cancel = struct {
         std.debug.print("这一行不会被执行\n", .{});
     }
 
-    pub fn main(io: Io) !void {
+    pub fn main(init: std.process.Init) !void {
+        const io = init.io; // 默认的 Io.Threaded，支持真正的并发
         var task = try io.concurrent(slowTask, .{io});
 
         try io.sleep(.fromMilliseconds(10), .awake);
@@ -198,7 +205,8 @@ const GroupExample = struct {
         results[id] = id * id;
     }
 
-    pub fn main(io: Io) !void {
+    pub fn main(init: std.process.Init) !void {
+        const io = init.io; // 默认的 Io.Threaded，支持真正的并发
         var results: [8]u64 = undefined;
 
         var group: Io.Group = .init;
@@ -226,7 +234,9 @@ const SelectExample = struct {
         return 42;
     }
 
-    pub fn main(io: Io) !void {
+    pub fn main(init: std.process.Init) !void {
+        const io = init.io; // 默认的 Io.Threaded，支持真正的并发
+
         // 每个字段对应一种任务，字段类型就是对应函数的返回类型
         const Result = union(enum) {
             query: Io.Cancelable!u32,
@@ -268,7 +278,8 @@ const MutexExample = struct {
         for (0..1000) |_| try counter.add(io, 1);
     }
 
-    pub fn main(io: Io) !void {
+    pub fn main(init: std.process.Init) !void {
+        const io = init.io; // 默认的 Io.Threaded，支持真正的并发
         var counter: Counter = .{};
 
         var group: Io.Group = .init;
@@ -435,7 +446,7 @@ const SimIoExample = struct {
         return n;
     }
 
-    pub fn main(io: Io) !void {
+    pub fn main(init: std.process.Init) !void {
         var buffer: [256]u8 = undefined;
         var sim: SimIo = .init("hello\nzig\nasync io\n", &buffer);
 
@@ -443,7 +454,7 @@ const SimIoExample = struct {
         try app(sim.io());
 
         // 再用真正的 Io 把捕获的结果打印出来
-        try Io.File.stdout().writeStreamingAll(io, sim.output());
+        try Io.File.stdout().writeStreamingAll(init.io, sim.output());
     }
     // #endregion sim_io_app
 };
