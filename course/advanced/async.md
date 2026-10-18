@@ -268,15 +268,4 @@ elapsed: 3s
 
 :::
 
-## 总结
-
-| 需求                         | 使用                                  |
-| ---------------------------- | ------------------------------------- |
-| 发起一个可以晚点取结果的任务 | `io.async` + `Future.await`           |
-| 必须同时运行的多个任务       | `io.concurrent`                       |
-| 提前结束任务                 | `Future.cancel` / `Group.cancel`      |
-| 启动一批任务并等待全部完成   | `Io.Group`                            |
-| 等待多个任务中最先完成的     | `Io.Select`                           |
-| 任务间通信与同步             | `Io.Queue`、`Io.Mutex`、`Io.Event` 等 |
-
 更多关于 `std.Io` 引入时的变更细节，可以参考 [0.16.0 版本说明](../update/0.16.0-description.md)。
