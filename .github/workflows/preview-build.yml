@@ -34,6 +34,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Build with VitePress
+        env:
+          # 预览站点不使用 Service Worker 缓存，保证每次访问都拿到最新内容
+          PWA_SELF_DESTROYING: "true"
         run: pnpm run build
       - name: Save PR metadata
         env:
