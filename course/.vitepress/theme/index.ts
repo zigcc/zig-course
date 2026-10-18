@@ -1,4 +1,5 @@
 // .vitepress/theme/index.ts
+/// <reference types="vite-plugin-pwa/client" />
 import type { Theme } from "vitepress";
 import DefaultTheme from "vitepress/theme";
 
@@ -27,6 +28,13 @@ export default {
         document.querySelectorAll("details").forEach(function (details) {
           details.removeAttribute("open");
         });
+      });
+
+      // 注册 Service Worker。插件默认注入的 registerSW.js 只负责注册，新版本激活后页面不会刷新，
+      // 读者会继续看到预缓存的旧内容；改用 virtual:pwa-register 后，autoUpdate 模式会在新版本激活时自动刷新页面。
+      // 引入该模块后，插件也不再注入 registerSW.js。
+      import("virtual:pwa-register").then(({ registerSW }) => {
+        registerSW({ immediate: true });
       });
     }
   },

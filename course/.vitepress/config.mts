@@ -31,6 +31,8 @@ export default withPwa(
     },
     pwa: {
       registerType: "autoUpdate",
+      // PR 预览构建时生成会自我注销的 Service Worker，避免评审时看到缓存的旧预览
+      selfDestroying: process.env.PWA_SELF_DESTROYING === "true",
       manifest: {
         name: title,
         short_name: "Zig 圣经",
