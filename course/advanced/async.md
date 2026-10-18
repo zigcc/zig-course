@@ -49,7 +49,7 @@ vtable: *const VTable,
 
 ::: tip 🅿️ 什么是 fiber？
 
-**fiber**（纤程）可以理解为“由程序自己调度的轻量级线程”，也常被称为**有栈协程（stackful coroutine）**或用户态线程。
+**fiber**（纤程）可以理解为“由程序自己调度的轻量级线程”，也常被称为**有栈协程**（stackful coroutine）或用户态线程。
 
 和操作系统线程一样，每个 fiber 都拥有**自己独立的栈**，所以它可以在任意深度的函数调用中途暂停，之后再从暂停的地方继续执行。不同之处在于，fiber 之间的切换完全发生在用户态：只需保存当前 fiber 的栈指针、帧指针和指令指针，再恢复另一个 fiber 的这三个值即可，不需要陷入内核，也不需要内核参与调度。标准库中的 `std.Io.fiber.Context` 保存的正是这三个寄存器。
 
@@ -143,7 +143,7 @@ Io 实现完全可以在 `io.async` 内部就地把函数执行完，再把结�
 
 ## 取消
 
-`future.cancel(io)` 与 `await` 类似，但会先向任务发出**取消请求**。任务在下一次到达**取消点（cancelation point）**时会收到 `error.Canceled`。所谓取消点，就是任何错误集合中包含 `error.Canceled` 的 `Io` 函数，例如 `sleep`、文件读写、网络收发、`Mutex.lock` 等。
+`future.cancel(io)` 与 `await` 类似，但会先向任务发出**取消请求**。任务在下一次到达**取消点**（cancelation point）时会收到 `error.Canceled`。所谓取消点，就是任何错误集合中包含 `error.Canceled` 的 `Io` 函数，例如 `sleep`、文件读写、网络收发、`Mutex.lock` 等。
 
 <<<@/code/release/async.zig#cancel
 
