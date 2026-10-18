@@ -1,0 +1,38 @@
+# PR 预览收尾：PR 关闭（合并或放弃）后删除对应的 Workers Preview
+#
+# 使用 pull_request_target 以便读取 secrets（来自 fork 的 PR 也能清理）。
+# 这里不检出、不执行 PR 中的任何代码，只用 PR 编号拼出 Preview 名称。
+name: Preview Cleanup
+on:
+  pull_request_target:
+    types: [closed]
+permissions: {}
+jobs:
+  preview-cleanup:
+    runs-on: ubuntu-latest
+    env:
+      WORKER_NAME: ${{ vars.CLOUDFLARE_WORKER_NAME || 'zig-course' }}
+    steps:
+      - name: Check Cloudflare credentials
+        id: cf
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -n "$CF_TOKEN" ] && [ -n "$CF_ACCOUNT" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::未配置 CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID，跳过预览清理"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 该 PR 可能从未部署过预览（例如没有改动文档），删除失败不视为错误
+      - name: Delete Workers Preview
+        if: steps.cf.outputs.ok == 'true'
+        continue-on-error: true
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
+          command: preview delete --worker-name ${{ env.WORKER_NAME }} --name pr-${{ github.event.pull_request.number }} --skip-confirmation
