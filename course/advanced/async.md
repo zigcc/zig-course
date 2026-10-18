@@ -20,6 +20,8 @@ outline: deep
 
 ## `std.Io` 接口
 
+为了行文简洁，下文正文中的 `Io` 均指 `std.Io`，例如 `Io.Threaded` 即 `std.Io.Threaded`；示例代码中则一律写出完整的 `std.Io`。
+
 `std.Io` 本身非常小，只有两个字段：
 
 ```zig
@@ -90,7 +92,7 @@ vtable: *const VTable,
 
 `std.Io` 本身**不包含任何 I/O 逻辑**。`Io.zig` 中的 `sleep`、`async`、`File.writeStreaming` 等函数都只是薄薄的一层包装：整理一下参数，然后调用 `io.vtable.xxx(io.userdata, ...)`。真正干活的，是把自己的函数填进 vtable 的那个实现。
 
-以 `io.sleep(.fromMilliseconds(100), .awake)` 在 `Io.Threaded` 上的执行过程为例，下面三段代码摘自 Zig 0.17.0 标准库（有删减和简化），可以切换标签页按顺序阅读：
+以 `io.sleep(.fromMilliseconds(100), .awake)` 在 `Io.Threaded` 上的执行过程为例，下面三段代码摘自 Zig 0.17.0 标准库（有删减和简化），可以切换标签页按顺序阅读。注意标准库源码内部用 `const Io = @This();`（`Io.zig`）或 `const Io = std.Io;`（`Io/Threaded.zig`）声明了别名，所以摘录中的 `Io` 就是 `std.Io`：
 
 ::: code-group
 
