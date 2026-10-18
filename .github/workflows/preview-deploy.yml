@@ -1,4 +1,6 @@
-# PR 预览第二阶段：把 Preview Build 产出的静态站点部署到 Cloudflare Pages，并在 PR 中回帖
+# PR 预览第二阶段：把 Preview Build 产出的静态站点部署为 Cloudflare Workers Preview，并在 PR 中回帖
+#
+# 每个 PR 对应同一个 Worker 下名为 pr-<编号> 的 Preview，PR 更新时覆盖，PR 关闭后由 preview-cleanup.yml 删除。
 #
 # workflow_run 始终使用默认分支上的工作流定义，在主仓库上下文中运行，可以读取 secrets，
 # 因此即使是来自 fork 的 PR 也能获得预览。这里绝不检出或执行 PR 中的代码：
@@ -6,9 +8,9 @@
 # - 元数据（PR 编号、提交）先做格式校验，再通过 GitHub API 交叉验证
 #
 # 需要的配置（仓库 Settings → Secrets and variables → Actions）：
-# - secrets.CLOUDFLARE_API_TOKEN：权限为 Account → Cloudflare Pages → Edit
+# - secrets.CLOUDFLARE_API_TOKEN：权限为 Account → Workers Scripts → Edit
 # - secrets.CLOUDFLARE_ACCOUNT_ID
-# - vars.CLOUDFLARE_PAGES_PROJECT（可选，默认 zig-course）
+# - vars.CLOUDFLARE_WORKER_NAME（可选，默认 zig-course；Worker 不存在时会自动创建，无需先部署生产版本）
 # 未配置 secrets 时只输出提示并跳过，不会让 CI 失败。
 name: Preview Deploy
 on:
@@ -28,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
-      PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT || 'zig-course' }}
+      WORKER_NAME: ${{ vars.CLOUDFLARE_WORKER_NAME || 'zig-course' }}
     steps:
       - name: Download metadata
         uses: actions/download-artifact@v8
@@ -104,23 +106,40 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
 
-      - name: Deploy to Cloudflare Pages
+      # 不检出仓库，wrangler 配置直接在这里生成：只有静态资源，没有 Worker 脚本
+      - name: Write wrangler config
+        if: steps.cf.outputs.ok == 'true'
+        run: |
+          cat > wrangler.jsonc <<EOF
+          {
+            "name": "$WORKER_NAME",
+            "compatibility_date": "2026-10-18",
+            "assets": {
+              "directory": "./dist",
+              "html_handling": "auto-trailing-slash",
+              "not_found_handling": "404-page"
+            },
+            "previews": {}
+          }
+          EOF
+
+      - name: Deploy Workers Preview
         id: deploy
         if: steps.cf.outputs.ok == 'true'
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          wranglerVersion: "4"
-          command: pages deploy dist --project-name=${{ env.PAGES_PROJECT }} --branch=pr-${{ steps.meta.outputs.pr }} --commit-hash=${{ steps.meta.outputs.sha }} --commit-dirty=true
+          wranglerVersion: "4" # preview 命令及对应输出需要 >= 4.136.3
+          command: preview --name pr-${{ steps.meta.outputs.pr }} --message ${{ steps.meta.outputs.sha }}
 
       - name: Comment on PR
         if: steps.cf.outputs.ok == 'true'
         env:
           PR: ${{ steps.meta.outputs.pr }}
           SHA: ${{ steps.meta.outputs.sha }}
-          ALIAS_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
-          DEPLOY_URL: ${{ steps.deploy.outputs.deployment-url }}
+          ALIAS_URL: ${{ steps.deploy.outputs.preview-url }}
+          DEPLOY_URL: ${{ steps.deploy.outputs.preview-deployment-url }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           preview_url="${ALIAS_URL:-$DEPLOY_URL}"
