@@ -36,6 +36,22 @@ const GetIo = struct {
     }
 };
 
+const VTableCall = struct {
+    // #region vtable_call
+    fn sleepTwice(io: std.Io) !void {
+        // 平时的写法
+        try io.sleep(.fromMilliseconds(10), .awake);
+
+        // 与上一行完全等价：std.Io.sleep 所做的，只是把参数打包成 Timeout，
+        // 再把 userdata 连同参数一起交给 vtable 中的函数
+        try io.vtable.sleep(io.userdata, .{ .duration = .{
+            .raw = .fromMilliseconds(10),
+            .clock = .awake,
+        } });
+    }
+    // #endregion vtable_call
+};
+
 const AsyncAwait = struct {
     // #region async_await
     /// 模拟一个耗时的 I/O 操作，例如网络请求
@@ -469,6 +485,10 @@ const SimIoExample = struct {
     }
     // #endregion sim_io_app
 };
+
+test "vtable call" {
+    try VTableCall.sleepTwice(std.testing.io);
+}
 
 test "async await" {
     const io = std.testing.io;

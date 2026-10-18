@@ -22,14 +22,7 @@ outline: deep
 
 为了行文简洁，下文正文中的 `Io` 均指 `std.Io`，例如 `Io.Threaded` 即 `std.Io.Threaded`；示例代码中则一律写出完整的 `std.Io`。
 
-`std.Io` 本身非常小，只有两个字段：
-
-```zig
-userdata: ?*anyopaque,
-vtable: *const VTable,
-```
-
-和 `std.mem.Allocator` 一样，它是一个“胖指针”：`userdata` 指向具体实现的状态，`vtable` 是一张函数指针表。这张表涵盖了：
+`std.Io` 本身非常小，只有两个字段：类型为 `?*anyopaque` 的 `userdata`，以及类型为 `*const std.Io.VTable` 的 `vtable`。和 `std.mem.Allocator` 一样，它是一个“胖指针”：`userdata` 指向具体实现的状态，`vtable` 是一张函数指针表。这张表涵盖了：
 
 - 异步与并发：`async`、`concurrent`、`await`、`cancel`，以及任务组 `Group`
 - 取消：`checkCancel`、`swapCancelProtection`、`recancel`
@@ -90,83 +83,27 @@ vtable: *const VTable,
 
 ### `Io` 是如何工作的
 
-`std.Io` 本身**不包含任何 I/O 逻辑**。`Io.zig` 中的 `sleep`、`async`、`File.writeStreaming` 等函数都只是薄薄的一层包装：整理一下参数，然后调用 `io.vtable.xxx(io.userdata, ...)`。真正干活的，是把自己的函数填进 vtable 的那个实现。
+`std.Io` 本身**不包含任何 I/O 逻辑**。标准库中 `std.Io` 的 `sleep`、`async`，以及 `File`、`Dir`、`net` 中的各种操作，都只是薄薄的一层包装：整理一下参数，然后调用 `io.vtable.xxx(io.userdata, ...)`。真正干活的，是把自己的函数填进 vtable 的那个实现。
 
-以 `io.sleep(.fromMilliseconds(100), .awake)` 在 `Io.Threaded` 上的执行过程为例，下面三段代码摘自 Zig 0.17.0 标准库（有删减和简化），可以切换标签页按顺序阅读。注意标准库源码内部用 `const Io = @This();`（`Io.zig`）或 `const Io = std.Io;`（`Io/Threaded.zig`）声明了别名，所以摘录中的 `Io` 就是 `std.Io`：
+下面两行代码的效果完全相同，第二行就是第一行在标准库内部展开后的样子：
 
-::: code-group
+<<<@/code/release/async.zig#vtable_call
 
-```zig [① std/Io.zig]
-// 接口层：只是把参数打包成 Timeout，然后转交给 vtable
-pub fn sleep(io: Io, duration: Duration, clock: Clock) Cancelable!void {
-    return io.vtable.sleep(io.userdata, .{ .duration = .{ // [!code highlight]
-        .raw = duration,
-        .clock = clock,
-    } });
-}
-```
+以 `io.sleep(...)` 在 `Io.Threaded` 上的执行过程为例，整条调用链是：
 
-```zig [② std/Io/Threaded.zig: io()]
-// 实现层：生成 Io 时，把自身的指针放进 userdata，把自己的函数填进 vtable
-pub fn io(t: *Threaded) Io {
-    return .{
-        .userdata = t, // [!code highlight]
-        .vtable = &.{
-            .crashHandler = crashHandler,
+1. **接口层**：`std.Io.sleep` 把参数打包成 `Timeout`，调用 `io.vtable.sleep(io.userdata, timeout)`。它不知道、也不关心背后是线程、fiber 还是一个模拟系统
+2. **装配**：`Io.Threaded` 的 `io()` 方法在生成 `std.Io` 时，把自身的指针放进 `userdata`，把自己的 `sleep`、`async`、`now` 等函数填进 vtable
+3. **实现层**：调用落到 `Io.Threaded` 的 `sleep` 函数，它先把 `userdata` 转回 `*Threaded`，再按平台调用 `clock_nanosleep` 等系统调用阻塞当前线程
 
-            .async = async,
-            .concurrent = concurrent,
-            .await = await,
-            .cancel = cancel,
-            // ...
-            .now = now,
-            // ...
-            .sleep = sleep, // [!code highlight]
-            // ...
-        },
-    };
-}
-```
+同样是 `sleep`，换成 `Io.Evented`，就会变成向 io_uring 提交一个定时器，然后切换到别的 fiber。
 
-```zig [③ std/Io/Threaded.zig: sleep()]
-// 实现层：先把 userdata 还原成 *Threaded，再按平台选择真正的系统调用
-fn sleep(userdata: ?*anyopaque, timeout: Io.Timeout) Io.Cancelable!void {
-    const t: *Threaded = @ptrCast(@alignCast(userdata)); // [!code highlight]
-    if (use_parking_sleep) return parking_sleep.sleep(timeout);
-    if (native_os == .wasi) return sleepWasi(t, timeout);
-    if (@TypeOf(posix.system.clock_nanosleep) != void) return sleepPosix(timeout);
-    return sleepNanosleep(t, timeout);
-}
+这和 `std.mem.Allocator` 的设计如出一辙：`allocator.alloc` 最终调用的也是 `allocator.vtable.alloc(allocator.ptr, ...)`。正因为所有 I/O 都要经过这张表，替换一个 `Io` 实现就能改变程序全部的 I/O 行为，而调用方的代码一个字都不用改。本章最后我们会利用这一点，亲手实现一个 `Io`。
 
-fn sleepPosix(timeout: Io.Timeout) Io.Cancelable!void {
-    // ... 计算 clock_id 与 timespec
-    const syscall: Syscall = try .start();
-    while (true) {
-        const rc = posix.system.clock_nanosleep(clock_id, flags, &timespec, &timespec); // [!code highlight]
-        switch (posix.errno(rc)) {
-            .INTR => {
-                // 被信号打断：检查当前任务是否被取消，没有的话继续睡
-                try syscall.checkCancel();
-                continue;
-            },
-            else => {
-                syscall.finish();
-                return;
-            },
-        }
-    }
-}
-```
+:::info 🅿️ 提示
+
+想进一步了解细节，可以直接阅读标准库源码：接口层位于 `lib/std/Io.zig`，`Io.Threaded` 的实现位于 `lib/std/Io/Threaded.zig`。
 
 :::
-
-整条调用链是：`io.sleep(...)` → `io.vtable.sleep(io.userdata, ...)` → `Threaded.sleep` → `clock_nanosleep` 系统调用。
-
-- **接口层**（`Io.zig`）只负责“转发”，它不知道也不关心背后是线程、fiber 还是一个模拟系统
-- **实现层**通过 `userdata` 拿回自己的状态，再决定具体怎么做。同样是 `sleep`，`Io.Threaded` 会调用 `clock_nanosleep` 阻塞当前线程，而 `Io.Evented` 则会把定时器交给 io_uring，然后切换到别的 fiber
-- 上面 `.INTR` 分支也顺便揭示了 `Io.Threaded` 实现取消的方式：取消任务时，它向执行该任务的线程发送信号，打断阻塞中的系统调用，再在这里检查取消请求并返回 `error.Canceled`
-
-这和 `std.mem.Allocator` 的设计如出一辙：`allocator.alloc` 最终调用的是 `allocator.vtable.alloc(allocator.ptr, ...)`。正因为所有 I/O 都要经过这张表，替换一个 `Io` 实现就能改变程序全部的 I/O 行为，而调用方的代码一个字都不用改。本章最后我们会利用这一点，亲手实现一个 `Io`。
 
 ## `async` 与 `await`
 
@@ -204,118 +141,23 @@ Io 实现完全可以在 `io.async` 内部就地把函数执行完，再把结�
 
 ### `io.async` 内部发生了什么
 
-为什么 `async` 有时并发、有时又是就地执行的？答案同样藏在接口层和实现层的代码里（摘自 Zig 0.17.0 标准库，有删减和简化）：
+为什么 `async` 有时并发、有时又是就地执行的？答案同样在接口层和实现层的分工里。
 
-::: code-group
+**接口层：类型擦除**。vtable 中的函数指针必须有固定的签名，没法直接接收任意的 `function` 和 `args`。因此 `std.Io.async` 在编译期为每一种被调用的函数生成一个签名固定的“跳板”函数 `start(context, result)`：参数元组以字节的形式交给实现（由实现负责复制一份），跳板再把字节还原成参数元组，调用真正的函数，并把返回值写入 `result` 指向的位置，也就是 `Future` 中的 `result` 字段。
 
-```zig [① std/Io.zig: async()]
-pub fn async(
-    io: Io,
-    function: anytype,
-    args: std.meta.ArgsTuple(@TypeOf(function)),
-) Future(@typeInfo(@TypeOf(function)).@"fn".return_type.?) {
-    const Result = @typeInfo(@TypeOf(function)).@"fn".return_type.?;
-    const Args = @TypeOf(args);
-    // 编译期为每一种 function 生成一个签名固定的“跳板”函数
-    const TypeErased = struct {
-        fn start(context: *const anyopaque, result: *anyopaque) void {
-            const args_casted: *const Args = @ptrCast(@alignCast(context));
-            const result_casted: *Result = @ptrCast(@alignCast(result));
-            result_casted.* = @call(.auto, function, args_casted.*); // [!code highlight]
-        }
-    };
-    var future: Future(Result) = undefined;
-    future.any_future = io.vtable.async( // [!code highlight]
-        io.userdata,
-        @ptrCast(&future.result), // 结果直接写到 future.result
-        .of(Result),
-        @ptrCast(&args), // 参数以字节的形式传给实现，由实现负责复制
-        .of(Args),
-        TypeErased.start,
-    );
-    return future;
-}
-```
+**实现层：两种结局**。拿到跳板之后，实现有两种选择：
 
-```zig [② std/Io.zig: Future.await()]
-pub fn await(f: *@This(), io: Io) Result {
-    // any_future 为 null，说明结果已经在 async 时写好了
-    const any_future = f.any_future orelse return f.result; // [!code highlight]
-    io.vtable.await(io.userdata, any_future, @ptrCast(&f.result), .of(Result));
-    f.any_future = null;
-    return f.result;
-}
-```
+- 在 `vtable.async` 里**就地调用** `start`，结果直接写进 `Future`，然后返回 `null`。此后 `future.await` 发现没有待完成的任务，会直接返回结果，不再调用实现
+- 把任务**交给别人执行**（例如线程池中的线程或另一个 fiber），返回一个任务句柄。等到 `await` 时，再通过 `vtable.await` 等待任务完成、取回结果
 
-```zig [③ std/Io/Threaded.zig: async()]
-fn async(
-    userdata: ?*anyopaque,
-    result: []u8,
-    result_alignment: Alignment,
-    context: []const u8,
-    context_alignment: Alignment,
-    start: *const fn (context: *const anyopaque, result: *anyopaque) void,
-) ?*Io.AnyFuture {
-    const t: *Threaded = @ptrCast(@alignCast(userdata));
-    // 情况一：以单线程模式编译，直接就地执行
-    if (builtin.single_threaded) {
-        start(context.ptr, result.ptr); // [!code highlight]
-        return null; // [!code highlight]
-    }
+`Io.Threaded` 会优先把任务交给线程池，但在以下情况会退化为就地执行，而不是报错：
 
-    const gpa = t.allocator;
-    // 情况二：为任务分配内存失败，退化为就地执行
-    const future = Future.create(gpa, result.len, result_alignment, context, context_alignment, start) catch |err| switch (err) {
-        error.OutOfMemory => {
-            start(context.ptr, result.ptr); // [!code highlight]
-            return null; // [!code highlight]
-        },
-    };
+- 以单线程模式编译（`builtin.single_threaded`）
+- 为任务分配内存失败
+- 正在执行任务的线程数已经达到上限 `async_limit`（默认是 CPU 核数减一，`init_single_threaded` 则是 0）
+- 线程池中没有空闲线程，并且创建新线程失败
 
-    mutexLockUncancelable(&t.mutex);
-
-    const busy_count = t.busy_count;
-
-    // 情况三：忙碌的线程数已达上限（init_single_threaded 的上限是 0），退化为就地执行
-    if (busy_count >= @backingInt(t.async_limit)) {
-        mutexUnlock(&t.mutex);
-        future.destroy(gpa);
-        start(context.ptr, result.ptr); // [!code highlight]
-        return null; // [!code highlight]
-    }
-
-    t.busy_count = busy_count + 1;
-
-    const pool_size = t.wait_group.value();
-    if (pool_size - busy_count == 0) {
-        t.wait_group.start();
-        // 情况四：线程池没有空闲线程，并且创建新线程失败，退化为就地执行
-        const thread = std.Thread.spawn(.{ .stack_size = t.stack_size }, worker, .{t}) catch {
-            // ... 恢复计数、释放 future
-            start(context.ptr, result.ptr); // [!code highlight]
-            return null; // [!code highlight]
-        };
-        thread.detach();
-    }
-
-    // 一切顺利：把任务放进运行队列，唤醒一个工作线程
-    t.run_queue.prepend(&future.runnable.node);
-
-    mutexUnlock(&t.mutex);
-    condSignal(&t.cond);
-    return @ptrCast(future);
-}
-```
-
-:::
-
-把这三段代码连起来看：
-
-1. **类型擦除**：vtable 中的函数指针必须有固定的签名，没法直接接收任意的 `function` 和 `args`。因此 `Io.async` 在编译期生成了一个 `TypeErased.start` 跳板：参数以字节切片的形式交给实现，跳板再把它们还原成参数元组，调用真正的函数，并把返回值写入 `result` 指向的位置
-2. **两种结局**：实现要么在 `vtable.async` 里就地调用 `start`，结果直接写进 `future.result` 并返回 `null`；要么把任务交给别人执行，返回一个 `*AnyFuture`，等到 `await` 时再通过 `vtable.await` 等待任务完成、取回结果
-3. **为什么 `async` 永远不会失败**：从 `Io.Threaded.async` 中可以看到，凡是无法并发的情况（单线程编译、内存不足、达到 `async_limit`、无法创建线程），它都会退化为就地执行，而不是报错。`Io.Threaded.init_single_threaded` 把 `async_limit` 设为 0，所以每次都会走到情况三；默认的 `async_limit` 则是 CPU 核数减一
-
-`io.concurrent` 走的是另一条路：`vtable.concurrent` 在无法分配并发单元时返回 `error.ConcurrencyUnavailable`，而不会退化为就地执行。这就是下一节的主题。
+这就是 `io.async` 永远不会失败、却也不保证并发的原因。`io.concurrent` 走的是另一条路：`vtable.concurrent` 在无法分配并发单元时直接返回 `error.ConcurrencyUnavailable`，而不会退化为就地执行。这就是下一节的主题。
 
 ## `concurrent`：需要真正的并发
 
