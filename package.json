@@ -22,7 +22,7 @@
     "jspdf": "^4.2.1",
     "jszip": "^3.10.2",
     "less": "^4.9.1",
-    "markdown-it": "^15.0.2",
+    "markdown-it": "^15.0.3",
     "marked": "^18.1.1",
     "prettier": "^3.9.10",
     "sharp": "^0.35.5",
