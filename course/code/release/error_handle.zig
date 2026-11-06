@@ -67,11 +67,11 @@ const ConvertEnglishToInteger = struct {
 
             // x *= radix
             var ov = @mulWithOverflow(x, radix);
-            if (ov[1] != 0) return error.OverFlow;
+            if (ov[1] != 0) return error.Overflow;
 
             // x += digit
             ov = @addWithOverflow(ov[0], digit);
-            if (ov[1] != 0) return error.OverFlow;
+            if (ov[1] != 0) return error.Overflow;
             x = ov[0];
         }
 
@@ -146,7 +146,7 @@ const PreciseErrorHandle = struct {
     fn doSomethingWithNumber(_: u64) void {}
 
     // #region PreciseErrorHandle
-    fn doAThing(str: []u8) void {
+    fn doAThing(str: []u8) !void {
         if (parseU64(str, 10)) |number| {
             doSomethingWithNumber(number);
         } else |err| switch (err) {
