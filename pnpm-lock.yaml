@@ -22,8 +22,8 @@ importers:
         specifier: ^26.6.5
         version: 26.6.5
       '@vite-pwa/vitepress':
-        specifier: ^2.0.1
-        version: 2.0.1(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))(vitepress@1.6.4(@algolia/client-search@5.59.0)(@types/node@26.6.5)(less@4.9.1)(postcss@8.5.28)(search-insights@2.17.3)(terser@5.51.2)(typescript@7.0.2))
+        specifier: ^2.0.3
+        version: 2.0.3(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))(vitepress@1.6.4(@algolia/client-search@5.59.0)(@types/node@26.6.5)(less@4.9.1)(postcss@8.5.28)(search-insights@2.17.3)(terser@5.51.2)(typescript@7.0.2))
       jspdf:
         specifier: ^4.2.1
         version: 4.2.1
@@ -1528,8 +1528,8 @@ packages:
   '@ungap/structured-clone@1.4.0':
     resolution: {integrity: sha512-1mEZtMKPM09vDmQt5y7YvmN2+DFTP7Tg0EWXdic8/C6VRnpb33e4ghisCIE3WZjsE2N8mf+QV1Zqh7ZFYLWInQ==}
 
-  '@unplugin-pwa/core@0.0.2':
-    resolution: {integrity: sha512-Uuq2R0k9dAs48MepqIklmfmeewagpy4c7OnEjN5IJQKCYIei6QGPFDKJrmwBf5wM2vyZN6Ljsffenq2iKlQNqg==}
+  '@unplugin-pwa/core@0.0.5':
+    resolution: {integrity: sha512-bbV/T6fpeXgDvfoyTtV6xJpd3midjnsx52uZBRgAjKa0HCEqYNOODdBUadnl9/Phqp9VwKfqxzFajkugjz74iw==}
     engines: {node: '>=22.14.0'}
     peerDependencies:
       '@vite-pwa/assets-generator': ^1.0.0 || ^2.0.0
@@ -1543,12 +1543,12 @@ packages:
       vite:
         optional: true
 
-  '@unplugin-pwa/inspector@0.0.2':
-    resolution: {integrity: sha512-vdBlr8JVvkiz3KhRK3rAJWYAqF3vP8PzF6wntgoC4279J7mOZah08S/AVg3IiFTAoR1GASO3JKb8SmoJdxNigQ==}
+  '@unplugin-pwa/inspector@0.0.5':
+    resolution: {integrity: sha512-Hk2MZeOvYfhTYUitPspKS+nwvTeck6F/9ZLyKjaGy1wVx8HIU69ayVHVAi01t2DzDVIdnlIaj92MuOeKxdo4wA==}
     engines: {node: '>=22.14.0'}
 
-  '@unplugin-pwa/vite@0.0.2':
-    resolution: {integrity: sha512-mZmI5dpbfLDusuqqA/KcPsqntACB7j/mrcbm4Z4MVhcMKTGXJ7/DGw40BB3LwvAFPLoYqGgQA6Reb0Dzn/hSiQ==}
+  '@unplugin-pwa/vite@0.0.5':
+    resolution: {integrity: sha512-5rgd1u6VIMmQ3F4GKLBTx09v3L/XyenMhtrkAbo6SG397zQqa8E83l/48LW14N9izsDNoQpGxIW8QGvqt9hXJQ==}
     engines: {node: '>=22.14.0'}
     peerDependencies:
       '@vite-pwa/assets-generator': ^1.0.0 || ^2.0.0
@@ -1565,8 +1565,8 @@ packages:
       vite:
         optional: true
 
-  '@vite-pwa/vitepress@2.0.1':
-    resolution: {integrity: sha512-S/tpIFx3WR7FUTZs9CkjWsoRnp/tvc/rWxYEFt12j+Kg/a4iWyWSpKTGUi2EGOXVc+nO0qJFPYkR7KHrnpTbjQ==}
+  '@vite-pwa/vitepress@2.0.3':
+    resolution: {integrity: sha512-/v5lbsIztCj9wn+ppcxFpE5wMzf0BMkvMTMEmFDdX2rjXOuGJ3byCJaiky4TaLdT8XRQRiOaiOOtCp7liXNKwQ==}
     engines: {node: '>=22.14.0'}
     peerDependencies:
       '@vite-pwa/assets-generator': ^1.0.0 || ^2.0.0
@@ -1581,8 +1581,8 @@ packages:
       rolldown:
         optional: true
 
-  '@vite-pwa/workbox-build@8.0.13':
-    resolution: {integrity: sha512-4MF4p1hc+nVfcETXFo0HGVosmRaLZgIdhxhfPbLY51gG5YZFt/sEfznwSZdnjztDSLuTWJJryuMhBXh77RsGcw==}
+  '@vite-pwa/workbox-build@8.0.15':
+    resolution: {integrity: sha512-4CjOeJ8RjHokAAss20ilrjDXlA3mFgKEXY1YEp2jCWJ81ebakZx8fpwY0TUHwe4GCHTHdeobyB8ACseLL6RtDA==}
     engines: {node: '>=22.14.0'}
     peerDependencies:
       '@rspack/core': ^1.0.0 || ^2.0.0
@@ -1602,11 +1602,11 @@ packages:
       webpack:
         optional: true
 
-  '@vite-pwa/workbox-swkit@8.0.13':
-    resolution: {integrity: sha512-MH9KKR/XNIbjCRvgy8yCGv3AHc+dHAmG+GdA6jGo+jKZsK62cdoa/MhXhwxp893Tn6NuNzUH1QJZmNIt1cmjNQ==}
+  '@vite-pwa/workbox-swkit@8.0.15':
+    resolution: {integrity: sha512-AunMF5+ye+tMiqTqektZcSHPcV0MXw7VeY/xXOiQ54fNxSWg17USW4BY8aj16Xxlz24QBIHl759xxLhkY1K/aA==}
 
-  '@vite-pwa/workbox-window@8.0.13':
-    resolution: {integrity: sha512-jb74txMXdS/laitdtIpsj/p+ersyTkHKg2dRpOv2HCB5fFoy96QKZnKQcI64Oh33Sr/kjyQNOgQ1pY/XZvD3NQ==}
+  '@vite-pwa/workbox-window@8.0.15':
+    resolution: {integrity: sha512-iA3z/yl3Jp1EXKmeLEg/KjyTdm6ZQZEM7YTI72lQv4ImuDlz7cGUu06Kafm7Un3/Pggci+RMrVwGZxoq9jkm4g==}
 
   '@vitejs/plugin-vue@5.2.4':
     resolution: {integrity: sha512-7Yx/SXSOcQq5HiiV3orevHUFn+pmMB4cgbEkDYgnkUWb0WfeQ/wa2yFv6D5ICiCQOVpjA7vYDXrC7AGO8yjDHA==}
@@ -2683,6 +2683,10 @@ packages:
 
   serialize-javascript@7.1.2:
     resolution: {integrity: sha512-GL2BWwVa6JydKO6l/ljVgjAZF4QJ3S7dWDWi53s5GZT8PJzD2fNxi67HANQGKAqPrwEpL5ba7gUBGi0Ls/sEoQ==}
+    engines: {node: '>=20.0.0'}
+
+  serialize-javascript@7.1.4:
+    resolution: {integrity: sha512-FqlEuoTq/zRmA4Lg6aOqyH3lCHbUtCB0bmHCeFniX2GBdDqMJM3FwdvEhlE5Pim1dlt2FfBdVPmUNNiGhhKqpw==}
     engines: {node: '>=20.0.0'}
 
   set-function-length@1.2.2:
@@ -4519,9 +4523,10 @@ snapshots:
 
   '@ungap/structured-clone@1.4.0': {}
 
-  '@unplugin-pwa/core@0.0.2(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))':
+  '@unplugin-pwa/core@0.0.5(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))':
     dependencies:
-      '@vite-pwa/workbox-build': 8.0.13(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))
+      '@vite-pwa/workbox-build': 8.0.15(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))
+      '@vite-pwa/workbox-window': 8.0.15
       hookable: 6.1.2
     optionalDependencies:
       vite: 6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2)
@@ -4531,16 +4536,16 @@ snapshots:
       - typescript
       - webpack
 
-  '@unplugin-pwa/inspector@0.0.2': {}
+  '@unplugin-pwa/inspector@0.0.5': {}
 
-  '@unplugin-pwa/vite@0.0.2(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))':
+  '@unplugin-pwa/vite@0.0.5(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
-      '@unplugin-pwa/core': 0.0.2(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))
-      '@unplugin-pwa/inspector': 0.0.2
-      '@vite-pwa/workbox-build': 8.0.13(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))
-      '@vite-pwa/workbox-swkit': 8.0.13
-      '@vite-pwa/workbox-window': 8.0.13
+      '@unplugin-pwa/core': 0.0.5(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))
+      '@unplugin-pwa/inspector': 0.0.5
+      '@vite-pwa/workbox-build': 8.0.15(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))
+      '@vite-pwa/workbox-swkit': 8.0.15
+      '@vite-pwa/workbox-window': 8.0.15
     optionalDependencies:
       vite: 6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2)
     transitivePeerDependencies:
@@ -4548,14 +4553,14 @@ snapshots:
       - typescript
       - webpack
 
-  '@vite-pwa/vitepress@2.0.1(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))(vitepress@1.6.4(@algolia/client-search@5.59.0)(@types/node@26.6.5)(less@4.9.1)(postcss@8.5.28)(search-insights@2.17.3)(terser@5.51.2)(typescript@7.0.2))':
+  '@vite-pwa/vitepress@2.0.3(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))(vitepress@1.6.4(@algolia/client-search@5.59.0)(@types/node@26.6.5)(less@4.9.1)(postcss@8.5.28)(search-insights@2.17.3)(terser@5.51.2)(typescript@7.0.2))':
     dependencies:
-      '@unplugin-pwa/core': 0.0.2(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))
-      '@unplugin-pwa/inspector': 0.0.2
-      '@unplugin-pwa/vite': 0.0.2(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))
-      '@vite-pwa/workbox-build': 8.0.13(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))
-      '@vite-pwa/workbox-swkit': 8.0.13
-      '@vite-pwa/workbox-window': 8.0.13
+      '@unplugin-pwa/core': 0.0.5(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))
+      '@unplugin-pwa/inspector': 0.0.5
+      '@unplugin-pwa/vite': 0.0.5(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))
+      '@vite-pwa/workbox-build': 8.0.15(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))
+      '@vite-pwa/workbox-swkit': 8.0.15
+      '@vite-pwa/workbox-window': 8.0.15
       vitepress: 1.6.4(@algolia/client-search@5.59.0)(@types/node@26.6.5)(less@4.9.1)(postcss@8.5.28)(search-insights@2.17.3)(terser@5.51.2)(typescript@7.0.2)
     transitivePeerDependencies:
       - '@rspack/core'
@@ -4563,14 +4568,14 @@ snapshots:
       - vite
       - webpack
 
-  '@vite-pwa/workbox-build@8.0.13(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))':
+  '@vite-pwa/workbox-build@8.0.15(typescript@7.0.2)(vite@6.4.3(@types/node@26.6.5)(less@4.9.1)(terser@5.51.2))':
     dependencies:
       '@jridgewell/remapping': 2.3.5
-      '@vite-pwa/workbox-swkit': 8.0.13
-      '@vite-pwa/workbox-window': 8.0.13
+      '@vite-pwa/workbox-swkit': 8.0.15
+      '@vite-pwa/workbox-window': 8.0.15
       magic-string: 1.4.5
       proper-tags: 2.0.2
-      serialize-javascript: 7.1.2
+      serialize-javascript: 7.1.4
       tinyglobby: 0.2.17
       valibot: 1.5.0(typescript@7.0.2)
       verkit: 0.5.0
@@ -4579,11 +4584,11 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@vite-pwa/workbox-swkit@8.0.13':
+  '@vite-pwa/workbox-swkit@8.0.15':
     dependencies:
       idb: 8.0.4
 
-  '@vite-pwa/workbox-window@8.0.13':
+  '@vite-pwa/workbox-window@8.0.15':
     dependencies:
       '@types/trusted-types': 2.0.7
 
@@ -5840,6 +5845,8 @@ snapshots:
   semver@7.8.5: {}
 
   serialize-javascript@7.1.2: {}
+
+  serialize-javascript@7.1.4: {}
 
   set-function-length@1.2.2:
     dependencies:
