@@ -123,7 +123,6 @@ fn addProjectExample(b: *Build, dir_name: []const u8) void {
     const sub_build = b.addSystemCommand(&.{ b.graph.zig_exe, "build" });
     sub_build.setName(b.fmt("zig build ({s}/{s})", .{ relative_path, dir_name }));
     sub_build.setCwd(b.path(b.fmt("{s}/{s}", .{ relative_path, dir_name })));
-    sub_build.stdio = .inherit;
 
     b.getInstallStep().dependOn(&sub_build.step);
 }
