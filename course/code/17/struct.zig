@@ -331,7 +331,7 @@ const BasePtr = struct {
     };
 
     fn setYBasedOnX(x: *f32, y: f32) void {
-        const point: Point = @fieldParentPtr("x", x);
+        const point: *Point = @fieldParentPtr("x", x);
         point.y = y;
     }
     // #endregion base_ptr
@@ -498,4 +498,10 @@ const reorder_struct = struct {
 
 test "packed cast" {
     try PackedCast.main();
+}
+
+test "base ptr" {
+    var point: BasePtr.Point = .{ .x = 1, .y = 0 };
+    BasePtr.setYBasedOnX(&point.x, 2);
+    try @import("std").testing.expect(point.y == 2);
 }
